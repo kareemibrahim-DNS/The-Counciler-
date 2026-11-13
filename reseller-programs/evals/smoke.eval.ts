@@ -18,9 +18,12 @@ export default defineEval({
     },
     {
       id: "price-requires-country",
-      description: "Looks up Core Seat price in AE via get_line_item_price.",
+      description:
+        "Looks up Grubtech - gOnline License [Annual] price in SA via get_line_item_price.",
       async test(t) {
-        await t.send("What is the price of Core Seat in the UAE (AE)?");
+        await t.send(
+          "What is the price of Grubtech - gOnline License [Annual] in Saudi Arabia (SA)?",
+        );
         t.succeeded();
         t.calledTool("get_line_item_price");
       },
