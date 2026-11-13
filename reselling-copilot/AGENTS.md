@@ -40,6 +40,7 @@ npm run deploy     # Partnerships only
 | `data/*.json` | Catalogue, partners, categories, policy, channel map |
 | `web/index.html` | Stand-alone page with the same data embedded |
 | `docs/ROADMAP.md` | Open tasks and which assistant picks them up |
+| `scripts/export-grok-feed.mjs` | Regenerates `../reseller-programs/feed/*.csv` (the Grok Agent SDK bot) from `data/`. Edit `data/`, never the CSVs. Only signed resellers are exported. |
 
 ## How assistants split the work
 

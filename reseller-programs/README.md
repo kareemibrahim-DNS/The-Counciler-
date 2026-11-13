@@ -16,7 +16,7 @@ Agent SDK bot that answers **only** reseller-program questions:
 | Behavior | Reseller-only; refuses off-topic |
 | Tools | `list_partners`, `list_line_items`, `get_quote_structure`, `get_line_item_price` |
 | Data | Fed from [`feed/*.csv`](feed/) → [`bot/lib/catalog.data.ts`](bot/lib/catalog.data.ts) |
-| Current feed | Foodics pipeline partners listed with commercial/ops **Not loaded** until Orbit/contract rows are pasted |
+| Current feed | 28 active resellers, 187 line items, 831 country prices from the Salesforce price book (list prices only), generated from `../reselling-copilot/data` with `npm run feed:salesforce`. Only signed resellers are included. |
 | Deploy | See [`GO_LIVE.md`](GO_LIVE.md) — you run `deploy` |
 
 ```text

@@ -12,6 +12,16 @@ Authoritative catalog = CSV files under `feed/`. Tools never invent rows outside
 
 Countries are ISO 3166-1 alpha-2. One price row per country — never reuse another country’s amount.
 
+## Salesforce feed (default)
+
+The CSVs are generated from `../reselling-copilot/data` (Salesforce list prices), so both bots share one source of truth:
+
+```bash
+npm run feed:salesforce   # regenerate feed/*.csv, then catalog.data.ts
+```
+
+Only signed, active resellers are exported. Never add cost, markup, margin or wholesale columns or notes. Edit `reselling-copilot/data` instead of the CSVs.
+
 ## Rebuild
 
 ```bash

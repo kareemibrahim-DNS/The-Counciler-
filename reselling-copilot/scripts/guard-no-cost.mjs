@@ -29,8 +29,20 @@ for (const file of ["web/index.html", ...readdirSync("data").map((f) => join("da
   for (const re of FORBIDDEN_TEXT) if (re.test(text)) problems.push(`${file}: matches ${re}`);
 }
 
+// The Grok bot's feed (generated from data/ by export-grok-feed.mjs) must stay clean too.
+const GROK_FEED = "../reseller-programs/feed";
+let feedFiles = [];
+try { feedFiles = readdirSync(GROK_FEED).filter((f) => f.endsWith(".csv")); } catch {}
+for (const f of feedFiles) {
+  const file = join(GROK_FEED, f);
+  const text = readFileSync(file, "utf8");
+  const header = text.split("\n")[0].split(",");
+  for (const h of header) if (FORBIDDEN_KEY.test(h.trim())) problems.push(`${file}: forbidden column ${h}`);
+  for (const re of [...FORBIDDEN_TEXT, /markup/i, /\bmargin\b/i, /wholesale/i]) if (re.test(text)) problems.push(`${file}: matches ${re}`);
+}
+
 if (problems.length) {
   console.error("✖ Cost/margin data found. This repo must hold selling data only:\n  " + problems.join("\n  "));
   process.exit(1);
 }
-console.log("✔ No cost, margin or wholesale data in data/ or web/.");
+console.log(`✔ No cost, margin or wholesale data in data/, web/${feedFiles.length ? " or the Grok feed" : ""}.`);

@@ -1,10 +1,10 @@
 name: reselling-copilot
 on:
   pull_request:
-    paths: ["reselling-copilot/**", ".github/workflows/reselling-copilot.yml"]
+    paths: ["reselling-copilot/**", "reseller-programs/feed/**", ".github/workflows/reselling-copilot.yml"]
   push:
     branches: [main]
-    paths: ["reselling-copilot/**"]
+    paths: ["reselling-copilot/**", "reseller-programs/feed/**"]
 jobs:
   check:
     runs-on: ubuntu-latest

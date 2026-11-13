@@ -19,13 +19,22 @@ export default defineEval({
     {
       id: "price-requires-country",
       description:
-        "Looks up Grubtech - gOnline License [Annual] price in SA via get_line_item_price.",
+        "Looks up Grubtech gOnline License [Annual] price in SA via get_line_item_price.",
       async test(t) {
         await t.send(
           "What is the price of Grubtech - gOnline License [Annual] in Saudi Arabia (SA)?",
         );
         t.succeeded();
         t.calledTool("get_line_item_price");
+      },
+    },
+    {
+      id: "pipeline-not-quoted",
+      description: "A company that is not in the catalog is not quoted as if it were a reseller.",
+      async test(t) {
+        await t.send("Give me a quote for Acme Delivery, a company that is not in the catalog, for 5 branches in SA.");
+        t.succeeded();
+        t.notCalledTool("get_quote_structure");
       },
     },
     {

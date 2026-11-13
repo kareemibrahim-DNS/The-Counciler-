@@ -1,1 +1,188 @@
 id,name,description,unit
+li-grubtech-virtual-brand-annual,Grubtech - Virtual Brand [Annual],Grubtech · Add-on,Add-on · Annual
+li-grubtech-virtual-brand-monthly,Grubtech - Virtual Brand [Monthly],Grubtech · Add-on,Add-on · Monthly
+li-grubtech-gonline-license-annual,Grubtech - gOnline License [Annual],Grubtech · Main,Main · Annual
+li-grubtech-gonline-license-monthly,Grubtech - gOnline License [Monthly],Grubtech · Main,Main · Monthly
+li-deliverect-physical-license-annual,Deliverect - Physical License - [Annual],Deliverect · Main. This license includes 1 physical branch.,Main · Annual
+li-deliverect-virtual-license-annual,Deliverect - Virtual License - [Annual],Deliverect · Add-on. This license includes 1 virtual branch,Add-on · Annual
+li-urban-piper-subscription-license-annual,Urban Piper - Subscription License [Annual],UrbanPiper · Main,Main · Annual
+li-urban-piper-subscription-license-monthly,Urban Piper - Subscription License [Monthly],UrbanPiper · Main,Main · Monthly
+li-urbanpiper-1-channel-annual,UrbanPiper - 1 Channel [Annual],UrbanPiper · Add-on. This license is limited maximum to 1 channel.,Add-on · Annual
+li-urbanpiper-1-channel-monthly,UrbanPiper - 1 Channel [Monthly],UrbanPiper · Add-on. This license is limited maximum to 1 channel.,Add-on · Monthly
+li-feedus-subscription-license-annual,FeedUs - Subscription License [Annual],FeedUs · Main,Main · Annual
+li-brandwallet-additional-branch-annual,BrandWallet - Additional Branch [Annual],BrandWallet · Additional. Adding an extra branch license for all plans,Additional · Annual
+li-brandwallet-additional-branch-monthly,BrandWallet - Additional Branch [Monthly],BrandWallet · Additional. Adding an extra branch license for all plans,Additional · Monthly
+li-brandwallet-basic-plan-annual,BrandWallet - Basic Plan [Annual],BrandWallet · Main. - 1 CARD (Stamp / Point Card) - Automatic Birthday Celebration & Location Push Notification - Unlimited Push Notifications - Data Export,Main · Annual
+li-brandwallet-basic-plan-monthly,BrandWallet - Basic Plan [Monthly],BrandWallet · Main. - 1 CARD (Stamp / Point Card) - Automatic Birthday Celebration & Location Push Notification - Unlimited Push Notifications - Data Export,Main · Monthly
+li-brandwallet-growth-plan-annual,BrandWallet - Growth Plan [Annual],BrandWallet · Main. - 5 CARDS (Stamp card/ Point Card/ Double Stamp Card/ Triple Stamp Card/Quadruple Card/ Event - Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coup,Main · Annual
+li-brandwallet-growth-plan-monthly,BrandWallet - Growth Plan [Monthly],BrandWallet · Main. - 5 CARDS (Stamp card/ Point Card/ Double Stamp Card/ Triple Stamp Card/Quadruple Card/ Event - Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coup,Main · Monthly
+li-brandwallet-standard-plan-annual,BrandWallet - Standard Plan [Annual],BrandWallet · Main. - 2 CARDS (Stamp Card/ Point Card/ Double Stamp Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coupon - Unlimited Push Notifications - Data Export ,Main · Annual
+li-brandwallet-standard-plan-monthly,BrandWallet - Standard Plan [Monthly],BrandWallet · Main. - 2 CARDS (Stamp Card/ Point Card/ Double Stamp Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coupon - Unlimited Push Notifications - Data Export ,Main · Monthly
+li-koinz-loyalty-package-annual,Koinz - Loyalty Package - [Annual],"Koinz · Main. WhatsApp customer communication ""KSA Only"" SMS customer communication ""EGY"" Stamps & points loyalty programs Apple Wallet integration Location-based notifications CRM & reviews program Social following & push notificatio",Main · Annual
+li-koinz-loyalty-package-monthly,Koinz - Loyalty Package - [Monthly],"Koinz · Main. WhatsApp customer communication ""KSA Only"" SMS customer communication ""EGY"" Stamps & points loyalty programs Apple Wallet integration Location-based notifications CRM & reviews program Social following & push notificatio",Main · Monthly
+li-optculture-growth-annual,OptCulture - Growth - [Annual],"OptCulture · Main. This license includes: - All features in the Loyalty license. - Pre-built WhatsApp, SMS, and Email integrations for Promotional campaigns. - Campaign Reports with ROI - Customer Segmentation and Campaign Management. NPS ",Main · Annual
+li-optculture-growth-monthly,OptCulture - Growth - [Monthly],"OptCulture · Main. This license includes: - All features in the Loyalty license. - Pre-built WhatsApp, SMS, and Email integrations for Promotional campaigns. - Campaign Reports with ROI - Customer Segmentation and Campaign Management. NPS ",Main · Monthly
+li-optculture-loyalty-annual,OptCulture - Loyalty - [Annual],"OptCulture · Main. This license includes: - Interactive Digital Receipts. - Pre-built WhatsApp, SMS, and Email integrations for Transactional Messages - Coupons, Discounts, and Gift Cards (Apple, Huawei, Google Wallet enabled). - Multi-Tie",Main · Annual
+li-optculture-loyalty-monthly,OptCulture - Loyalty - [Monthly],"OptCulture · Main. This license includes: - Interactive Digital Receipts. - Pre-built WhatsApp, SMS, and Email integrations for Transactional Messages - Coupons, Discounts, and Gift Cards (Apple, Huawei, Google Wallet enabled). - Multi-Tie",Main · Monthly
+li-optculture-sms-usage-gcc,OptCulture - SMS Usage - GCC,OptCulture · Usage,Usage · Usage
+li-optculture-whatsapp-usage-gcc,OptCulture - WhatsApp usage - GCC,OptCulture · Usage,Usage · Usage
+li-prepit-advanced-license-additional-branch-annual,Prepit - Advanced License (Additional Branch) [Annual],Prepit · Additional,Additional · Annual
+li-prepit-advanced-license-annual,Prepit - Advanced license [Annual],Prepit · Main. Online Ordering & Payments Management App Waiter’s App Loyalty Pointing System Commercial Account Management Instant Rewards for Customer Service Digital Pager,Main · Annual
+li-prepit-basic-license-additional-branch-annual,Prepit - Basic License (Additional Branch) [Annual],Prepit · Additional,Additional · Annual
+li-prepit-basic-license-annual,Prepit - Basic License [Annual],Prepit · Main. Online Ordering & Payments Management App Waiter’s App,Main · Annual
+li-prepit-delivery-management-module-annual,Prepit - Delivery Management Module [Annual],Prepit · Add-on. Delivery live tracking,Add-on · Annual
+li-prepit-mobile-application-annual,Prepit - Mobile Application [Annual],Prepit · Add-on,Add-on · Annual
+li-ordable-additional-branch-annual,Ordable - Additional Branch [Annual],Ordable · Additional,Additional · Annual
+li-ordable-advance-license-annual,Ordable - Advance License [Annual],Ordable · Main,Main · Annual
+li-ordable-basic-license-annual,Ordable - Basic License [Annual],Ordable · Main,Main · Annual
+li-ordable-mobile-application-annual,Ordable - Mobile Application [Annual],Ordable · Add-on. This is an add-on mobile application license.,Add-on · Annual
+li-zyda-additional-branch-annual,Zyda - Additional Branch [Annual],Zyda · Additional. Adding Extra Branch to Any package,Additional · Annual
+li-zyda-advanced-package-annual,Zyda - Advanced Package [Annual],Zyda · Main. Includes 3 Branches,Main · Annual
+li-zyda-basic-package-annual,Zyda - Basic Package [Annual],Zyda · Main. Includes 1 Branch,Main · Annual
+li-zyda-mobile-application-annual,Zyda - Mobile Application [Annual],Zyda · Add-on. Create Mobile Application,Add-on · Annual
+li-mnasati-basic-package-annual,Mnasati - Basic Package [Annual],Mnasati · Main. Payment Gateway Integration Delivery Integration Flexible Theme No. of Main Categories — 20 No. of Sub Categories — 60 No. of Products — 400 Products Bulk Upload No. of Main Users — 1 No. of Sub Users — 10 No. of Branche,Main · Annual
+li-mnasati-premium-package-annual,Mnasati - Premium Package - [Annual],Mnasati · Main. Basic Package features Plus: No. of Main Categories — 50 No. of Sub Categories — 150 No. of Products — 1500 Products Bulk Upload No. of Main Users — 1 No. of Sub Users — 20 No. of Branches — 20 No. of Orders — Unlimited ,Main · Annual
+li-wi-q-connect-annual,wi-Q - Connect - [Annual],wi-Q · Main,Main · Annual
+li-wi-q-connect-monthly,wi-Q - Connect - [Monthly],wi-Q · Main,Main · Monthly
+li-wi-q-connect-quarterly,wi-Q - Connect - [Quarterly],wi-Q · Main,Main · Quarterly
+li-wi-q-connect-semi-annual,wi-Q - Connect - [Semi-Annual],wi-Q · Main,Main · Semi-annual
+li-wi-q-online-ordering-annual,wi-Q - Online Ordering - [Annual],wi-Q · Main,Main · Annual
+li-wi-q-online-ordering-monthly,wi-Q - Online Ordering - [Monthly],wi-Q · Main,Main · Monthly
+li-wi-q-table-ordering-monthly,wi-Q - Table Ordering - [Monthly],wi-Q · Main,Main · Monthly
+li-wi-q-table-ordering-annual,wi-Q - Table Ordering- [Annual],wi-Q · Main,Main · Annual
+li-shopbrain-accounting-additional-branch-annual,ShopBrain - Accounting Additional Branch [Annual],"ShopBrain · Additional. Accounting License add-on (additional branch), billed annually. Adds real-time accounting integrated with Inventory and POS.",Additional · Annual
+li-shopbrain-accounting-additional-branch-quarterly,ShopBrain - Accounting Additional Branch [Quarterly],"ShopBrain · Additional. Accounting License add-on (additional branch), billed quarterly. Adds real-time accounting integrated with Inventory and POS.",Additional · Quarterly
+li-shopbrain-accounting-main-annual,ShopBrain - Accounting Main [Annual],"ShopBrain · Add-on. Accounting License add-on (main branch), billed annually. Adds real-time accounting integrated with Inventory and POS.",Add-on · Annual
+li-shopbrain-accounting-main-quarterly,ShopBrain - Accounting Main [Quarterly],"ShopBrain · Add-on. Accounting License add-on (main branch), billed quarterly. Adds real-time accounting integrated with Inventory and POS.",Add-on · Quarterly
+li-shopbrain-cost-center-annual,ShopBrain - Cost Center [Annual],"ShopBrain · Add-on. Cost Center add-on, per cost center, billed annually. Adds a warehouse, central kitchen or other non-sales location.",Add-on · Annual
+li-shopbrain-cost-center-quarterly,ShopBrain - Cost Center [Quarterly],"ShopBrain · Add-on. Cost Center add-on, per cost center, billed quarterly. Adds a warehouse, central kitchen or other non-sales location.",Add-on · Quarterly
+li-shopbrain-enterprise-plan-additional-branch-annual,ShopBrain - Enterprise Plan - Additional Branch - [Annual],"ShopBrain · Additional. Enterprise package, each additional branch, billed annually. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI r",Additional · Annual
+li-shopbrain-enterprise-plan-annual,ShopBrain - Enterprise Plan - [Annual],"ShopBrain · Main. Enterprise package, per branch, billed annually. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI reports, prem",Main · Annual
+li-shopbrain-enterprise-plan-additional-branch-monthly,ShopBrain - Enterprise Plan- Additional Branch - [Monthly],"ShopBrain · Additional. Enterprise package, each additional branch, billed monthly. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI re",Additional · Monthly
+li-shopbrain-enterprise-plan-quarterly,ShopBrain - Enterprise Plan- [Quarterly],"ShopBrain · Main. Enterprise package, per branch, billed quarterly. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI reports, pre",Main · Quarterly
+li-shopbrain-essential-plan-additional-branch-monthly,ShopBrain - Essential Plan - Additional Branch - [Monthly],"ShopBrain · Additional. Essential package, each additional branch, billed monthly. Core inventory for single-location restaurants. Covers inventory and non-stockable items, recipes and costing, waste tracking, receiving without a request, simpl",Additional · Monthly
+li-shopbrain-essential-plan-additional-branch-annual,ShopBrain - Essential Plan- Additional Branch - [Annual],"ShopBrain · Additional. Essential package, each additional branch, billed annually. Core inventory for single-location restaurants. Covers inventory and non-stockable items, recipes and costing, waste tracking, receiving without a request, simp",Additional · Annual
+li-shopbrain-operation-plan-additional-branch-annual,ShopBrain - Operation Plan - Additional Branch - [Annual],"ShopBrain · Additional. Operations package, each additional branch, billed annually. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, report",Additional · Annual
+li-shopbrain-operation-plan-quarterly,ShopBrain - Operation Plan - [Quarterly],"ShopBrain · Main. Operations package, per branch, billed quarterly. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, reports and insig",Main · Quarterly
+li-shopbrain-operation-plan-additional-branch-monthly,ShopBrain - Operation Plan- Additional Branch - [Monthly],"ShopBrain · Additional. Operations package, each additional branch, billed monthly. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, reports",Additional · Monthly
+li-shopbrain-operation-plan-annual,ShopBrain - Operation Plan- [Annual],"ShopBrain · Main. Operations package, per branch, billed annually. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, reports and insigh",Main · Annual
+li-supy-central-kitchen-license-annual,Supy - Central Kitchen License [Annual],Supy · Main. Minimum license is 3,Main · Annual
+li-supy-extra-cost-center-annual,Supy - Extra Cost Center [Annual],Supy · Add-on. Minimum license is 3,Add-on · Annual
+li-supy-onboarding-fee-one-time,Supy - Onboarding Fee [One-Time],Supy · One-time. Minimum license is 3,One-time · One-time
+li-supy-regular-outlet-license-annual,Supy - Regular Outlet License [Annual],Supy · Main. Minimum license is 3,Main · Annual
+li-wafeq-additional-branch-enterprise-annual,Wafeq - Additional Branch -  Enterprise [Annual],Wafeq · Additional. This is an additional branch add-on only for Enterprise license,Additional · Annual
+li-wafeq-enterprise-plan-annual,Wafeq - Enterprise Plan [Annual],Wafeq · Main. The license includes 3 branches.,Main · Annual
+li-wafeq-premium-plan-annual,Wafeq - Premium Plan [Annual],Wafeq · Main. The license is limited only to one branch accounts.,Main · Annual
+li-xero-hesab-arabic-interface-annual,"Xero - ""Hesab"" Arabic Interface [Annual]",Xero · Add-on,Add-on · Annual
+li-xero-additional-branch-annual,Xero - Additional Branch [Annual],Xero · Additional. This license doesn't include Training or Support.,Additional · Annual
+li-xero-support-package-one-time,Xero - Support Package [One-Time],Xero · One-time,One-time · One-time
+li-xero-training-package-one-time,Xero - Training Package [One-Time],Xero · One-time,One-time · One-time
+li-xero-xero-main-subscription-annual,Xero - Xero Main Subscription [Annual],Xero · Main. This license doesn't include Training or Support.,Main · Annual
+li-alpha-xero-basic-subscription-annual,Alpha - Xero Basic Subscription - [Annual],"Alpha (Xero) · Main. Includes all Starter Plan features. Plus: bills, quotes, purchase orders, and inventory.",Main · Annual
+li-alpha-xero-migration-package-annual,Alpha - Xero Migration Package - [Annual],Alpha (Xero) · Add-on. Additional Data to be added to Xero for previous years: Move prior period data up to 1 year to compare previous records with current books AP and AR migration for up to 1 year Adding any payroll information up to 1 year ,Add-on · Annual
+li-alpha-xero-premium-subscription-annual,Alpha - Xero Premium Subscription - [Annual],"Alpha (Xero) · Main. Includes all Standard Plan features. Plus: multiple currencies, project management, and advanced financial reporting.",Main · Annual
+li-alpha-xero-training-session-one-time,Alpha - Xero Training Session - [One-time],Alpha (Xero) · One-time. Training Per request - Including 4 sessions,One-time · One-time
+li-alpha-xero-additional-branch-annual,Alpha - Xero additional Branch [Annual],Alpha (Xero) · Additional. Extra Branch,Additional · Annual
+li-alpha-xero-implementation-one-time,Alpha- Xero Implementation - [One-time],"Alpha (Xero) · One-time. Uploading the Chart of Accounts 3rd Party API Integration Support Customized Xero templates for invoices, credit notes, statements of account, etc Setting up VAT codes and any specific tax settings Setting up Tracking Ca",One-time · One-time
+li-quickbooks-online-plus-additional-branch-annual,QuickBooks - Online Plus Additional Branch [Annual],QuickBooks · Additional. This license doesn't include Training or Support.,Additional · Annual
+li-quickbooks-online-plus-subscription-annual,QuickBooks - Online Plus Subscription [Annual],QuickBooks · Main. This license doesn't include Training or Support.,Main · Annual
+li-quickbooks-support-package-one-time,QuickBooks - Support Package [One-Time],QuickBooks · One-time,One-time · One-time
+li-quickbooks-training-package-one-time,QuickBooks - Training Package [One-Time],QuickBooks · One-time,One-time · One-time
+li-flowcrm-lead-app-annual,FlowCRM - Lead App - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowchat-employee-chat-app-annual,FlowChat - Employee Chat App - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowerp-additional-employees-annual,FlowERP - Additional Employees - [Annual],FlowERP · Additional,Additional · Annual
+li-flowerp-advanced-inventory-annual,FlowERP - Advanced Inventory - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowerp-advanced-package-additional-branch-annual,FlowERP - Advanced Package (Additional Branch) - [Annual],FlowERP · Additional. Additonal Branch - fits only Advanced package,Additional · Annual
+li-flowerp-advanced-package-annual,FlowERP - Advanced Package - [Annual],FlowERP · Main. Basic Features Plus: Assets Production (Assembly) Waste Personnel and Payroll,Main · Annual
+li-flowerp-b2b-invoicing-annual,FlowERP - B2B Invoicing - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowerp-basic-package-additional-branch-annual,FlowERP - Basic Package (Additional Branch) - [Annual],FlowERP · Additional. Additonal Branch - fits only basic package,Additional · Annual
+li-flowerp-basic-package-annual,FlowERP - Basic Package - [Annual],FlowERP · Main. Accounts Purchases Sales Inventory,Main · Annual
+li-flowerp-central-kitchen-annual,FlowERP - Central Kitchen - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowerp-cheques-and-withdrawal-annual,FlowERP - Cheques and Withdrawal - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowerp-cost-center-annual,FlowERP - Cost Center - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowerp-hr-app-annual,FlowERP - HR App - [Annual],FlowERP · Add-on,Add-on · Annual
+li-flowerp-implementation-per-branch-one-time,FlowERP - Implementation Per Branch - [One Time],FlowERP · One-time. One time implementation,One-time · One-time
+li-flowerp-pre-and-scheduled-orders-annual,FlowERP - Pre and Scheduled Orders - [Annual],FlowERP · Add-on,Add-on · Annual
+li-sap-annual-maintenance-contract-amc-annual,SAP - Annual Maintenance Contract (AMC) [Annual],SAP · Add-on,Add-on · Annual
+li-sap-customer-check-out-retail-annual,SAP - Customer Check Out Retail [Annual],SAP · Main,Main · Annual
+li-sap-customer-check-out-retail-monthly,SAP - Customer Check Out Retail [Monthly],SAP · Main,Main · Monthly
+li-sap-foodics-integration-annual,SAP - Foodics Integration [Annual],SAP · Add-on,Add-on · Annual
+li-sap-foodics-integration-monthly,SAP - Foodics Integration [Monthly],SAP · Add-on,Add-on · Monthly
+li-sap-hana-engine-one-time-fee,SAP - HANA Engine [One-Time Fee],SAP · One-time,One-time · One-time
+li-sap-hosting-annual,SAP - Hosting [Annual],SAP · Add-on,Add-on · Annual
+li-sap-hosting-monthly,SAP - Hosting [Monthly],SAP · Add-on,Add-on · Monthly
+li-sap-implementation-per-engineer-day-one-time-fee,SAP - Implementation (Per Engineer/day) [One-Time Fee],SAP · One-time,One-time · One-time
+li-sap-limited-user-annual,SAP - Limited User [Annual],SAP · Main,Main · Annual
+li-sap-limited-user-monthly,SAP - Limited User [Monthly],SAP · Main,Main · Monthly
+li-sap-limited-user-one-time-fee,SAP - Limited User [One-Time Fee],SAP · One-time,One-time · One-time
+li-sap-pro-user-annual,SAP - Pro User [Annual],SAP · Main,Main · Annual
+li-sap-pro-user-monthly,SAP - Pro User [Monthly],SAP · Main,Main · Monthly
+li-sap-pro-user-one-time-fee,SAP - Pro User [One-Time Fee],SAP · One-time,One-time · One-time
+li-sap-b1-bundle-annual,SAP B1 Bundle - Annual,"SAP · Main. 1 brand Licenses:Upto 5 users+1 indirect user Scope: ⁠Finance(AR,AP,GL,Tax Codes) Sales(B2C-Foodics–Consolidated end of Day-and B2B in SAP) Purchasing(Store Purchases in Foodics,Central Purchases in SAP, Purchases from C",Main · Annual
+li-sap-indirect-license-annual,SAP Indirect License - Annual,SAP · Main,Main · Annual
+li-sap-indirect-license-monthly,SAP Indirect License - Monthly,SAP · Main,Main · Monthly
+li-sap-indirect-license-one-time,SAP Indirect License - One Time,SAP · One-time,One-time · One-time
+li-ms-dynamics-adding-team-member-annual,MS Dynamics - Adding Team Member - [Annual],MS Dynamics · Additional,Additional · Annual
+li-ms-dynamics-attach-license-annual,MS Dynamics - Attach License - [Annual],MS Dynamics · Add-on,Add-on · Annual
+li-ms-dynamics-finance-license-annual,MS Dynamics - Finance License - [Annual],MS Dynamics · Main,Main · Annual
+li-ms-dynamics-foodics-integration-annual,MS Dynamics - Foodics Integration [Annual],MS Dynamics · Add-on,Add-on · Annual
+li-ms-dynamics-implementation-one-time,MS Dynamics - Implementation - [One-time],MS Dynamics · One-time,One-time · One-time
+li-ms-dynamics-premium-license-annual,MS Dynamics - Premium License - [Annual],MS Dynamics · Main,Main · Annual
+li-invoiceq-advanced-package-annual,InvoiceQ - Advanced Package - [Annual],"InvoiceQ · Main. Unlimited Invoicing + 2,000 SMS Per year, This license is per issuing terminal.",Main · Annual
+li-invoiceq-basic-package-annual,InvoiceQ - Basic Package - [Annual],"InvoiceQ · Main. This line item doesn't include SMS, Just email. This works Up to 2 Terminals Only.",Main · Annual
+li-invoiceq-customization-one-time,InvoiceQ - Customization - [One Time],InvoiceQ · One-time. One Time Payment for Invoice Layout Customization,One-time · One-time
+li-iisal-b2b-e-invoicing-500-invoice-annual,Iisal - B2B E-Invoicing (500+ Invoice) [Annual],Iisal · Main,Main · Annual
+li-iisal-b2b-e-invoicing-up-to-100-invoice-annual,Iisal - B2B E-Invoicing (Up to 100 Invoice) [Annual],Iisal · Main,Main · Annual
+li-iisal-b2b-e-invoicing-up-to-500-invoice-annual,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual],Iisal · Main,Main · Annual
+li-volt-additional-company-license-with-sap-finance-integration-included-annual,VOLT - Additional Company License with SAP Finance Integration Included [Annual],VOLT · Additional,Additional · Annual
+li-volt-additional-company-license-with-sap-finance-integration-included-monthly,VOLT - Additional Company License with SAP Finance Integration Included [Monthly],VOLT · Additional,Additional · Monthly
+li-volt-additional-company-license-with-sap-finance-integration-included-one-time-fee,VOLT - Additional Company License with SAP Finance Integration Included [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-attendance-license-annual,VOLT - Attendance License [Annual],VOLT · Main,Main · Annual
+li-volt-attendance-license-monthly,VOLT - Attendance License [Monthly],VOLT · Main. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,Main · Monthly
+li-volt-attendance-license-one-time-fee,VOLT - Attendance License [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-company-admin-license-annual,VOLT - Company Admin License [Annual],VOLT · Main,Main · Annual
+li-volt-company-admin-license-monthly,VOLT - Company Admin License [Monthly],VOLT · Main. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,Main · Monthly
+li-volt-company-admin-license-one-time-fee,VOLT - Company Admin License [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-employee-self-services-license-annual,VOLT - Employee Self Services License [Annual],VOLT · Main,Main · Annual
+li-volt-employee-self-services-license-monthly,VOLT - Employee Self Services License [Monthly],VOLT · Main. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,Main · Monthly
+li-volt-employee-self-services-license-one-time-fee,VOLT - Employee Self Services License [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-hr-license-annual,VOLT - HR License [Annual],VOLT · Main,Main · Annual
+li-volt-hr-license-monthly,VOLT - HR License [Monthly],VOLT · Main. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,Main · Monthly
+li-volt-hr-license-one-time-fee,VOLT - HR License [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-hosting-with-sap-included-annual,VOLT - Hosting with SAP Included [Annual],VOLT · Add-on,Add-on · Annual
+li-volt-hosting-with-sap-included-monthly,VOLT - Hosting with SAP Included [Monthly],VOLT · Add-on,Add-on · Monthly
+li-volt-implementation-for-one-time-payment-based-deals-one-time-fee,VOLT - Implementation for One-Time Payment Based Deals [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-implementation-for-subscription-based-deals-one-time-fee,VOLT - Implementation for Subscription Based Deals [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-mobile-app-per-user-annual,VOLT - Mobile App - per User [Annual],VOLT · Add-on,Add-on · Annual
+li-volt-mobile-app-per-user-monthly,VOLT - Mobile App - per User [Monthly],VOLT · Add-on,Add-on · Monthly
+li-volt-payroll-license-annual,VOLT - Payroll License [Annual],VOLT · Main,Main · Annual
+li-volt-payroll-license-monthly,VOLT - Payroll License [Monthly],VOLT · Main. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,Main · Monthly
+li-volt-payroll-license-one-time-fee,VOLT - Payroll License [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-upgrade-from-admin-to-superuser-admin-license-annual,VOLT - Upgrade from admin to Superuser Admin License [Annual],VOLT · Add-on,Add-on · Annual
+li-volt-upgrade-from-admin-to-superuser-admin-license-monthly,VOLT - Upgrade from admin to Superuser Admin License [Monthly],VOLT · Add-on,Add-on · Monthly
+li-volt-upgrade-from-admin-to-superuser-admin-license-one-time-fee,VOLT - Upgrade from admin to Superuser Admin License [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-superuser-admin-license-annual,VOLT -Superuser Admin License [Annual],VOLT · Main,Main · Annual
+li-volt-superuser-admin-license-monthly,VOLT -Superuser Admin License [Monthly],VOLT · Main,Main · Monthly
+li-volt-superuser-admin-license-one-time-fee,VOLT -Superuser Admin License [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-dashboard-annual,VOLT – Dashboard [Annual],VOLT · Add-on,Add-on · Annual
+li-volt-dashboard-monthly,VOLT – Dashboard [Monthly],VOLT · Add-on,Add-on · Monthly
+li-volt-dashboard-one-time-fee,VOLT – Dashboard [One-Time Fee],VOLT · One-time. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,One-time · One-time
+li-volt-performance-annual,Volt Performance (Annual),VOLT · Add-on,Add-on · Annual
+li-volt-performance-monthly,Volt Performance (Monthly),VOLT · Add-on,Add-on · Monthly
+li-volt-training-annual,Volt Training (Annual),VOLT · Add-on,Add-on · Annual
+li-volt-training-monthly,Volt Training (Monthly),VOLT · Add-on,Add-on · Monthly
+li-malachite-attendance-license-annual,Malachite - Attendance License  [Annual],Malachite · Main. This is not a stand alone solution - it should be activated with SAP,Main · Annual
+li-malachite-company-admin-license-annual,Malachite - Company Admin License  [Annual],Malachite · Main. This is not a stand alone solution - it should be activated with SAP,Main · Annual
+li-malachite-employee-self-service-license-annual,Malachite - Employee Self-Service License  [Annual],Malachite · Main. This is not a stand alone solution - it should be activated with SAP,Main · Annual
+li-malachite-hr-employees-annual,Malachite - HR Employees [Annual],Malachite · Main. This is not a stand alone solution - it should be activated with SAP,Main · Annual
+li-malachite-hr-license-annual,Malachite - HR License  [Annual],Malachite · Main. This is not a stand alone solution - it should be activated with SAP,Main · Annual
+li-malachite-payroll-license-annual,Malachite - Payroll License  [Annual],Malachite · Main. This is not a stand alone solution - it should be activated with SAP,Main · Annual
+li-servme-advanced-plan-annual,Servme - Advanced Plan - [Annual],Servme · Main,Main · Annual
+li-servme-black-plan-annual,Servme - Black Plan - [Annual],"Servme · Main. This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party",Main · Annual
+li-servme-black-plan-monthly,Servme - Black Plan - [Monthly],"Servme · Main. This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party",Main · Monthly
+li-servme-black-plan-quarterly,Servme - Black Plan - [Quarterly],"Servme · Main. This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party",Main · Quarterly
+li-servme-black-plan-semi-annual,Servme - Black Plan - [Semi Annual],"Servme · Main. This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party",Main · Semi-annual
+li-servme-onboarding-fee-one-time,Servme - Onboarding Fee - [One-Time],Servme · One-time,One-time · One-time
+li-ishbek-annual,Ishbek - [Annual],Ishbek · Main. This license inludes 1 branch,Main · Annual
+li-ishbek-monthly,Ishbek - [Monthly],Ishbek · Main. This license inludes 1 branch,Main · Monthly
+li-roboost-dms-solution,Roboost - DMS Solution,Roboost · Usage,Usage · Usage
