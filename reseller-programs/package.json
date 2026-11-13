@@ -4,8 +4,10 @@
   "type": "module",
   "description": "agent project: reseller-programs",
   "scripts": {
+    "feed": "node scripts/build-catalog.mjs",
     "check": "tsc --noEmit",
-    "dev": "agent-sdk dev"
+    "dev": "agent-sdk dev",
+    "precheck": "npm run feed"
   },
   "dependencies": {
     "@grok/agent-sdk": "^0.6.0",
