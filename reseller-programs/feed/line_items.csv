@@ -1,0 +1,5 @@
+id,name,description,unit
+li-ballurh-base,Ballurh Subscription Base,"Ballurh subscription covering up to 5 branches: Compensation Recovery, Marketing, Operations Health, Performance. VAT excluded.",branch-pack / month
+li-ballurh-extra-branch,Ballurh Extra Branch,Additional branch beyond the base pack of 5. VAT excluded.,branch / month
+li-ballurh-dispute,Ballurh Dispute Tool,"Dispute / compensation recovery tool as a split SKU. Separate price pending partner confirmation.",seat-pack / month
+li-ballurh-marketing,Ballurh Marketing Tool,"Marketing / campaign tool as a split SKU. Separate price pending partner confirmation.",seat-pack / month
