@@ -1,0 +1,480 @@
+{
+ "Grubtech": {
+  "cat": "opm",
+  "countries": "KSA, UAE, Kuwait, Jordan",
+  "slack": "#ksa-grubtech, #uae-grubtech, #kw-jo-grubtech",
+  "form": "https://share.hsforms.com/1rOFHTm1gTpepWC29FiQGzQ5c1ve",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects online ordering channels to Foodics POS and adds kitchen management and delivery dispatch in one platform. 300+ integrations.",
+  "bestFor": "Multi-brand operators and cloud kitchens that want order flow, kitchen tracking and dispatch together.",
+  "unit": "gOnline License per branch (main line). Virtual Brand add-on for each extra brand on the same branch.",
+  "edge": "Live order tracking from prep to dispatch; multi-brand, multi-location from one setup; widest integration list.",
+  "watch": "Menu sync is the most common support issue. Confirm menu setup ownership before go-live.",
+  "rules": [
+   "1 gOnline License per physical branch.",
+   "Each additional brand on a branch = 1 Virtual Brand line.",
+   "Sold Monthly or Annual."
+  ]
+ },
+ "Deliverect": {
+  "cat": "opm",
+  "countries": "KSA, UAE, Kuwait, Jordan",
+  "slack": "#ksa-deliverect, #uae-deliverect, #kw-jo-deliverect",
+  "form": "https://welcome.deliverect.com/foodics-bundle",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects online ordering channels to Foodics POS so orders and menus are managed in one place, with sales and third-party delivery analytics.",
+  "bestFor": "Brands that care most about central menu control and channel analytics.",
+  "unit": "Physical License per physical branch; Virtual License per virtual branch.",
+  "edge": "Strongest menu management with location-specific variations; real-time sales analytics across channels.",
+  "watch": "Highest price in the category. Annual only in Salesforce.",
+  "rules": [
+   "1 Physical License per physical branch (includes 1 physical branch).",
+   "1 Virtual License per virtual branch (includes 1 virtual branch).",
+   "Annual billing in Salesforce."
+  ]
+ },
+ "UrbanPiper": {
+  "cat": "opm",
+  "countries": "KSA, UAE, Egypt",
+  "slack": "#ksa-urbanpiper, #uae-urbanpiper, #egypt-urbanpiper",
+  "form": "https://tally.so/r/Xx11k4",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects online ordering channels to Foodics POS; control menus, stock availability and business data across platforms and outlets.",
+  "bestFor": "Price-sensitive merchants, and the only aggregator-management option for Egypt.",
+  "unit": "Subscription License per outlet. '1 Channel' license for merchants on a single aggregator.",
+  "edge": "Lowest entry price in KSA; real-time stock availability across outlets.",
+  "watch": "The 1 Channel line has no SAR price. It can't be quoted in KSA.",
+  "rules": [
+   "1 Subscription License per outlet.",
+   "1 Channel variant is limited to one channel and has no KSA price.",
+   "Monthly or Annual."
+  ]
+ },
+ "FeedUs": {
+  "cat": "opm",
+  "countries": "KSA only",
+  "slack": "To be confirmed",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSeHp1QSysXGWgxilSlD3mSiEgDexgPFQFAG4yUVDpGPZNI-tQ/viewform",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects HungerStation, Jahez, Mrsool and other online channels to Foodics POS; unified menu control and branch-specific provider mapping.",
+  "bestFor": "KSA merchants whose orders come from local Saudi aggregators.",
+  "unit": "Subscription License per branch.",
+  "edge": "Local-aggregator focus and branch-level provider assignments.",
+  "watch": "SAR only. Not sellable outside KSA.",
+  "rules": [
+   "1 Subscription License per branch.",
+   "Annual, SAR only."
+  ]
+ },
+ "BrandWallet": {
+  "cat": "loyalty",
+  "countries": "Global",
+  "slack": "To be confirmed",
+  "form": "https://foodics-sales.brand-wallet.com/PZQ5AqGEWaO7LyY9",
+  "ksaForm": "Yes",
+  "overview": "Digital loyalty cards (stamp, multi-stamp, point, tiered) with automated rewards, coupons, location push alerts and QR table tents.",
+  "bestFor": "Cafés and QSRs that want wallet loyalty cards live fast, in any country.",
+  "unit": "One plan for the main branch plus one Additional Branch line per extra branch.",
+  "edge": "Plans are tiered by number of cards: Basic 1, Standard 2, Growth 5.",
+  "watch": "License count must equal branch count. 6 branches = 1 plan + 5 Additional Branch.",
+  "rules": [
+   "1 Main plan (Basic / Standard / Growth) + (branches − 1) Additional Branch.",
+   "Additional Branch works with all plans.",
+   "Monthly or Annual."
+  ]
+ },
+ "Koinz": {
+  "cat": "loyalty",
+  "countries": "KSA, Egypt, UAE (no AED price)",
+  "slack": "To be confirmed",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLScSNaZ0Ih5peHu2NBRMS0U1MYnLS7CcxereCUEqdzL-xI260g/viewform",
+  "ksaForm": "Yes",
+  "overview": "Loyalty plus customer feedback, growth analytics, retargeting, and online ordering for pickup and delivery.",
+  "bestFor": "KSA or Egypt merchants who want loyalty, feedback and their own ordering in one package.",
+  "unit": "Single Loyalty Package.",
+  "edge": "WhatsApp messaging in KSA, SMS in Egypt; Apple Wallet; built-in ordering.",
+  "watch": "Priced in SAR and EGP only.",
+  "rules": [
+   "One Loyalty Package line.",
+   "WhatsApp is KSA only; SMS is Egypt only.",
+   "Monthly or Annual."
+  ]
+ },
+ "OptCulture": {
+  "cat": "loyalty",
+  "countries": "KSA, UAE (also US, India)",
+  "slack": "#ksa-optculture, #kw-jo-optculture, #uae-optculture, #egypt-optculture",
+  "form": "Not provided",
+  "ksaForm": "Yes",
+  "overview": "AI-powered loyalty and CRM: interactive digital receipts, personalized loyalty, automated campaigns, Apple and Google Wallet cards, Customer 360.",
+  "bestFor": "Mid-to-large brands that want a CRM with segmentation and automated campaigns, not just a stamp card.",
+  "unit": "Loyalty or Growth license, plus messaging billed per usage.",
+  "edge": "Growth adds pre-built WhatsApp, SMS and email promotional campaigns on top of Loyalty.",
+  "watch": "SMS and WhatsApp are charged per message on top of the license. Tell the merchant up front.",
+  "rules": [
+   "Choose Loyalty or Growth (Growth includes all Loyalty features).",
+   "Add SMS Usage and/or WhatsApp Usage lines (per message, GCC).",
+   "Monthly or Annual."
+  ]
+ },
+ "Prepit": {
+  "cat": "loyalty",
+  "countries": "Egypt (also KSA, Canada)",
+  "slack": "To be confirmed",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSf8GJb_U_N2UMV6EYvssgza4JfQRB_kCd4wiPhkjaTnc6V7vA/viewform",
+  "ksaForm": "Yes",
+  "overview": "Behavior-based loyalty rewards, automated promotions and SMS, plus online ordering, payments and a waiter app.",
+  "bestFor": "Egyptian merchants who want loyalty and ordering together.",
+  "unit": "Basic or Advanced license for the main branch + Additional Branch lines; Delivery Module and Mobile App add-ons.",
+  "edge": "Advanced adds loyalty points, commercial account management and instant rewards.",
+  "watch": "EGP only in Salesforce. Advanced and Mobile App are high-value lines.",
+  "rules": [
+   "1 Main license (Basic or Advanced) + (branches − 1) matching Additional Branch.",
+   "Additional Branch must match the main tier.",
+   "Annual, EGP only."
+  ]
+ },
+ "Ordable": {
+  "cat": "ordering",
+  "countries": "Kuwait, Bahrain, Qatar (Jordan priced)",
+  "slack": "To be confirmed",
+  "form": "Not provided",
+  "ksaForm": "Yes",
+  "overview": "0% commission online store connected to Foodics POS, with 60+ features, delivery, payment gateways and social marketing tools.",
+  "bestFor": "Kuwait merchants who want their own branded ordering store.",
+  "unit": "Basic or Advance license + Additional Branch; Mobile Application add-on.",
+  "edge": "0% commission; deep feature set; strong in Kuwait.",
+  "watch": "Priced in KWD and JOD only. No KSA or UAE price.",
+  "rules": [
+   "1 Main license (Basic / Advance) + (branches − 1) Additional Branch.",
+   "Mobile Application is an optional add-on.",
+   "Annual."
+  ]
+ },
+ "Zyda": {
+  "cat": "ordering",
+  "countries": "Global (priced KWD, AED, EGP)",
+  "slack": "To be confirmed",
+  "form": "https://mex87gdp4z7.typeform.com/to/S5JhEa0v",
+  "ksaForm": "Yes",
+  "overview": "Direct ordering website set up in 24 hours at 0% commission, with one dashboard for orders, stock, delivery and marketing.",
+  "bestFor": "Merchants in UAE, Kuwait or Egypt who want a fast, low-effort web store.",
+  "unit": "Basic includes 1 branch; Advanced includes 3 branches; Additional Branch for each extra; Mobile Application add-on.",
+  "edge": "Advanced already covers 3 branches, which is cheaper than stacking branches on Basic.",
+  "watch": "No SAR or JOD price. Can't be quoted in KSA or Jordan.",
+  "rules": [
+   "Basic = 1 branch; Advanced = 3 branches included.",
+   "Extra branches beyond what's included = Additional Branch lines.",
+   "Annual."
+  ]
+ },
+ "Mnasati": {
+  "cat": "ordering",
+  "countries": "Kuwait, Qatar, KSA (priced KWD, AED)",
+  "slack": "To be confirmed",
+  "form": "https://docs.google.com/forms/d/13UZOcC_pX0Ic14QMSvILejgq0gMpPFsrCE7l9VDmj5U/edit?ts=696e1e47",
+  "ksaForm": "Yes",
+  "overview": "Own online store live in about 24 hours; syncs menu, branches, customers and orders with Foodics.",
+  "bestFor": "Kuwait merchants who need a store fast and know their catalog size.",
+  "unit": "Basic or Premium package.",
+  "edge": "Tiered by catalog size: Premium allows 50 main and 150 sub categories, 1,500 products and bulk upload.",
+  "watch": "No SAR price in Salesforce, even though KSA is listed as a working country.",
+  "rules": [
+   "One package line (Basic or Premium) chosen by catalog size.",
+   "Annual."
+  ]
+ },
+ "wi-Q": {
+  "cat": "ordering",
+  "countries": "Priced in all six currencies",
+  "slack": "To be confirmed",
+  "form": "Not provided",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Modular ordering: Connect, Online Ordering and Table (QR) Ordering.",
+  "bestFor": "Dine-in venues that want QR table ordering, or a modular online ordering setup.",
+  "unit": "Module licenses: Connect, Online Ordering, Table Ordering.",
+  "edge": "The only partner here with QR table ordering, and the only one with Monthly, Quarterly, Semi-annual and Annual options.",
+  "watch": "Table Ordering is the highest-priced module. Quote modules separately.",
+  "rules": [
+   "Quote each module as its own line.",
+   "Connect is available Monthly, Quarterly, Semi-annual and Annual."
+  ]
+ },
+ "ShopBrain": {
+  "cat": "inventory",
+  "countries": "KSA, UAE, Egypt, Qatar",
+  "slack": "To be confirmed",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSeSgfMm0SOBlcvU56fhSTOWEJK4YQSQE6WsNnHaRUwmx5ceTg/viewform",
+  "ksaForm": "Yes",
+  "overview": "Real-time inventory with AI demand planning, a restaurant accounting module and F&B expert insights.",
+  "bestFor": "Single and multi-branch restaurants that want solid inventory at a mid price, with optional accounting.",
+  "unit": "Tier per branch: Essential, Operation or Enterprise. Main license + Additional Branch. Accounting add-on (main + additional). Cost Center per warehouse or central kitchen.",
+  "edge": "Operation adds the full PR/PO cycle; Enterprise adds advanced adjustments and COGS. The accounting add-on runs on the same POS data.",
+  "watch": "Essential has only Additional Branch lines in Salesforce, so the Essential main license is missing. Confirm before quoting Essential.",
+  "rules": [
+   "1 Main (tier) + (branches − 1) Additional Branch of the same tier.",
+   "Accounting: 1 Accounting Main + (branches − 1) Accounting Additional Branch.",
+   "Each warehouse or central kitchen = 1 Cost Center.",
+   "Annual, Quarterly, or Monthly for additional lines."
+  ]
+ },
+ "Supy": {
+  "cat": "inventory",
+  "countries": "KSA, UAE (also UK, Australia)",
+  "slack": "To be confirmed",
+  "form": "https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw",
+  "ksaForm": "Yes",
+  "overview": "Inventory, smart procurement, invoices and supplier settlements, recipe and menu engineering, and BI on Foodics sales data.",
+  "bestFor": "Groups with central kitchens that want procurement, recipe costing and supplier control.",
+  "unit": "Regular Outlet License per outlet; Central Kitchen License per central kitchen; Extra Cost Center; one-time Onboarding Fee.",
+  "edge": "Deepest procurement and recipe-costing features in the category.",
+  "watch": "Minimum 3 licenses. The onboarding fee is one-time and can't be discounted. About 2× ShopBrain Operation per outlet.",
+  "rules": [
+   "Minimum 3 licenses in total.",
+   "1 Regular Outlet per outlet; 1 Central Kitchen per central kitchen.",
+   "Add the one-time Onboarding Fee on new business.",
+   "Annual."
+  ]
+ },
+ "Wafeq": {
+  "cat": "accounting",
+  "countries": "KSA, UAE",
+  "slack": "#ksa-wafeq, #uae-wafeq",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLScDy932sEjgQ4M3BgGzsHnZ7A_O7tQDXoaS6L0e4Kd8DzDCCA/viewform",
+  "ksaForm": "Yes",
+  "overview": "Cloud accounting that syncs Foodics sales; VAT returns, invoicing and payroll.",
+  "bestFor": "Saudi and UAE merchants who want local, VAT-ready accounting.",
+  "unit": "Premium (1 branch only) or Enterprise (includes 3 branches) + Additional Branch on Enterprise only.",
+  "edge": "Local Arabic-first product; Enterprise covers 3 branches in one license.",
+  "watch": "Premium can't take extra branches. With 2+ branches, quote Enterprise.",
+  "rules": [
+   "1 branch → Premium.",
+   "2–3 branches → Enterprise.",
+   "4+ branches → Enterprise + (branches − 3) Additional Branch.",
+   "Annual."
+  ]
+ },
+ "Xero": {
+  "cat": "accounting",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Xero subscription sold directly, with an optional Hesab Arabic interface and separate training and support packages.",
+  "bestFor": "Merchants who already know Xero or need international accounting.",
+  "unit": "Main Subscription + Additional Branch; Hesab Arabic Interface add-on; Training and Support packages (one-time).",
+  "edge": "Global brand; Arabic interface available as an add-on.",
+  "watch": "Training and support are NOT included. Quote them separately if the merchant needs help.",
+  "rules": [
+   "1 Main Subscription + (branches − 1) Additional Branch.",
+   "Training and Support are separate one-time lines."
+  ]
+ },
+ "Alpha (Xero)": {
+  "cat": "accounting",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Xero delivered by implementation partner Alpha: subscription plus implementation, migration and training.",
+  "bestFor": "Merchants who want Xero fully set up for them: chart of accounts, templates, integrations.",
+  "unit": "Basic or Premium Subscription + Additional Branch; Implementation (one-time), Migration Package, Training Sessions.",
+  "edge": "Done-for-you setup and up to 1 year of historical data migration.",
+  "watch": "Don't quote Xero direct and Alpha (Xero) to the same merchant. Pick one route.",
+  "rules": [
+   "1 Subscription (Basic / Premium) + (branches − 1) Additional Branch.",
+   "Implementation is one-time and can't be discounted.",
+   "Migration and Training are optional."
+  ]
+ },
+ "QuickBooks": {
+  "cat": "accounting",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "QuickBooks Online Plus with separate training and support packages.",
+  "bestFor": "Merchants already on QuickBooks.",
+  "unit": "Online Plus Subscription + Additional Branch; Training and Support (one-time).",
+  "edge": "Familiar to many accountants.",
+  "watch": "Training and support are not included.",
+  "rules": [
+   "1 Subscription + (branches − 1) Additional Branch.",
+   "Training and Support are separate one-time lines."
+  ]
+ },
+ "FlowERP": {
+  "cat": "erp",
+  "countries": "KSA",
+  "slack": "#ksa-flowerp",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLScrAhuEzLPgQIjk01wYfdl5U4MaplE6P-5aTGBzLx4ce3_8Bw/viewform",
+  "ksaForm": "Yes",
+  "overview": "Finance and ERP that syncs Foodics sales into accounting: automated journals, inventory lifecycle, COGS, ZATCA e-invoicing.",
+  "bestFor": "KSA small and mid-size groups that need a real ERP without SAP-level cost.",
+  "unit": "Basic or Advanced Package + matching Additional Branch; Implementation per branch (one-time); add-ons (HR, Cost Center, Central Kitchen, B2B Invoicing and more).",
+  "edge": "Advanced adds assets, production (assembly), waste and payroll. Modular add-ons.",
+  "watch": "Additional Branch must match the package. Implementation is per branch.",
+  "rules": [
+   "1 Package (Basic / Advanced) + (branches − 1) Additional Branch of the SAME package.",
+   "Implementation: 1 line per branch (one-time).",
+   "Add-ons only on request."
+  ]
+ },
+ "SAP": {
+  "cat": "erp",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "SAP Business One for F&B groups: Pro and Limited users, hosting, Foodics integration, maintenance (AMC), implementation.",
+  "bestFor": "Enterprise and multi-entity groups.",
+  "unit": "Users (Pro / Limited: annual, monthly or perpetual one-time) + Hosting + Foodics Integration + AMC + Implementation per engineer-day. B1 Bundle = 1 brand, up to 5 users + 1 indirect user.",
+  "edge": "Most complete ERP; the B1 Bundle simplifies quoting for a single brand.",
+  "watch": "Many components. Use the B1 Bundle for a single brand with 5 users or fewer.",
+  "rules": [
+   "Count Pro and Limited users separately.",
+   "Always add Hosting + Foodics Integration unless the merchant self-hosts.",
+   "Implementation is quoted per engineer/day (one-time)."
+  ]
+ },
+ "MS Dynamics": {
+  "cat": "erp",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Microsoft Dynamics 365 Finance with Foodics integration.",
+  "bestFor": "Groups standardized on Microsoft.",
+  "unit": "Finance or Premium license + Attach licenses + Team Members + Foodics Integration + Implementation (one-time).",
+  "edge": "Microsoft ecosystem fit.",
+  "watch": "The Foodics Integration line is required for the POS sync.",
+  "rules": [
+   "Base license (Finance or Premium) + optional Attach and Team Member.",
+   "Add Foodics Integration and Implementation."
+  ]
+ },
+ "VOLT": {
+  "cat": "hr",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "HR, payroll, attendance and self-service suite with SAP finance integration.",
+  "bestFor": "SAP customers who need HR and payroll.",
+  "unit": "Per-module licenses (HR, Payroll, Attendance, ESS, Company Admin, Superuser, Dashboard, Mobile per user) in Annual, Monthly or One-time; Hosting with SAP; Implementation.",
+  "edge": "Native SAP finance link.",
+  "watch": "Several Monthly lines have inconsistent prices across currencies (flagged ⚠). Verify in Salesforce before quoting.",
+  "rules": [
+   "Quote per module and per user where the line says per user.",
+   "Pick one billing model (Annual, Monthly or One-time) for all modules."
+  ]
+ },
+ "Malachite": {
+  "cat": "hr",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "HR, payroll, attendance and employee self-service licenses.",
+  "bestFor": "SAP customers only.",
+  "unit": "Per-module annual licenses.",
+  "edge": "Alternative HR suite for SAP.",
+  "watch": "Not a stand-alone solution. It must be activated with SAP.",
+  "rules": [
+   "Only quote together with SAP."
+  ]
+ },
+ "InvoiceQ": {
+  "cat": "einv",
+  "countries": "KSA, Jordan",
+  "slack": "To be confirmed",
+  "form": "https://invoiceq.com/?ff_landing=26",
+  "ksaForm": "Yes",
+  "overview": "Compliant B2B and B2C e-invoicing from Foodics POS with tax-authority integration, credit and debit notes, and approval workflows.",
+  "bestFor": "KSA and Jordan merchants who need ZATCA-compliant invoicing per terminal.",
+  "unit": "Licensed per account (not per branch). Basic = email only, up to 2 terminals. Advanced = unlimited invoicing + 2,000 SMS/year, per issuing terminal. Customization one-time.",
+  "edge": "Terminal-based model fits merchants with few issuing points.",
+  "watch": "Advanced is per issuing terminal. Count terminals, not branches.",
+  "rules": [
+   "Basic: one account line covers up to 2 terminals.",
+   "Advanced: 1 line per issuing terminal.",
+   "Customization is one-time and can't be discounted."
+  ]
+ },
+ "Iisal": {
+  "cat": "einv",
+  "countries": "Global",
+  "slack": "To be confirmed",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSdmC6bQAoGYvjo-7GKIaGFhQsbp4k-VcH2tPv1xO8sScq4_Fg/viewform",
+  "ksaForm": "Yes",
+  "overview": "Digital receipts: POS transactions become compliant e-invoices sent by SMS, with sales dashboards, consumer insights and a loyalty program.",
+  "bestFor": "Merchants who want paperless SMS receipts plus customer insights.",
+  "unit": "Licensed per account (not per branch). Tier by yearly invoice volume: up to 100, up to 500, 500+.",
+  "edge": "Receipts double as a customer-data and loyalty channel. ZATCA Phase 1 and 2.",
+  "watch": "Pick the tier by invoice volume, not by branch count.",
+  "rules": [
+   "One account line, tier chosen by invoice volume."
+  ]
+ },
+ "Servme": {
+  "cat": "table",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "Servme Submission Form",
+  "ksaForm": "—",
+  "overview": "Reservations and seat management, waitlist, CRM guest profiles and booking widget.",
+  "bestFor": "Dine-in and fine-dining venues that take reservations.",
+  "unit": "Black Plan (Monthly, Quarterly, Semi-annual, Annual) or Advanced Plan (Annual) + one-time Onboarding Fee.",
+  "edge": "Only table-management partner; flexible billing frequency.",
+  "watch": "The onboarding fee is one-time and can't be discounted.",
+  "rules": [
+   "One plan line + Onboarding Fee on new business."
+  ]
+ },
+ "Ishbek": {
+  "cat": "other",
+  "countries": "Kuwait, Jordan (priced)",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "License includes 1 branch.",
+  "bestFor": "Kuwait or Jordan only.",
+  "unit": "1 license per branch.",
+  "edge": "—",
+  "watch": "Priced in KWD and JOD only.",
+  "rules": [
+   "1 license per branch."
+  ]
+ },
+ "Roboost": {
+  "cat": "other",
+  "countries": "All markets",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Delivery management system (DMS).",
+  "bestFor": "Merchants running their own delivery fleet.",
+  "unit": "Usage-priced line (very small unit price).",
+  "edge": "—",
+  "watch": "Confirm the billing unit with Partnerships before quoting.",
+  "rules": [
+   "Confirm the unit (per order or per driver) first."
+  ]
+ },
+ "Nitx": {
+  "cat": "other",
+  "countries": "—",
+  "slack": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "inactive": true,
+  "overview": "Screen management software.",
+  "bestFor": "—",
+  "unit": "Annual license.",
+  "edge": "—",
+  "watch": "Partner is DEACTIVATED. Do not quote.",
+  "rules": [
+   "Do not quote: partner deactivated."
+  ]
+ }
+}

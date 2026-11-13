@@ -1,0 +1,24 @@
+name: reselling-copilot
+on:
+  pull_request:
+    paths: ["reselling-copilot/**", ".github/workflows/reselling-copilot.yml"]
+  push:
+    branches: [main]
+    paths: ["reselling-copilot/**"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reselling-copilot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: reselling-copilot/package-lock.json
+      - run: npm ci
+      - run: npm run guard     # blocks any cost / margin data
+      - run: npm run typecheck
+      - run: npm test
