@@ -1,9 +1,16 @@
 /**
- * Reseller program catalog.
+ * Reseller program catalog — query helpers.
  *
- * Replace SAMPLE_* rows with your real partner, line-item, and country
- * price data. Tools never invent prices or partners outside this file.
+ * Authoritative rows live in feed/*.csv. Regenerate with:
+ *   npm run feed
+ * which writes bot/lib/catalog.data.ts
  */
+
+import {
+  lineItems as feedLineItems,
+  partners as feedPartners,
+  prices as feedPrices,
+} from "./catalog.data.js";
 
 export type CountryCode = string;
 
@@ -51,158 +58,9 @@ export type PublicPartner = {
   nature: string;
 };
 
-/** SAMPLE data — update before production use. */
-export const partners: Partner[] = [
-  {
-    id: "partner-dns-sa",
-    name: "DNS Gulf Resellers",
-    countries: ["SA", "BH", "KW"],
-    nature:
-      "Regional distributor with its own credit terms and local-stock fulfillment.",
-    commercial: {
-      quoteType: "Commercial",
-      billingModel: "Partner-invoiced; monthly consolidated billing",
-      paymentTerms: "Net 30 from invoice date",
-      discountPolicy: "Tiered volume discount by quarterly commit",
-      notes:
-        "Commercial quotes must use this partner's billing model and payment terms — do not reuse another partner's commercial terms.",
-    },
-    operational: {
-      quoteType: "Operational",
-      fulfillment: "Local warehouse in Riyadh; cross-border for BH/KW",
-      supportModel: "Partner L1, vendor L2/L3 via ticket",
-      sla: "Next-business-day for in-stock SKUs in SA",
-      notes:
-        "Operational quotes follow this partner's fulfillment and SLA — they differ from UAE partners.",
-    },
-  },
-  {
-    id: "partner-me-cloud",
-    name: "ME Cloud Partners",
-    countries: ["AE", "OM", "QA"],
-    nature:
-      "Cloud-first reseller; quotes are subscription-led with usage true-up.",
-    commercial: {
-      quoteType: "Commercial",
-      billingModel: "Subscription + usage true-up",
-      paymentTerms: "Net 15 prepaid for first term",
-      discountPolicy: "Fixed partner margin; no end-customer discount stack",
-      notes:
-        "Commercial structure is subscription-led. Do not quote one-time CAPEX terms for this partner.",
-    },
-    operational: {
-      quoteType: "Operational",
-      fulfillment: "Digital provisioning within 24h of PO",
-      supportModel: "Partner-managed tenant; vendor portal for escalations",
-      sla: "P1 4h response via partner queue",
-      notes:
-        "Operational structure assumes digital delivery — no physical stock.",
-    },
-  },
-  {
-    id: "partner-egypt-channel",
-    name: "Nile Channel Co.",
-    countries: ["EG"],
-    nature:
-      "Single-country channel partner; local currency and local VAT handling.",
-    commercial: {
-      quoteType: "Commercial",
-      billingModel: "Local EGP invoice with VAT",
-      paymentTerms: "Net 45",
-      discountPolicy: "Deal-registration protected margin",
-      notes:
-        "Commercial quotes must be in EGP structure; do not quote USD list as customer price.",
-    },
-    operational: {
-      quoteType: "Operational",
-      fulfillment: "Cairo DC + partner last-mile",
-      supportModel: "Arabic-first partner support desk",
-      sla: "2 business days for standard SKUs",
-      notes: "Operational coverage is Egypt-only.",
-    },
-  },
-];
-
-/** SAMPLE data — update before production use. */
-export const lineItems: LineItem[] = [
-  {
-    id: "li-core-seat",
-    name: "Core Seat",
-    description: "Named-user seat for the core product.",
-    unit: "seat / year",
-  },
-  {
-    id: "li-storage-tb",
-    name: "Storage Pack",
-    description: "Additional storage capacity pack.",
-    unit: "TB / year",
-  },
-  {
-    id: "li-premium-support",
-    name: "Premium Support",
-    description: "Premium support uplift for covered seats.",
-    unit: "seat / year",
-  },
-  {
-    id: "li-onboarding",
-    name: "Onboarding Package",
-    description: "One-time partner-led onboarding engagement.",
-    unit: "engagement",
-  },
-];
-
-/** SAMPLE data — prices are per country; never reuse across countries. */
-export const prices: CountryPrice[] = [
-  { lineItemId: "li-core-seat", country: "SA", currency: "SAR", amount: 1200 },
-  { lineItemId: "li-core-seat", country: "AE", currency: "AED", amount: 1100 },
-  { lineItemId: "li-core-seat", country: "EG", currency: "EGP", amount: 9500 },
-  { lineItemId: "li-core-seat", country: "BH", currency: "BHD", amount: 110 },
-  { lineItemId: "li-core-seat", country: "KW", currency: "KWD", amount: 95 },
-  { lineItemId: "li-core-seat", country: "OM", currency: "OMR", amount: 115 },
-  { lineItemId: "li-core-seat", country: "QA", currency: "QAR", amount: 1050 },
-
-  { lineItemId: "li-storage-tb", country: "SA", currency: "SAR", amount: 450 },
-  { lineItemId: "li-storage-tb", country: "AE", currency: "AED", amount: 420 },
-  { lineItemId: "li-storage-tb", country: "EG", currency: "EGP", amount: 3800 },
-
-  {
-    lineItemId: "li-premium-support",
-    country: "SA",
-    currency: "SAR",
-    amount: 300,
-  },
-  {
-    lineItemId: "li-premium-support",
-    country: "AE",
-    currency: "AED",
-    amount: 280,
-  },
-  {
-    lineItemId: "li-premium-support",
-    country: "EG",
-    currency: "EGP",
-    amount: 2400,
-  },
-
-  {
-    lineItemId: "li-onboarding",
-    country: "SA",
-    currency: "SAR",
-    amount: 15000,
-  },
-  {
-    lineItemId: "li-onboarding",
-    country: "AE",
-    currency: "AED",
-    amount: 14000,
-  },
-  {
-    lineItemId: "li-onboarding",
-    country: "EG",
-    currency: "EGP",
-    amount: 125000,
-  },
-];
+export const partners: Partner[] = feedPartners;
+export const lineItems: LineItem[] = feedLineItems;
+export const prices: CountryPrice[] = feedPrices;
 
 export function normalizeCountry(raw: string): string {
   return raw.trim().toUpperCase();
