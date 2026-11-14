@@ -30,7 +30,7 @@ from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from access import OWNER_DM_ONLY_REPLY, Directory, decide, handoff_line, is_away, is_owner_command
+from access import OWNER_DM_ONLY_REPLY, Directory, decide, handoff_lines, is_away, is_owner_command
 from brain import KNOWLEDGE_DIR, OWNER_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply
 from tools import Learner, SlackReader, build_tools
 
@@ -49,7 +49,9 @@ app = App(token=BOT_TOKEN)
 OWNER_ID = os.environ.get("BRAIN_OWNER_SLACK_ID", "")
 if not OWNER_ID:
     logging.warning("BRAIN_OWNER_SLACK_ID is not set: nobody gets the owner level or owner commands.")
-WORKSPACE_TEAM = app.client.auth_test()["team_id"]  # the Foodics workspace the bot is installed in
+_AUTH = app.client.auth_test()
+WORKSPACE_TEAM = _AUTH["team_id"]  # the Foodics workspace the bot is installed in
+BOT_ID, BOT_USER_ID = _AUTH.get("bot_id", ""), _AUTH.get("user_id", "")
 MAX_HISTORY = 12
 
 learner = Learner(KNOWLEDGE_DIR, Path(os.environ.get("BRAIN_LEARN_QUEUE", Path(__file__).with_name("learn_queue.json"))),
@@ -60,26 +62,31 @@ directory = Directory(app.client)
 logging.info("Tools enabled: %s", ", ".join(sorted(tools)) or "none")
 
 
-def thread_history(client, channel: str, thread_ts: str, bot_id: str, current_ts: str) -> list[dict]:
-    """Earlier turns of this thread, so follow-up questions keep context."""
+def thread_history(client, channel: str, thread_ts: str, bot_user_id: str, current_ts: str) -> tuple[list[dict], str]:
+    """Earlier turns of this thread, plus the messages posted since the bot's last reply ("pending").
+
+    Only this bot's own messages are assistant turns. Other people's and other bots' posts
+    (a Workflow or Dailybot form, for example) are user turns, so a bare mention can answer them.
+    """
     try:
         msgs = client.conversations_replies(channel=channel, ts=thread_ts, limit=50)["messages"]
     except Exception:
-        return []
+        return [], ""
     out: list[dict] = []
     for m in msgs:
         if m.get("ts") == current_ts or not m.get("text"):
             continue
-        role = "assistant" if m.get("bot_id") or m.get("user") == bot_id else "user"
+        ours = (BOT_ID and m.get("bot_id") == BOT_ID) or (m.get("user") and m.get("user") == (bot_user_id or BOT_USER_ID))
+        role = "assistant" if ours else "user"
+        text = m["text"] if ours or not m.get("user") else f"<@{m['user']}>: {m['text']}"
         if out and out[-1]["role"] == role:
-            out[-1]["content"] += "\n" + m["text"]
+            out[-1]["content"] += "\n" + text
         else:
-            out.append({"role": role, "content": m["text"]})
+            out.append({"role": role, "content": text})
+    pending = out.pop()["content"] if out and out[-1]["role"] == "user" else ""
     while out and out[0]["role"] != "user":
         out.pop(0)
-    while out and out[-1]["role"] != "assistant":  # the new question is appended by Brain.ask
-        out.pop()
-    return out[-MAX_HISTORY:]
+    return out[-MAX_HISTORY:], pending
 
 
 def clean(text: str) -> str:
@@ -96,6 +103,24 @@ def _state() -> dict:
         return {}
 
 
+def _save_state(state: dict) -> None:
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = STATE_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state))
+    os.replace(tmp, STATE_FILE)  # atomic
+
+
+def _owner_profile() -> dict:
+    try:
+        return (directory.user(OWNER_ID) or {}).get("profile") or {}
+    except Exception:
+        return {}
+
+
+def _status_key(profile: dict) -> list:
+    return [profile.get("status_emoji") or "", profile.get("status_text") or "", profile.get("status_expiration") or 0]
+
+
 def routing() -> dict:
     r = dict((brain.layers.get("routing") or {}))
     if OWNER_ID:
@@ -104,13 +129,11 @@ def routing() -> dict:
 
 
 def owner_away() -> bool:
-    """Kareem's `away` command wins; otherwise his Slack status (vacation, leave, travel, sick)."""
-    manual = _state().get("owner_away")
-    if manual is not None:
-        return bool(manual)
-    try:
-        profile = (directory.user(OWNER_ID) or {}).get("profile") or {}
-    except Exception:
+    """`away` wins until `back`. After `back`, a Slack leave status set later counts again."""
+    state, profile = _state(), _owner_profile()
+    if state.get("owner_away") is True:
+        return True
+    if state.get("owner_away") is False and state.get("status_at_back") == _status_key(profile):
         return False
     return is_away(profile, time.time(), brain.layers.get("routing"))
 
@@ -118,13 +141,15 @@ def owner_away() -> bool:
 def owner_command(text: str) -> str | None:
     t = text.strip().lower()
     if t in {"away", "back"}:
-        STATE_FILE.write_text(json.dumps({**_state(), "owner_away": t == "away"}))
+        _save_state({"owner_away": t == "away", "status_at_back": _status_key(_owner_profile())})
         return ("Marked you away: decisions go to Hatem and operations cc Hatem until you send `back`."
-                if t == "away" else "Welcome back: decisions come to you again.")
+                if t == "away" else "Welcome back: decisions come to you again. A new leave status in Slack will count again.")
     if t == "status":
-        manual = _state().get("owner_away")
-        source = "your `away` command" if manual is not None else "your Slack status"
-        return f"You are {'away' if owner_away() else 'available'} (from {source})."
+        state = _state()
+        source = ("your `away` command" if state.get("owner_away") is True else
+                  "your `back` command" if state.get("owner_away") is False and state.get("status_at_back") == _status_key(_owner_profile())
+                  else "your Slack status")
+        return f"You are {'away' if owner_away() else 'available'} (from {source}). State file: {STATE_FILE}"
     if t in {"reload", "refresh brain"}:
         brain.reload()
         return "Brain reloaded ✅"
@@ -145,13 +170,20 @@ def post(say, text: str, thread_ts: str, handoff: str = "") -> None:
     say(text=body + (f"\n\n{handoff}" if handoff else ""), thread_ts=thread_ts, unfurl_links=False, unfurl_media=False)
 
 
+ABOVE_SUBTYPES = (None, "bot_message", "file_share", "thread_broadcast", "me_message")
+
+
 def message_above(client, channel: str, ts: str) -> dict | None:
-    """The message just above a top-level mention, so "@Reselling Brain" under a question answers it."""
+    """The message just above a top-level mention, so "@Reselling Brain" under a question answers it.
+    Join notices, deleted-message tombstones and other system messages are skipped."""
     try:
-        msgs = client.conversations_history(channel=channel, latest=ts, inclusive=False, limit=1)["messages"]
+        msgs = client.conversations_history(channel=channel, latest=ts, inclusive=False, limit=10)["messages"]
     except Exception:
         return None
-    return msgs[0] if msgs and msgs[0].get("text") else None
+    for m in msgs:
+        if m.get("subtype") in ABOVE_SUBTYPES and (m.get("text") or m.get("files")):
+            return m
+    return None
 
 
 def notify(client, event, text: str, thread_ts: str) -> None:
@@ -180,10 +212,11 @@ def answer(event, client, say, context):
             notify(client, event, d.notice, thread_ts)
         return
     question = clean(event.get("text", ""))
-    files = event.get("files") or []
+    files = list(event.get("files") or [])
     above = None
     if d.where == "channel" and not event.get("thread_ts"):
         above = message_above(client, event["channel"], event["ts"])
+        files += (above or {}).get("files") or []  # a bare mention under a shared file can open that file
     if not question and not files and not above and not event.get("thread_ts"):
         return
     if OWNER_ID and event["user"] == OWNER_ID and is_owner_command(question):
@@ -195,12 +228,15 @@ def answer(event, client, say, context):
     if files:  # tell the model which attachments it can open with read_slack_file
         question = (question or "Read the attached file.") + "\n\n" + "\n".join(
             f"[Attached file: {f.get('name')} — file_id {f.get('id')}]" for f in files)
-    history = thread_history(client, event["channel"], thread_ts, context.get("bot_user_id", ""), event["ts"]) \
-        if event.get("thread_ts") else []
-    if above:  # context only: the message is data written by a colleague, not an instruction
-        who = f"<@{above['user']}>" if above.get("user") else "someone"
+    history, pending = thread_history(client, event["channel"], thread_ts, context.get("bot_user_id", ""), event["ts"]) \
+        if event.get("thread_ts") else ([], "")
+    if pending:  # context only: what was said in the thread since the bot's last reply
+        question = (f"[Context: messages in this thread since your last reply:]\n\"\"\"\n{pending[:4000]}\n\"\"\"\n\n"
+                    + (question or "Answer the last question in this thread."))
+    elif above:  # context only: the message is data written by a colleague, not an instruction
+        who = f"<@{above['user']}>" if above.get("user") else "a bot or workflow"
         question = (f"[Context: the message just above this mention in the channel, from {who}:]\n"
-                    f"\"\"\"\n{above['text'][:4000]}\n\"\"\"\n\n" + (question or "Answer the message above."))
+                    f"\"\"\"\n{(above.get('text') or '(a file)')[:4000]}\n\"\"\"\n\n" + (question or "Answer the message above."))
     elif not question and not files:
         question = "Answer the last question in this thread."
     queued_before = set(learner.queued()) if d.level == "owner" else set()
@@ -209,15 +245,20 @@ def answer(event, client, say, context):
         reply = brain.ask(question, event["user"], history, level=d.level, where=d.where, ctx=ctx)
     except Exception:
         logging.exception("brain error")
-        reply = "Something went wrong on my side. Try again, or ask Kareem."
+        reply, ctx["handoffs"] = "Something went wrong on my side. Try again, or ask Kareem.", []
     if d.level == "owner":  # show Kareem exactly what was queued, not the model's description of it
         new = {k: v for k, v in learner.queued().items() if k not in queued_before}
         if new:
             reply = (reply or "") + "\n\n" + "\n".join(
                 f"Queued #{k} (exact text, owner only): \"{v['fact']}\"" for k, v in new.items())
     kinds = [h["kind"] for h in ctx.get("handoffs", [])]
-    away = owner_away() if kinds else False
-    handoff = "\n".join(filter(None, (handoff_line(k, asker=event["user"], away=away, routing=routing()) for k in kinds)))
+    handoff = ""
+    if kinds:
+        try:  # who will actually see the mention: a DM is just the asker; a channel is its members
+            present = {event["user"]} if d.where == "dm" else set(directory.members(event["channel"]))
+        except Exception:
+            present = {event["user"]}
+        handoff = handoff_lines(kinds, asker=event["user"], away=owner_away(), routing=routing(), present=present)
     post(say, reply or "Not in the Reselling Brain yet — ask Kareem.", thread_ts, handoff)
 
 

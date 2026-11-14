@@ -265,9 +265,16 @@ MAX_TOOL_TURNS = 8
 LEVEL_RANK = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
 
 
+# Hard floors, whatever layers.yaml (a shared file) lists: tools that read private sources stay owner-only.
+TOOL_MIN_LEVEL = {"salesforce_query": "owner", "drive_search": "owner", "drive_read": "owner",
+                  "slack_read_channel": "owner", "learn": "owner", "sheets_read": "team", "read_slack_file": "team"}
+
+
 def tools_for(level: str, layers: dict, tools: dict) -> dict:
     allowed = (layers.get("levels") or {}).get(level, {}).get("tools", [])
-    return {k: v for k, v in tools.items() if k in allowed}
+    rank = LEVEL_RANK.get(level, -1)
+    return {k: v for k, v in tools.items()
+            if k in allowed and rank >= LEVEL_RANK.get(TOOL_MIN_LEVEL.get(k, "sales"), 0)}
 
 
 class Brain:
@@ -296,7 +303,8 @@ class Brain:
             level = "sales"
         capped = LEVEL_RANK.get(level, -1) < LEVEL_RANK.get(own, -1)
         # Cost and contracts only in a private DM, at the person's own level, for a cost grant.
-        cost = where == "dm" and not capped and cost_access(slack_user_id)
+        cost = (where == "dm" and not capped and cost_access(slack_user_id)
+                and LEVEL_RANK.get(level, -1) >= LEVEL_RANK["manager"])
         tools = tools_for(level, self.layers, self.all_tools)
         guide = (SALES_TOOL_GUIDE if level == "sales" else TOOL_GUIDE) if tools else ""
         system = system_prompt(level, self.layers, self.docs, where=where, capped=capped, cost=cost) + guide

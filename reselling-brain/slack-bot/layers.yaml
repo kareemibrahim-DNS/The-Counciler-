@@ -55,19 +55,20 @@ people:
 # Who the bot pulls in under a reply (code adds the @-mentions; the model never writes them):
 #   decision   (discounts, exceptions, approvals, cost, contracts) -> owner; manager when the owner is away
 #   operations (detailed solution and operations questions)        -> operations, cc owner (cc manager when away)
-# "Away" = Kareem's `away` DM command, or a Slack status with one of these emojis or words.
+# "Away" = Kareem's `away` DM command (until `back`), or a Slack status with one of these emojis or words
+# (whole words; "back from vacation" doesn't count; business travel doesn't count).
 routing:
   owner: U08DW8E5WKW
   manager: U02VD9VGNA0
   operations: U0BQKNQNF89
-  away_emojis: [":palm_tree:", ":airplane:", ":desert_island:", ":beach_with_umbrella:", ":face_with_thermometer:"]
-  away_words: [vacation, holiday, on leave, annual leave, sick, ooo, out of office, off today, agaza, إجازة, اجازة, عطلة]
+  away_emojis: [":palm_tree:", ":desert_island:", ":beach_with_umbrella:", ":face_with_thermometer:"]
+  away_words: [vacation, vacationing, holiday, on leave, annual leave, sick leave, sick, ooo, out of office, agaza, إجازة, اجازة, عطلة]
 
 # Sources the tools may read. Only sheets listed here can be opened.
 sources:
   sheets:
-    # audience: team → the team may read it. No audience → Kareem only.
-    # Trackers are owner-only (Kareem, 14 Nov 2026), so none of these has audience: team.
+    # audience: team → the team (and managers) may read it; audience: manager → managers only; none → Kareem only.
+    # Trackers are manager-level (Kareem, 14 Nov 2026): give them audience: manager, never team.
     # tickets: { id: "<spreadsheet id>", title: "TRACKER-NAME", range: "A1:Z1000" }
     # example: { id: "<spreadsheet id>", title: "<sheet title>" }
     # targets: { id: "<spreadsheet id>", title: "<sheet title>" }

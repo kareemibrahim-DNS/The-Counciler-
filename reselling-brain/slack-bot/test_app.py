@@ -22,7 +22,8 @@ CHANNELS = {"CPRIV": ({"name": "partnerships-internal", "is_private": True}, [OW
             "CSHARED": ({"name": "launch", "is_private": True, "is_ext_shared": True}, [OWNER, BOT]),
             "CGUEST": ({"name": "grubtech-onboarding", "is_private": True}, [OWNER, GUEST, BOT])}
 CALLS = []
-ABOVE = {}  # channel -> the message just above a mention
+ABOVE = {}  # channel -> messages above a mention, newest first
+REPLIES = {}  # thread ts -> thread messages
 
 
 def fake_api_call(self, api_method, **kw):
@@ -39,9 +40,10 @@ def fake_api_call(self, api_method, **kw):
     elif api_method == "conversations.members":
         data = {"members": CHANNELS[args["channel"]][1], "response_metadata": {"next_cursor": ""}}
     elif api_method == "conversations.replies":
-        data = {"messages": []}
+        data = {"messages": REPLIES.get(args.get("ts"), [])}
     elif api_method == "conversations.history":
-        data = {"messages": [ABOVE[args["channel"]]] if args.get("channel") in ABOVE else []}
+        above = ABOVE.get(args.get("channel"), [])
+        data = {"messages": above if isinstance(above, list) else [above]}
     else:
         data = {}
     return SlackResponse(client=self, http_verb="POST", api_url=api_method, req_args={}, data={"ok": True, **data},
@@ -103,7 +105,7 @@ class AppWiring(unittest.TestCase):
         for s in said:
             self.assertIs(s.get("unfurl_links"), False)
             self.assertIs(s.get("unfurl_media"), False)
-            self.assertEqual(s.get("thread_ts"), "1.1")
+            self.assertEqual(s.get("thread_ts"), event.get("thread_ts") or event["ts"])
         return said, ephemeral
 
     def level(self):
@@ -197,6 +199,79 @@ class AppWiring(unittest.TestCase):
         finally:
             USERS[OWNER].pop("profile")
             app.directory._loaded_at = float("-inf")
+
+    def test_a_bare_mention_in_a_thread_answers_the_question_posted_since_the_last_reply(self):
+        REPLIES["1.0"] = [{"ts": "1.0", "user": SALES, "text": "Which ordering platform fits a 4-brand cloud kitchen in KSA?"},
+                          {"ts": "1.1", "user": TEAM, "text": "<@UBOT>"}]
+        try:
+            said, _ = self.run_event(TEAM, "CPRIV", "<@UBOT>", thread_ts="1.0")
+        finally:
+            REPLIES.clear()
+        last = app.brain.client.calls[0]["messages"][-1]["content"]
+        self.assertIn("4-brand cloud kitchen", last)
+        self.assertEqual(len(said), 1)
+
+    def test_a_workflow_form_parent_is_a_question_not_the_bots_own_answer(self):
+        REPLIES["2.0"] = [{"ts": "2.0", "bot_id": "B_DAILYBOT", "text": "New response for the I need discount form: 12 branches"},
+                          {"ts": "2.1", "user": TEAM, "text": "<@UBOT> what's the flow?"}]
+        try:
+            self.run_event(TEAM, "CPRIV", "<@UBOT> what's the flow?", thread_ts="2.0", ts="2.1")
+        finally:
+            REPLIES.clear()
+        msgs = app.brain.client.calls[0]["messages"]
+        self.assertTrue(all(m["role"] == "user" for m in msgs))
+        self.assertIn("12 branches", msgs[-1]["content"])
+
+    def test_the_message_above_skips_join_notices_and_brings_its_file(self):
+        ABOVE["CPRIV"] = [{"subtype": "channel_join", "user": SALES, "text": "<@US> has joined the channel", "ts": "1.2"},
+                          {"subtype": "file_share", "user": SALES, "text": "quote for this merchant", "ts": "1.1",
+                           "files": [{"id": "F9", "name": "quote.pdf"}]}]
+        seen = {}
+        def spy(question, user, history=None, **kw):
+            seen.update(kw, question=question)
+            return "ok"
+        try:
+            with mock.patch.object(app.brain, "ask", spy):
+                self.run_event(TEAM, "CPRIV", "<@UBOT>")
+        finally:
+            ABOVE.clear()
+        self.assertIn("quote for this merchant", seen["question"])
+        self.assertNotIn("has joined", seen["question"])
+        self.assertEqual(seen["ctx"]["file_ids"], ["F9"])
+        args = [a for m, a in CALLS if m == "conversations.history"][0]
+        self.assertEqual((args.get("latest"), str(args.get("inclusive")).lower()), ("1.1", "false"))
+
+    def test_hand_offs_from_a_dm_say_the_person_is_not_in_the_conversation(self):
+        said, _ = self.run_event(SALES, "DS", "can I give 10%?",
+                                 [tool_call("escalate", {"kind": "decision"}), text("Use the discount form.")])
+        self.assertIn("aren't in this conversation", said[0]["text"])
+
+    def test_no_hand_off_under_an_error(self):
+        class Boom:
+            messages = None
+            def create(self, **kw):
+                raise RuntimeError("api down")
+        app.brain.client = Boom()
+        Boom.messages = app.brain.client
+        said = []
+        app.answer({"user": SALES, "channel": "DS", "channel_type": "im", "text": "hi", "ts": "1.1"},
+                   app.app.client, lambda **k: said.append(k), {"bot_user_id": BOT})
+        self.assertNotIn("➡️", said[0]["text"])
+
+    def test_back_ignores_the_current_leave_status_but_a_new_one_counts(self):
+        USERS[OWNER]["profile"] = {"status_emoji": ":palm_tree:", "status_text": "Vacation"}
+        app.directory._loaded_at = float("-inf")
+        try:
+            self.assertTrue(app.owner_away())
+            self.run_event(OWNER, "DK", "back")
+            self.assertFalse(app.owner_away(), "back wins over the same status")
+            USERS[OWNER]["profile"] = {"status_emoji": ":palm_tree:", "status_text": "Vacation again"}
+            app.directory._loaded_at = float("-inf")
+            self.assertTrue(app.owner_away(), "a new leave status counts again")
+        finally:
+            USERS[OWNER].pop("profile")
+            app.directory._loaded_at = float("-inf")
+            app._save_state({})
 
     def test_kareem_sees_the_exact_queued_fact_not_the_models_summary(self):
         script = [tool_call("learn", {"fact": "Grubtech markup is 42%"}), text("I queued a harmless SLA note.")]

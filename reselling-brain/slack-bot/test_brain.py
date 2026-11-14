@@ -656,6 +656,17 @@ class EscalationTest(unittest.TestCase):
         self.assertEqual(self.line("decision", "UH", True), "")
         self.assertEqual(self.line("operations", "UA", False), "➡️ Operational details: <@UK>")
 
+    def test_away_words_are_whole_words_and_back_or_travel_does_not_count(self):
+        for text_ in ["Back from vacation", "Sickness check-in", "Holidays planning", "✈️ Riyadh trip"]:
+            self.assertFalse(access.is_away({"status_text": text_}, 0), text_)
+        self.assertFalse(access.is_away({"status_emoji": ":airplane:"}, 0))
+        for text_ in ["On leave", "Vacationing", "OOO till Sunday", "sick leave"]:
+            self.assertTrue(access.is_away({"status_text": text_}, 0), text_)
+
+    def test_both_kinds_never_mention_anyone_twice(self):
+        out = access.handoff_lines(["operations", "decision"], asker="US", away=False, routing=self.R)
+        self.assertEqual(out, "➡️ Decision needed: <@UK>\n➡️ Operational details: <@UA>")
+
     def test_away_from_slack_status(self):
         self.assertTrue(access.is_away({"status_emoji": ":palm_tree:"}, 100))
         self.assertTrue(access.is_away({"status_text": "Annual leave until Sunday"}, 100))
@@ -678,6 +689,53 @@ class EscalationTest(unittest.TestCase):
         layers = brain.load_layers()
         for level, cfg in layers["levels"].items():
             self.assertIn("escalate", cfg["tools"], level)
+
+
+class HardLimitsTest(unittest.TestCase):
+    def test_private_source_tools_never_go_below_their_floor(self):
+        layers = {"levels": {"sales": {"tools": ["brain_catalog", "escalate", "slack_read_channel", "drive_read",
+                                                   "salesforce_query", "learn", "sheets_read", "read_slack_file"]}}}
+        tmap = {k: {} for k in layers["levels"]["sales"]["tools"]}
+        self.assertEqual(sorted(brain.tools_for("sales", layers, tmap)), ["brain_catalog", "escalate"])
+
+    def test_cost_grant_needs_a_dm_and_manager_rank_inside_brain_ask(self):
+        docs = [brain.Doc("cost-prices", "cost", "COST-30"), brain.Doc("cycles", "manager", "CYCLES"),
+                brain.Doc("how", "base", "BASE")]
+        layers = {"default_level": "sales", "people": {"UH": {"level": "manager"}, "US": {"level": "sales"}},
+                  "levels": {"manager": {"sees": ["manager", "team", "base"], "tools": []},
+                             "sales": {"sees": ["sales", "base"], "tools": []}}}
+
+        def system(user, **kw):
+            b = brain.Brain(client=FakeClaude([text("ok")]), tools={})
+            b.layers, b.docs = layers, docs
+            with mock.patch.dict(os.environ, {"BRAIN_COST_SLACK_IDS": "UH,US"}):
+                b.ask("q", user, **kw)
+            return b.client.calls[0]["system"][0]["text"]
+        self.assertIn("COST-30", system("UH"))
+        self.assertNotIn("COST-30", system("UH", where="channel"))
+        self.assertNotIn("COST-30", system("UH", level="team"))
+        dm_sales = system("US")
+        self.assertNotIn("COST-30", dm_sales)
+        self.assertIn("locked at this level", dm_sales, "the lock line stays for a grant below manager")
+
+    def test_team_cannot_be_taught_contracts_targets_or_strategy(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            lr = tools.Learner(d, d / "q.json", owner_file=d / "o.md")
+            for fact in ["Supy contract is now signed", "Q1 target is 2M", "New strategy: bundles", "Grubtech commission 5%"]:
+                pid = pid_of(lr.propose(fact))
+                self.assertIn("not shared", lr.approve(pid, "team"), fact)
+            self.assertFalse((d / "10-learned-team.md").exists())
+
+    def test_managers_read_manager_sheets_and_team_does_not(self):
+        allow = {"trackers": {"id": "x", "audience": "manager"}, "tickets": {"id": "y", "audience": "team"}}
+        with self.assertRaisesRegex(ValueError, "restricted"):
+            tools.sheets_read("trackers", None, allow, "team")
+        with self.assertRaisesRegex(ValueError, "restricted"):
+            tools.sheets_read("tickets", None, allow, "sales")
+        with mock.patch.object(tools, "_google", side_effect=RuntimeError("no google in tests")):
+            with self.assertRaisesRegex(RuntimeError, "no google"):
+                tools.sheets_read("trackers", None, allow, "manager")
 
 
 class SlackReadLimits(unittest.TestCase):

@@ -38,7 +38,7 @@ The owner and the cost grant come only from Railway secrets. A line in `layers.y
 
 ### Triggers: when the bot answers
 - A **DM** to the bot.
-- An **@mention** in an internal channel. The bot reads the message just above the mention (or the thread it is in), so `@Reselling Brain` under a question answers that question. Without a mention it never answers in a channel.
+- An **@mention** in an internal channel. Under a top-level message, the bot reads the message just above the mention (skipping join notices; a Workflow or Dailybot post counts, and so does a shared file). In a thread, it reads the messages posted since its last reply. So `@Reselling Brain` under a question answers that question. Without a mention it never answers in a channel.
 
 ### Hand-offs: who gets pulled in
 When a question needs a person, the bot explains the flow to follow and adds the right person under its reply. The @-mentions are added by code from `routing` in `layers.yaml`; the model can't write them.
@@ -47,7 +47,9 @@ When a question needs a person, the bot explains the flow to follow and adds the
 | Decision (discounts, exceptions, approvals, cost, contracts) | @Kareem | @Hatem |
 | Operational detail (solution, onboarding, activation, integration, tickets) | @Althurayyaa · cc @Kareem | @Althurayyaa · cc @Hatem |
 
-"Away" means Kareem sent `away` to the bot in a DM (until `back`), or his Slack status shows leave, travel or sickness (🌴 ✈️ 🏝️ 🤒, or words such as vacation, leave, OOO, إجازة). Nobody is pulled in for their own question.
+"Away" means Kareem sent `away` to the bot in a DM (until `back`), or his Slack status shows leave or sickness (🌴 🏝️ 🏖️ 🤒, or whole words such as vacation, on leave, OOO, إجازة; "back from vacation" and business travel don't count). After `back`, a new leave status counts again. Nobody is pulled in for their own question, and nobody is mentioned twice.
+
+A mention only notifies people who are in the conversation. In a DM, or a channel the person isn't in, the line says so and tells the asker to message them or post in #reseller-hub. (The bot never posts outside the thread it was asked in.)
 
 ### Who reads the reply decides the level (`slack-bot/access.py`)
 | Where | Answer level |
@@ -93,7 +95,7 @@ Which level gets which tool is set in `layers.yaml` (we finalize it when we defi
 ### Teaching the bot (Kareem only, in a DM)
 Tell it a new or corrected rule. It queues it as owner-only, and the bot adds the exact stored text and id under its reply (so you never approve the model's paraphrase). Then send:
 - `approve <id>` → kept for you only (owner level), live immediately
-- `approve <id> team` → shared with the team, live immediately. Facts about cost, margin, markup, wholesale, payout or commission are refused and stay pending
+- `approve <id> team` → shared with the team, live immediately. Facts about cost, margin, markup, commission, contracts, targets or strategy are refused and stay pending
 - `reject <id>` → dropped
 - `pending` → list what's waiting
 - `reload` → re-read the knowledge files
@@ -103,19 +105,19 @@ Tell it a new or corrected rule. It queues it as owner-only, and the bot adds th
 These commands work only in your DM with the bot. In a channel it tells you privately to DM it.
 
 ### Tests
-`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 86 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 98 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 
 ### Deploy on Railway (recommended)
 1. railway.app → sign in with GitHub → **New Project → Deploy from GitHub repo** → `The-Counciler-`.
 2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `claude/reselling-copilot` until PR #5 is merged, then `main`. Railway reads `railway.json` and builds the `Dockerfile` (the build runs the offline tests and fails if they don't pass).
-3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add Salesforce/Google variables later; each tool turns on only when its variables exist.
+3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). The service has a volume at `/data` for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`. Add Salesforce/Google variables later; each tool turns on only when its variables exist.
 4. Deploy. The log shows `Tools enabled: …` and `⚡️ Bolt app is running!`.
 
-Note: approved facts are written inside the running container and are lost on the next deploy.
+Note: owner facts and the learn queue live on the `/data` volume and survive deploys. Team facts are written inside the container and are lost on the next deploy.
 - Team facts (`approve <id> team`, in `knowledge/10-learned-team.md`): copy them into the right team file in `knowledge/` with a PR.
-- Owner facts (`approve <id>`, in `slack-bot/learned_owner.md`, outside `knowledge/`): add them to the `BRAIN_OWNER_KNOWLEDGE_B64` secret. **Never commit them.** Both files are in `.gitignore` and `.dockerignore`.
+- Owner facts (`approve <id>`, in `/data/learned_owner.md` on Railway, `slack-bot/learned_owner.md` locally, never in `knowledge/`): add them to the `BRAIN_OWNER_KNOWLEDGE_B64` secret when you want them permanent. **Never commit them.** The local files are in `.gitignore` and `.dockerignore`. Facts about cost, margin, markup, commission, contracts, targets or strategy can't be shared with the team.
 
 ## What the bot will never do
 - Answer a partner, a guest or a user from another workspace, in a DM or anywhere else.

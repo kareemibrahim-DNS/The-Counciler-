@@ -78,17 +78,18 @@ def knowledge_markdown() -> str:
         body = re.sub(r"\n## When the answer needs a person or a flow\n.*?(?=\n## |\Z)", "\n", d.body, flags=re.S)
         for tool_text, skill_text in SKILL_WORDING:
             body = body.replace(tool_text, skill_text)
-        if "brain_catalog" in body or "escalate" in body:
+        if "`brain_catalog`" in body or "`escalate`" in body:
             raise ValueError(f"{d.id}: tool wording left for the skill; add it to SKILL_WORDING")
         parts += [body.strip(), ""]
     return "\n".join(parts)
 
 
 def build(skill_dir: Path = SKILL_DIR, zip_dir: Path | None = None) -> Path:
+    catalog, knowledge = catalog_markdown(tools.Catalog()), knowledge_markdown()  # build both before writing either
     ref = skill_dir / "references" / "catalog.md"
     ref.parent.mkdir(parents=True, exist_ok=True)
-    ref.write_text(catalog_markdown(tools.Catalog()), encoding="utf-8")
-    (skill_dir / "references" / "knowledge.md").write_text(knowledge_markdown(), encoding="utf-8")
+    ref.write_text(catalog, encoding="utf-8")
+    (skill_dir / "references" / "knowledge.md").write_text(knowledge, encoding="utf-8")
     if zip_dir:
         out = Path(zip_dir) / f"{skill_dir.name}.zip"
         with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:

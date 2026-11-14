@@ -104,12 +104,18 @@ def _google(service: str, version: str):
     return build(service, version, credentials=creds, cache_discovery=False)
 
 
+SHEET_AUDIENCES = {"owner": None, "manager": ("team", "manager"), "team": ("team",)}
+
+
 def sheets_read(sheet: str, range: str | None, allowlist: dict, level: str = "team") -> str:
     if sheet not in allowlist:
         raise ValueError(f"Sheet '{sheet}' is not on the allowed list: {sorted(allowlist)}")
     cfg = allowlist[sheet]
-    # Fail closed: a sheet without audience: team is owner-only.
-    if level != "owner" and cfg.get("audience") != "team":
+    # Fail closed: a sheet without an audience is owner-only; levels below team read nothing.
+    if level not in SHEET_AUDIENCES:
+        raise ValueError(f"Sheet '{sheet}' is restricted. Ask Kareem.")
+    ok = SHEET_AUDIENCES[level]
+    if ok is not None and cfg.get("audience") not in ok:
         raise ValueError(f"Sheet '{sheet}' is restricted. Ask Kareem.")
     rng = range or cfg.get("range", "A1:Z500")
     vals = _google("sheets", "v4").spreadsheets().values().get(spreadsheetId=cfg["id"], range=rng).execute().get("values", [])
@@ -199,7 +205,8 @@ class Learner:
     def _save(self, q: dict) -> None:
         self.queue_file.write_text(json.dumps(q, ensure_ascii=False, indent=1))
 
-    OWNER_ONLY_WORDS = re.compile(r"\b(costs?|cost[- ]price|wholesale|margins?|mark-?ups?|payouts?|commissions?|buy[- ]price)\b", re.I)
+    OWNER_ONLY_WORDS = re.compile(r"\b(costs?|cost[- ]price|wholesale|margins?|mark-?ups?|payouts?|commissions?|buy[- ]price|"
+                                  r"contracts?|agreements?|negotiat\w*|targets?|kpis?|strateg\w*|exclusiv\w*)\b", re.I)
 
     def queued(self) -> dict:
         return self._load()
@@ -222,8 +229,9 @@ class Learner:
         if not item:
             return f"No pending item #{pid}."
         if audience == "team" and self.OWNER_ONLY_WORDS.search(item["fact"]):
-            return (f"#{pid} is still pending and was not shared: facts about cost, margin, markup, wholesale, "
-                    f"payout or commission are owner-only. Send `approve {pid}` to keep it for yourself, or `reject {pid}`.")
+            return (f"#{pid} is still pending and was not shared: facts about cost, margin, markup, commission, "
+                    f"contracts, targets or strategy can't go to the team. Send `approve {pid}` to keep it for yourself, "
+                    f"or `reject {pid}`.")
         if audience == "team":
             path = self.knowledge_dir / "10-learned-team.md"
             header = "---\nid: learned-team\naudience: team\n---\n# Learned from Kareem\n"
@@ -355,8 +363,8 @@ def escalate(kind: str, reason: str = "", ctx: dict | None = None) -> str:
         ctx.setdefault("handoffs", [])
         if not any(h["kind"] == kind for h in ctx["handoffs"]):
             ctx["handoffs"].append({"kind": kind, "reason": (reason or "")[:300]})
-    return ("Noted. The right person will be added to your reply automatically. Do not write any @-mention yourself. "
-            "Tell the asker which flow to follow to get a correct result.")
+    return ("Noted. The bot names the right person under your reply. Do not write any @-mention yourself, "
+            "and don't promise that they were notified. Tell the asker which flow to follow to get a correct result.")
 
 
 # ---------- registry ----------

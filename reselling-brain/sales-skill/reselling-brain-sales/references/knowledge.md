@@ -95,6 +95,7 @@ Use the category section in references/catalog.md for a side-by-side (best for, 
 1. Pick the partner that fits the merchant (the category section in references/catalog.md shows the side-by-side).
 2. Build the quote from the list prices and the partner's quote structure.
 3. Submit the deal or lead with that partner's submission form (see references/catalog.md). Partnerships takes it from there.
+- **UrbanPiper:** unified billing is still being set up. Its form is for lead referrals only: send closed UrbanPiper deals to Partnerships in #reseller-hub.
 
 ## Requests: use the flow, don't improvise
 All requests go to **#reseller-hub** on Slack, one Workflow Builder form per request type:
@@ -102,7 +103,10 @@ All requests go to **#reseller-hub** on Slack, one Workflow Builder form per req
 - **Refund** → the "i need refund" form.
 - **Cancellation** → the "i need cancellation" form.
 - **Anything else** (a question or an exception) → post it in #reseller-hub.
-Partnerships reviews and approves every request. Response time: 48 working hours for usual cases, 24 for urgent ones. Never promise a discount, refund or exception to a merchant before it is approved.
+Partnerships reviews and approves every request and replies in the thread. Never promise a discount, refund or exception to a merchant before it is approved.
+
+## Renewals
+- If a merchant won't renew, the account owner must tell Partnerships **before the renewal date**. The Salesforce alert is only a signal, not the flag.
 
 ## Blocked accounts
 - MP block requests come only through **#mp-block-requests**.
