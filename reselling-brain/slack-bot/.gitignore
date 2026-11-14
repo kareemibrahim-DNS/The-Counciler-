@@ -3,3 +3,4 @@ learn_queue.json
 __pycache__/
 *.pyc
 .venv/
+learned_owner.md

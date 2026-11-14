@@ -5,6 +5,11 @@
 #   sales : Sales and Account Managers, and ANYONE not listed below. Only three things:
 #           available resellers, list prices, and each partner's commercial (quote) structure.
 # Deny by default: a person not listed in `people` gets the sales layer.
+# The owner is whoever the BRAIN_OWNER_SLACK_ID secret names. An `owner` entry here alone gives sales.
+# Who READS the reply also counts (slack-bot/access.py):
+#   - partners, guests and other workspaces get nothing;
+#   - owner answers only happen in Kareem's DM;
+#   - a channel reply is written for the least-privileged channel member, never above team.
 default_level: sales
 
 levels:
@@ -14,20 +19,22 @@ levels:
     instructions: "This is Kareem. Full detail, including pricing, targets and strategy."
   team:
     sees: [team]
-    # Salesforce, Drive and learn stay owner-only until the layers are agreed.
-    tools: [brain_catalog, sheets_read, slack_read_channel, read_slack_file]
+    # Salesforce, Drive, Slack channel reading and learn stay owner-only.
+    # read_slack_file opens only files attached to the asker's own message.
+    tools: [brain_catalog, sheets_read, read_slack_file]
     instructions: "Partnerships team member or manager. Policy, rules, SLAs, processes and the catalogue. No partner contacts, trackers, contract status, pricing/markups, targets or strategy."
   sales:
     sees: [sales]
     tools: [brain_catalog]
     instructions: "Sales or Account Manager. Only available resellers, list prices and commercial structure. Nothing else."
 
-# Channels partners can read. The bot never answers there (it asks people to DM it instead).
-# Slack Connect channels and users from another workspace are always blocked.
+# Channels partners can read. The bot never answers there (it tells only the asker, privately).
+# Slack Connect channels, channels with a guest or an outside member, and users from another
+# workspace are always blocked, whatever the channel name.
 blocked_channels:
   - "^(ksa|uae|egypt|kw-jo|kw|jo|eg)-"   # per-partner country channels, e.g. ksa-grubtech
   - "^foodics-"                         # shared channels, e.g. foodics-urbanpiper
-# Internal channels that match a pattern above but have no partner members can be allowed here.
+# Internal channels that match a pattern above can be allowed here (the member check still applies).
 allowed_channels: []
 
 # Map Slack user IDs to a level. Add Kareem's Slack ID (owner) and each Partnerships team member (team).
@@ -41,7 +48,8 @@ people:
 sources:
   sheets:
     # audience: team → the team may read it. No audience → Kareem only.
-    # tickets: { id: "<spreadsheet id>", title: "TRACKER-NAME", range: "A1:Z1000", audience: team }
+    # Trackers are owner-only (Kareem, 14 Nov 2026), so none of these has audience: team.
+    # tickets: { id: "<spreadsheet id>", title: "TRACKER-NAME", range: "A1:Z1000" }
     # example: { id: "<spreadsheet id>", title: "<sheet title>" }
     # targets: { id: "<spreadsheet id>", title: "<sheet title>" }
   drive_folders:

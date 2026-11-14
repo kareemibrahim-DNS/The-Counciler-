@@ -6,3 +6,7 @@ dist/
 .env.*
 !.env.example
 .DS_Store
+
+# Reselling Brain: facts the bot learns at runtime never go into git
+reselling-brain/knowledge/10-learned-team.md
+reselling-brain/slack-bot/learned_owner.md

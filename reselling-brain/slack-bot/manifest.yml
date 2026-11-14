@@ -22,6 +22,7 @@ oauth_config:
       - files:read
       - channels:read
       - groups:read
+      - users:read        # to tell guests and other workspaces apart; the bot answers nobody without it
 settings:
   event_subscriptions:
     bot_events:

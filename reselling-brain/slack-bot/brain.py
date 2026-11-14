@@ -14,6 +14,9 @@ import anthropic
 import yaml
 
 KNOWLEDGE_DIR = Path(os.environ.get("BRAIN_KNOWLEDGE_DIR", Path(__file__).resolve().parent.parent / "knowledge"))
+CATALOG_DIR = Path(os.environ.get("BRAIN_CATALOG_DIR", Path(__file__).resolve().parent.parent / "catalog"))
+# Facts Kareem approves as owner-only are kept OUT of knowledge/ (and out of git and the image).
+OWNER_LEARNED_FILE = Path(os.environ.get("BRAIN_OWNER_LEARNED_FILE", Path(__file__).resolve().parent / "learned_owner.md"))
 LAYERS_FILE = Path(os.environ.get("BRAIN_LAYERS_FILE", Path(__file__).resolve().parent / "layers.yaml"))
 MODEL = os.environ.get("BRAIN_MODEL", "claude-sonnet-5-5")
 MAX_TOKENS = int(os.environ.get("BRAIN_MAX_TOKENS", "1500"))
@@ -43,7 +46,16 @@ def owner_docs_from_env(value: str | None = None) -> list[Doc]:
     return [Doc(id=str(i["id"]), audience="owner", body=str(i["body"]).strip()) for i in items if i.get("id") and i.get("body")]
 
 
-def load_docs(folder: Path = KNOWLEDGE_DIR) -> list[Doc]:
+def owner_docs_from_file(path: Path = OWNER_LEARNED_FILE) -> list[Doc]:
+    """Facts Kareem approved as owner-only with `approve <id>`. Always audience owner."""
+    if not path.exists():
+        return []
+    body = _FRONT.sub("", path.read_text(encoding="utf-8")).strip()
+    return [Doc(id="learned-owner", audience="owner", body=body)] if body else []
+
+
+def load_docs(folder: Path = KNOWLEDGE_DIR, private: bool = True) -> list[Doc]:
+    """The shared knowledge files, plus (private=True) the owner secret and owner-learned facts."""
     docs = []
     for path in sorted(folder.glob("*.md")):
         text = path.read_text(encoding="utf-8")
@@ -54,7 +66,7 @@ def load_docs(folder: Path = KNOWLEDGE_DIR) -> list[Doc]:
             body = text[m.end():]
         # Fail closed: a file with no audience tag is treated as owner-only.
         docs.append(Doc(id=str(meta.get("id", path.stem)), audience=str(meta.get("audience", "owner")), body=body.strip()))
-    return docs + owner_docs_from_env()
+    return docs + (owner_docs_from_env() + owner_docs_from_file() if private else [])
 
 
 def load_layers(path: Path = LAYERS_FILE) -> dict:
@@ -66,8 +78,6 @@ def load_layers(path: Path = LAYERS_FILE) -> dict:
 
 
 DEFAULT_BLOCKED_CHANNELS = [r"^(ksa|uae|egypt|kw-jo|kw|jo|eg)-", r"^foodics-"]
-PARTNER_SPACE_REPLY = ("I don't answer in channels that partners can read. "
-                       "Please DM me, or ask in an internal Foodics channel.")
 
 
 def partner_space(*, channel_name: str | None, is_shared: bool, is_im: bool, user_team: str | None,
@@ -91,27 +101,81 @@ def partner_space(*, channel_name: str | None, is_shared: bool, is_im: bool, use
     return any(re.search(p, name) for p in patterns)
 
 
-def level_for(slack_user_id: str, layers: dict) -> str:
+def level_for(slack_user_id: str, layers: dict, owner_id: str | None = None) -> str:
+    """The asker's own level. Deny by default: anyone not listed gets the most limited layer.
+
+    The owner is whoever BRAIN_OWNER_SLACK_ID (a Railway secret) names. An `owner` entry in
+    layers.yaml, which lives in the shared repo, is not enough on its own: it becomes sales.
+    """
+    owner_id = os.environ.get("BRAIN_OWNER_SLACK_ID", "") if owner_id is None else owner_id
+    if slack_user_id and owner_id and slack_user_id == owner_id:
+        return "owner"
     people = layers.get("people") or {}
-    # Deny by default: anyone not listed gets the most limited layer.
-    return str((people.get(slack_user_id) or {}).get("level", layers.get("default_level", "sales")))
+    level = str((people.get(slack_user_id) or {}).get("level", layers.get("default_level", "sales")))
+    return "sales" if level == "owner" else level
 
 
 def visible_docs(level: str, layers: dict, docs: list[Doc]) -> list[Doc]:
     sees = set((layers.get("levels") or {}).get(level, {}).get("sees", ["sales"]))
-    return [d for d in docs if d.audience in sees]
+    # Owner material is owner-only whatever layers.yaml says.
+    return [d for d in docs if d.audience in sees and (d.audience != "owner" or level == "owner")]
 
 
-def system_prompt(level: str, layers: dict, docs: list[Doc]) -> str:
+WHERE_NOTES = {
+    "dm": "You are answering in a private DM with this person.",
+    "channel": ("Your reply will be posted in a Slack channel thread that other people can read. "
+                "Answer only at this level, whatever the asker's own access is."),
+}
+
+
+def system_prompt(level: str, layers: dict, docs: list[Doc], where: str = "dm", capped: bool = False) -> str:
     parts = [f"<knowledge id=\"{d.id}\">\n{d.body}\n</knowledge>" for d in visible_docs(level, layers, docs)]
     level_note = (layers.get("levels") or {}).get(level, {}).get("instructions", "")
-    footer = f"\n\nThe person asking is at level: {level}.\n{level_note}".rstrip()
+    footer = f"\n\nThe answer is at level: {level}.\n{level_note}".rstrip()
+    footer += "\n" + WHERE_NOTES.get(where, WHERE_NOTES["channel"])
+    if capped:
+        footer += ("\nThe asker has more access in a private DM. If the question needs more than this level allows, "
+                   "say you can only share that in a DM, without hinting at the content.")
     if level != "owner":
         footer += ("\nThis person cannot see owner-only material (cost prices, markups, targets, strategy, "
                    "negotiations). If asked for it, say it is restricted and to ask Kareem.")
     return "\n\n".join(parts) + footer
 
 
+# ---------- reply safety ----------
+DEFAULT_LINK_HOSTS = ("foodics.com", "slack.com", "salesforce.com", "force.com", "google.com", "forms.gle")
+_URL = re.compile(r"https?://[^\s<>|()\[\]\"'`]+", re.I)
+_HOST = re.compile(r"^https?://([^/:?#]+)", re.I)
+
+
+def link_hosts(texts: list[str]) -> set[str]:
+    """Hosts of the links in our own knowledge and catalogue: the only links a reply may carry."""
+    hosts = set(DEFAULT_LINK_HOSTS)
+    for t in texts:
+        for url in _URL.findall(t or ""):
+            m = _HOST.match(url)
+            if m:
+                hosts.add(m.group(1).lower())
+    return hosts
+
+
+def _host_ok(url: str, hosts: set[str]) -> bool:
+    m = _HOST.match(url)
+    host = m.group(1).lower() if m else ""
+    return bool(host) and any(host == h or host.endswith("." + h) for h in hosts)
+
+
+def safe_reply(text: str, hosts: set[str]) -> str:
+    """Remove links to unknown hosts (a prompt-injection exfiltration path) and @channel-style pings."""
+    text = _URL.sub(lambda m: m.group(0) if _host_ok(m.group(0), hosts) else "[link removed]", text or "")
+    return re.sub(r"<!(channel|here|everyone|subteam\^[A-Z0-9]+)[^>]*>", r"@\1", text)
+
+
+SALES_TOOL_GUIDE = """
+## Tools
+- Call `brain_catalog` for every partner, line item and price. Never quote a price from memory.
+- If the tool fails or returns nothing, say so plainly; do not invent the result.
+"""
 TOOL_GUIDE = """
 ## Tools
 You have read-only tools. Use them whenever the answer depends on current facts (a merchant's ARR or churn,
@@ -123,6 +187,7 @@ a partner's latest Slack thread, a ticket's status, a contract clause, an attach
 - Use `learn` only when Kareem states a new or corrected rule; tell him it waits for his approval.
 """
 MAX_TOOL_TURNS = 8
+LEVEL_RANK = {"sales": 0, "team": 1, "owner": 2}
 
 
 def tools_for(level: str, layers: dict, tools: dict) -> dict:
@@ -139,11 +204,23 @@ class Brain:
     def reload(self) -> None:
         self.docs = load_docs()
         self.layers = load_layers()
+        catalog = [p.read_text(encoding="utf-8") for p in sorted(CATALOG_DIR.glob("*.json"))] if CATALOG_DIR.exists() else []
+        self.link_hosts = link_hosts([d.body for d in self.docs] + catalog)
 
-    def ask(self, question: str, slack_user_id: str, history: list[dict] | None = None) -> str:
-        level = level_for(slack_user_id, self.layers)
+    def level_of(self, slack_user_id: str) -> str:
+        return level_for(slack_user_id, self.layers)
+
+    def ask(self, question: str, slack_user_id: str, history: list[dict] | None = None, *,
+            level: str | None = None, where: str = "dm", ctx: dict | None = None) -> str:
+        """`level` caps the answer (it can only lower the asker's own level); `where` says who reads it."""
+        own = level_for(slack_user_id, self.layers)
+        level = own if level is None else (level if LEVEL_RANK.get(level, -1) <= LEVEL_RANK.get(own, -1) else own)
+        if LEVEL_RANK.get(level, -1) < 0:
+            level = "sales"
+        capped = LEVEL_RANK.get(level, -1) < LEVEL_RANK.get(own, -1)
         tools = tools_for(level, self.layers, self.all_tools)
-        system = system_prompt(level, self.layers, self.docs) + (TOOL_GUIDE if tools else "")
+        guide = (SALES_TOOL_GUIDE if level == "sales" else TOOL_GUIDE) if tools else ""
+        system = system_prompt(level, self.layers, self.docs, where=where, capped=capped) + guide
         messages = list(history or []) + [{"role": "user", "content": question}]
         kwargs = dict(model=MODEL, max_tokens=MAX_TOKENS,
                       # The knowledge block is cached so repeat questions are cheap and fast.
@@ -163,6 +240,8 @@ class Brain:
                     args = {k: v for k, v in (u.input or {}).items() if not k.startswith("_")}
                     if tool and tool.get("level_aware"):
                         args["_level"] = level
+                    if tool and tool.get("ctx_aware"):
+                        args["_ctx"] = dict(ctx or {})
                     out = tool["fn"](**args) if tool else f"Tool '{u.name}' is not available at level {level}."
                     err = tool is None
                 except Exception as exc:  # report the failure to the model instead of crashing

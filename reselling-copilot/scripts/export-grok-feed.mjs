@@ -27,6 +27,8 @@ const csvCell = (v) => {
 const toCsv = (header, rows) => [header.join(","), ...rows.map((r) => header.map((h) => csvCell(r[h])).join(","))].join("\n") + "\n";
 
 const ASK = "Not available here. Please ask the Partnerships team.";
+// Sales never sees discount rules or eligibility, not even "can't be discounted".
+const noDiscount = (s) => !/discount/i.test(s);
 
 const partnerRows = [];
 const itemRows = [];
@@ -66,7 +68,7 @@ for (const cat of categories) {
       name,
       countries: [...countries].join("|"),
       nature: `${cat.name}. ${m.overview}`,
-      billing_model: `${m.unit} Quote rules: ${m.rules.join(" ")}`,
+      billing_model: `${m.unit} Quote rules: ${m.rules.filter(noDiscount).join(" ")}`,
       payment_terms: `Billing options in Salesforce: ${[...billings].join(", ")}.`,
       discount_policy: ASK,
       commercial_notes: `Prices are list (selling) prices per line per billing period. ${SOURCE}`,
@@ -77,6 +79,11 @@ for (const cat of categories) {
     });
   }
 }
+
+// Product features such as a "Discount Card" in a line description are fine; Foodics discount rules are not.
+const COMMERCIAL = ["billing_model", "payment_terms", "commercial_notes", "operational_notes"];
+const leaks = partnerRows.flatMap((r) => COMMERCIAL.filter((k) => /discount/i.test(String(r[k]))).map((k) => `${r.id}.${k}`));
+if (leaks.length) throw new Error(`Grok feed is sales-only and must not mention discounts: ${leaks.join(", ")}`);
 
 writeFileSync(join(out, "partners.csv"), toCsv(
   ["id", "name", "countries", "nature", "billing_model", "payment_terms", "discount_policy", "commercial_notes", "fulfillment", "support_model", "sla", "operational_notes"],

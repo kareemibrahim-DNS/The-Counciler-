@@ -5,7 +5,7 @@
 import type { CountryPrice, LineItem, Partner } from "./catalog.js";
 
 export const catalogSource = "feed/*.csv";
-export const catalogGeneratedAt = "2026-11-14T06:20:02.016Z";
+export const catalogGeneratedAt = "2026-11-14T08:25:39.546Z";
 
 export const partners: Partner[] = [
   {
@@ -335,7 +335,7 @@ export const partners: Partner[] = [
     nature: "Accounting. Xero delivered by implementation partner Alpha: subscription plus implementation, migration and training.",
     commercial: {
       quoteType: "Commercial" as const,
-      billingModel: "Basic or Premium Subscription + Additional Branch; Implementation (one-time), Migration Package, Training Sessions. Quote rules: 1 Subscription (Basic / Premium) + (branches − 1) Additional Branch. Implementation is one-time and can't be discounted. Migration and Training are optional.",
+      billingModel: "Basic or Premium Subscription + Additional Branch; Implementation (one-time), Migration Package, Training Sessions. Quote rules: 1 Subscription (Basic / Premium) + (branches − 1) Additional Branch. Implementation is a one-time line. Migration and Training are optional.",
       paymentTerms: "Billing options in Salesforce: Annual, One-time.",
       discountPolicy: "Not available here. Please ask the Partnerships team.",
       notes: "Prices are list (selling) prices per line per billing period. Source: Salesforce Standard Price Book, list prices, exported 5 Nov 2026.",
@@ -435,7 +435,7 @@ export const partners: Partner[] = [
     nature: "E-invoicing & digital receipts. Compliant B2B and B2C e-invoicing from Foodics POS with tax-authority integration, credit and debit notes, and approval workflows.",
     commercial: {
       quoteType: "Commercial" as const,
-      billingModel: "Licensed per account (not per branch). Basic = email only, up to 2 terminals. Advanced = unlimited invoicing + 2,000 SMS/year, per issuing terminal. Customization one-time. Quote rules: Basic: one account line covers up to 2 terminals. Advanced: 1 line per issuing terminal. Customization is one-time and can't be discounted.",
+      billingModel: "Licensed per account (not per branch). Basic = email only, up to 2 terminals. Advanced = unlimited invoicing + 2,000 SMS/year, per issuing terminal. Customization one-time. Quote rules: Basic: one account line covers up to 2 terminals. Advanced: 1 line per issuing terminal. Customization is a one-time line.",
       paymentTerms: "Billing options in Salesforce: Annual, One-time.",
       discountPolicy: "Not available here. Please ask the Partnerships team.",
       notes: "Prices are list (selling) prices per line per billing period. Source: Salesforce Standard Price Book, list prices, exported 5 Nov 2026.",

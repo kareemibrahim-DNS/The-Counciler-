@@ -280,10 +280,10 @@
   "bestFor": "Merchants who want Xero fully set up for them: chart of accounts, templates, integrations.",
   "unit": "Basic or Premium Subscription + Additional Branch; Implementation (one-time), Migration Package, Training Sessions.",
   "edge": "Done-for-you setup and up to 1 year of historical data migration.",
-  "watch": "Don't quote Xero direct and Alpha (Xero) to the same merchant. Pick one route.",
+  "watch": "Don't quote Xero direct and Alpha (Xero) to the same merchant. Pick one route. Implementation is one-time and can't be discounted.",
   "rules": [
    "1 Subscription (Basic / Premium) + (branches − 1) Additional Branch.",
-   "Implementation is one-time and can't be discounted.",
+   "Implementation is a one-time line.",
    "Migration and Training are optional."
   ]
  },
@@ -394,11 +394,11 @@
   "bestFor": "KSA and Jordan merchants who need ZATCA-compliant invoicing per terminal.",
   "unit": "Licensed per account (not per branch). Basic = email only, up to 2 terminals. Advanced = unlimited invoicing + 2,000 SMS/year, per issuing terminal. Customization one-time.",
   "edge": "Terminal-based model fits merchants with few issuing points.",
-  "watch": "Advanced is per issuing terminal. Count terminals, not branches.",
+  "watch": "Advanced is per issuing terminal. Count terminals, not branches. Customization is one-time and can't be discounted.",
   "rules": [
    "Basic: one account line covers up to 2 terminals.",
    "Advanced: 1 line per issuing terminal.",
-   "Customization is one-time and can't be discounted."
+   "Customization is a one-time line."
   ]
  },
  "Iisal": {
