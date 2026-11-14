@@ -1,0 +1,354 @@
+"""Read-only tools for the Reselling Brain.
+
+Every tool reads. None of them sends, posts, edits or deletes anything in
+Salesforce, Google or Slack. The only write is `learn`, which queues a fact
+for Kareem's approval inside the bot's own knowledge folder.
+
+Credentials come from environment variables, so the bot can run on a
+service account or on Kareem's own account without code changes.
+"""
+from __future__ import annotations
+
+import io
+import json
+import os
+import re
+import time
+import uuid
+from pathlib import Path
+from typing import Any, Callable
+
+MAX_OUT = 20000  # characters returned to the model per tool call
+MAX_ROWS = 200
+
+
+def _clip(obj: Any) -> str:
+    text = obj if isinstance(obj, str) else json.dumps(obj, ensure_ascii=False, default=str)
+    return text if len(text) <= MAX_OUT else text[:MAX_OUT] + f"\n…[truncated, {len(text) - MAX_OUT} more characters]"
+
+
+# ---------- file parsing (Slack uploads and Drive files) ----------
+def parse_bytes(name: str, data: bytes) -> str:
+    n = name.lower()
+    if n.endswith(".pdf"):
+        from pypdf import PdfReader
+        reader = PdfReader(io.BytesIO(data))
+        return "\n\n".join((p.extract_text() or "") for p in reader.pages[:60])
+    if n.endswith((".xlsx", ".xlsm")):
+        from openpyxl import load_workbook
+        wb = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+        out = []
+        for ws in wb.worksheets[:10]:
+            out.append(f"## Sheet: {ws.title}")
+            for i, row in enumerate(ws.iter_rows(values_only=True)):
+                if i >= 500:
+                    out.append("…[more rows]")
+                    break
+                out.append(" | ".join("" if v is None else str(v) for v in row))
+        return "\n".join(out)
+    if n.endswith(".docx"):
+        import docx
+        return "\n".join(p.text for p in docx.Document(io.BytesIO(data)).paragraphs)
+    if n.endswith((".csv", ".txt", ".md", ".json", ".tsv")):
+        return data.decode("utf-8", errors="replace")
+    return f"[Cannot read this file type: {name}]"
+
+
+# ---------- Salesforce ----------
+_DML = re.compile(r"\b(insert|update|delete|upsert|merge|undelete)\b", re.I)
+
+
+def check_soql(soql: str) -> str:
+    q = (soql or "").strip().rstrip()
+    if not re.match(r"^select\s", q, re.I):
+        raise ValueError("Only SELECT queries are allowed.")
+    if ";" in q or _DML.search(q):
+        raise ValueError("Only a single read-only SELECT query is allowed.")
+    m = re.search(r"\blimit\s+(\d+)\s*$", q, re.I)
+    if not m:
+        q += f" LIMIT {MAX_ROWS}"
+    elif int(m.group(1)) > MAX_ROWS:
+        q = q[: m.start()] + f"LIMIT {MAX_ROWS}"
+    return q
+
+
+def _salesforce():
+    from simple_salesforce import Salesforce
+    if os.environ.get("SF_ACCESS_TOKEN"):
+        return Salesforce(instance_url=os.environ["SF_INSTANCE_URL"], session_id=os.environ["SF_ACCESS_TOKEN"])
+    return Salesforce(username=os.environ["SF_USERNAME"], password=os.environ["SF_PASSWORD"],
+                      security_token=os.environ.get("SF_SECURITY_TOKEN", ""), domain=os.environ.get("SF_DOMAIN", "login"))
+
+
+def salesforce_query(soql: str) -> str:
+    q = check_soql(soql)
+    res = _salesforce().query(q)
+    rows = [{k: v for k, v in r.items() if k != "attributes"} for r in res.get("records", [])]
+    return _clip({"query": q, "total": res.get("totalSize"), "rows": rows})
+
+
+# ---------- Google (Sheets + Drive) ----------
+def _google(service: str, version: str):
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+    scopes = ["https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/spreadsheets.readonly"]
+    creds = service_account.Credentials.from_service_account_file(os.environ["GOOGLE_SERVICE_ACCOUNT_FILE"], scopes=scopes)
+    if os.environ.get("GOOGLE_IMPERSONATE"):  # optional: act as a Workspace user (e.g. Kareem) via domain-wide delegation
+        creds = creds.with_subject(os.environ["GOOGLE_IMPERSONATE"])
+    return build(service, version, credentials=creds, cache_discovery=False)
+
+
+def sheets_read(sheet: str, range: str | None, allowlist: dict, level: str = "team") -> str:
+    if sheet not in allowlist:
+        raise ValueError(f"Sheet '{sheet}' is not on the allowed list: {sorted(allowlist)}")
+    cfg = allowlist[sheet]
+    # Fail closed: a sheet without audience: team is owner-only.
+    if level != "owner" and cfg.get("audience") != "team":
+        raise ValueError(f"Sheet '{sheet}' is restricted. Ask Kareem.")
+    rng = range or cfg.get("range", "A1:Z500")
+    vals = _google("sheets", "v4").spreadsheets().values().get(spreadsheetId=cfg["id"], range=rng).execute().get("values", [])
+    return _clip({"sheet": sheet, "range": rng, "rows": vals[:1000]})
+
+
+def drive_search(query: str, folder_ids: list[str]) -> str:
+    q = "trashed=false and fullText contains '" + query.replace("\\", "\\\\").replace("'", "\\'") + "'"
+    if folder_ids:
+        q += " and (" + " or ".join(f"'{f}' in parents" for f in folder_ids) + ")"
+    res = _google("drive", "v3").files().list(q=q, pageSize=15, fields="files(id,name,mimeType,modifiedTime,webViewLink)",
+                                               supportsAllDrives=True, includeItemsFromAllDrives=True, corpora="allDrives").execute()
+    return _clip(res.get("files", []))
+
+
+def drive_read(file_id: str) -> str:
+    drive = _google("drive", "v3")
+    meta = drive.files().get(fileId=file_id, fields="name,mimeType", supportsAllDrives=True).execute()
+    mt, name = meta["mimeType"], meta["name"]
+    exports = {"application/vnd.google-apps.document": ("text/plain", ".txt"),
+               "application/vnd.google-apps.spreadsheet": ("text/csv", ".csv"),
+               "application/vnd.google-apps.presentation": ("text/plain", ".txt")}
+    if mt in exports:
+        data = drive.files().export(fileId=file_id, mimeType=exports[mt][0]).execute()
+        return _clip(f"# {name}\n" + parse_bytes(name + exports[mt][1], data))
+    data = drive.files().get_media(fileId=file_id, supportsAllDrives=True).execute()
+    return _clip(f"# {name}\n" + parse_bytes(name, data))
+
+
+# ---------- Slack (read only) ----------
+class SlackReader:
+    def __init__(self, client, token: str):
+        self.client, self.token, self._ids, self._at = client, token, {}, 0.0
+
+    def channel_id(self, name: str) -> str:
+        name = name.lstrip("#")
+        if re.match(r"^[CGD][A-Z0-9]{6,}$", name):
+            return name
+        if not self._ids or time.time() - self._at > 3600:
+            ids, cursor = {}, None
+            while True:
+                r = self.client.conversations_list(types="public_channel,private_channel", limit=1000, cursor=cursor)
+                ids.update({c["name"]: c["id"] for c in r["channels"]})
+                cursor = r.get("response_metadata", {}).get("next_cursor")
+                if not cursor:
+                    break
+            self._ids, self._at = ids, time.time()
+        if name not in self._ids:
+            raise ValueError(f"Channel #{name} not found, or the bot is not in it.")
+        return self._ids[name]
+
+    def read_channel(self, channel: str, limit: int = 30) -> str:
+        cid = self.channel_id(channel)
+        msgs = self.client.conversations_history(channel=cid, limit=max(1, min(int(limit or 30), 100)))["messages"]
+        out = [{"ts": m.get("ts"), "user": m.get("user") or m.get("bot_id"), "text": m.get("text", ""),
+                "replies": m.get("reply_count", 0)} for m in msgs]
+        return _clip({"channel": channel, "messages": out})
+
+    def read_file(self, file_id: str) -> str:
+        import urllib.request
+        f = self.client.files_info(file=file_id)["file"]
+        req = urllib.request.Request(f["url_private_download"], headers={"Authorization": f"Bearer {self.token}"})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = resp.read(25 * 1024 * 1024)
+        return _clip(f"# {f.get('name')}\n" + parse_bytes(f.get("name", ""), data))
+
+
+# ---------- learn (queued for Kareem's approval) ----------
+class Learner:
+    def __init__(self, knowledge_dir: Path, queue_file: Path):
+        self.knowledge_dir, self.queue_file = knowledge_dir, queue_file
+
+    def _load(self) -> dict:
+        return json.loads(self.queue_file.read_text()) if self.queue_file.exists() else {}
+
+    def _save(self, q: dict) -> None:
+        self.queue_file.write_text(json.dumps(q, ensure_ascii=False, indent=1))
+
+    def propose(self, fact: str, audience: str = "owner") -> str:
+        if audience not in ("owner", "team"):
+            audience = "owner"
+        q = self._load()
+        pid = uuid.uuid4().hex[:6]
+        q[pid] = {"fact": fact.strip(), "audience": audience, "at": time.strftime("%Y-%m-%d")}
+        self._save(q)
+        return f"Queued as #{pid}. Kareem must reply `approve {pid}` to save it, or `reject {pid}`."
+
+    def approve(self, pid: str) -> str:
+        q = self._load()
+        item = q.pop(pid, None)
+        if not item:
+            return f"No pending item #{pid}."
+        name = "10-learned-team.md" if item["audience"] == "team" else "11-learned-owner.md"
+        path = self.knowledge_dir / name
+        if not path.exists():
+            path.write_text(f"---\nid: learned-{item['audience']}\naudience: {item['audience']}\n---\n# Learned from Kareem\n", encoding="utf-8")
+        with path.open("a", encoding="utf-8") as fh:
+            fh.write(f"- ({item['at']}) {item['fact']}\n")
+        self._save(q)
+        return f"Saved #{pid} to {name}."
+
+    def reject(self, pid: str) -> str:
+        q = self._load()
+        if q.pop(pid, None) is None:
+            return f"No pending item #{pid}."
+        self._save(q)
+        return f"Rejected #{pid}."
+
+    def pending(self) -> str:
+        q = self._load()
+        return "\n".join(f"#{k} [{v['audience']}] {v['fact']}" for k, v in q.items()) or "Nothing pending."
+
+
+# ---------- catalogue (list prices only; same files Orbit builds from) ----------
+CATALOG_DIR = Path(os.environ.get("BRAIN_CATALOG_DIR", Path(__file__).resolve().parent.parent / "catalog"))
+CURRENCY = {"SA": "SAR", "KSA": "SAR", "AE": "AED", "UAE": "AED", "KW": "KWD", "KWT": "KWD",
+            "JO": "JOD", "JOR": "JOD", "EG": "EGP", "EGT": "EGP", "INT": "USD", "USD": "USD"}
+
+
+def _norm(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", str(s or "").lower())
+
+
+class Catalog:
+    """Partner profiles, quote rules and Salesforce LIST prices. Never cost or margin."""
+
+    def __init__(self, folder: Path = CATALOG_DIR):
+        read = lambda f: json.loads((folder / f).read_text(encoding="utf-8"))
+        self.items, self.partners, self.categories = read("catalog.json"), read("partners.json"), read("categories.json")
+
+    def _partner(self, name: str) -> str | None:
+        n = _norm(name)
+        if not n:
+            return None
+        names = list(self.partners)
+        return next((p for p in names if _norm(p) == n), None) or next((p for p in names if _norm(p).startswith(n) or n.startswith(_norm(p))), None)
+
+    def _lines(self, name: str, cur: str | None) -> list[dict]:
+        out = []
+        for l in self.items.get(name, []):
+            row = {"name": l["name"], "type": l["t"], "billing": l["f"]}
+            if l.get("desc"):
+                row["description"] = l["desc"]
+            if l.get("flag"):
+                row["warning"] = l["flag"]
+            if cur:
+                row.update(price=l["p"].get(cur), currency=cur)
+            else:
+                row["prices"] = l["p"]
+            out.append(row)
+        return out
+
+    def _entry(self, name: str, cur: str) -> dict | None:
+        mains = [l for l in self.items.get(name, []) if l["t"] == "Main" and l["p"].get(cur) is not None]
+        pool = [l for l in mains if l["f"] == "Annual"] or mains
+        if not pool:
+            return None
+        best = min(pool, key=lambda l: l["p"][cur])
+        return {"line_item": best["name"], "price": best["p"][cur], "currency": cur}
+
+    def lookup(self, partner: str | None = None, category: str | None = None, country: str | None = None,
+               level: str = "sales") -> str:
+        """Sales (and any unknown level) gets only: available resellers, list prices, commercial structure."""
+        full = level in ("owner", "team")
+        cur = CURRENCY.get(str(country).upper()) if country else None
+        if country and not cur:
+            return _clip({"error": f"unknown country '{country}'. Use SA, AE, KW, JO, EG or INT."})
+        if partner:
+            name = self._partner(partner)
+            if not name:
+                return _clip({"error": f"partner '{partner}' is not in the reseller catalogue", "partners": sorted(self.partners)})
+            m = self.partners[name]
+            cat = next((c["name"] for c in self.categories if c["id"] == m["cat"]), "")
+            out = {"partner": name, "category": cat, "inactive": bool(m.get("inactive")), "overview": m["overview"],
+                   "licensing_unit": m["unit"], "countries": m["countries"], "quote_rules": m["rules"],
+                   "line_items": self._lines(name, cur)}
+            if full:
+                out.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"], submission_form=m["form"],
+                           ksa_approval_form=m["ksaForm"], slack=m["slack"])
+            return _clip(out)
+        if category:
+            n = _norm(category)
+            c = next((x for x in self.categories if _norm(x["id"]) == n or n in _norm(x["name"])), None)
+            if not c:
+                return _clip({"error": f"category '{category}' not found", "categories": [x["id"] for x in self.categories]})
+            rows = []
+            for p in c["partners"]:
+                m = self.partners.get(p)
+                if not m:
+                    continue
+                row = {"partner": p, "inactive": bool(m.get("inactive")), "licensing_unit": m["unit"], "countries": m["countries"]}
+                if full:
+                    row.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"])
+                if cur:
+                    row["entry_price"] = self._entry(p, cur)
+                rows.append(row)
+            out = {"category": c["name"], "partners": rows}
+            if full:
+                out["how_to_choose"] = c["pick"]
+            return _clip(out)
+        return _clip({"categories": [{"id": c["id"], "name": c["name"], "partners": c["partners"]} for c in self.categories]})
+
+
+# ---------- registry ----------
+def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: dict, catalog: Catalog | None = None) -> dict[str, dict]:
+    """name -> {schema, fn}. Which level may use which tool is decided in layers.yaml."""
+    sheets = sources.get("sheets") or {}
+    folders = sources.get("drive_folders") or []
+    t: dict[str, dict] = {}
+
+    def add(name: str, desc: str, props: dict, required: list[str], fn: Callable[..., str], level_aware: bool = False):
+        t[name] = {"schema": {"name": name, "description": desc,
+                              "input_schema": {"type": "object", "properties": props, "required": required}},
+                   "fn": fn, "level_aware": level_aware}
+
+    if catalog is None and (CATALOG_DIR / "catalog.json").exists():
+        catalog = Catalog()
+    if catalog:
+        add("brain_catalog", "Reseller catalogue: a partner's profile, quote rules and line items with LIST prices (Salesforce price book), "
+            "or a side-by-side of all partners in a category. Give a country (SA, AE, KW, JO, EG or INT) to get prices in its currency. "
+            "With no input, lists categories and partners. Never contains cost or margin.",
+            {"partner": {"type": "string"}, "category": {"type": "string"}, "country": {"type": "string"}}, [],
+            lambda partner=None, category=None, country=None, _level="sales": catalog.lookup(partner, category, country, _level),
+            level_aware=True)
+    if os.environ.get("SF_ACCESS_TOKEN") or os.environ.get("SF_USERNAME"):
+        add("salesforce_query", "Run one read-only SOQL SELECT on Salesforce (accounts, opportunities, ARR, churn, F5). Max 200 rows.",
+            {"soql": {"type": "string"}}, ["soql"], lambda soql: salesforce_query(soql))
+    if os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE"):
+        if sheets:
+            add("sheets_read", "Read an allowed Google Sheet. Allowed sheets: " +
+                "; ".join(f"{k} = {v.get('title', k)}" for k, v in sheets.items()),
+                {"sheet": {"type": "string", "enum": sorted(sheets)}, "range": {"type": "string", "description": "A1 range, optional"}},
+                ["sheet"], lambda sheet, range=None, _level="team": sheets_read(sheet, range, sheets, _level), level_aware=True)
+        add("drive_search", "Search Google Drive files (contracts, SOPs, policies, partner docs) by text.",
+            {"query": {"type": "string"}}, ["query"], lambda query: drive_search(query, folders))
+        add("drive_read", "Read a Google Drive file by id (Docs, Sheets, Slides, PDF, Word, Excel).",
+            {"file_id": {"type": "string"}}, ["file_id"], lambda file_id: drive_read(file_id))
+    if slack:
+        add("slack_read_channel", "Read recent messages in a Slack channel the bot is a member of, e.g. ksa-deliverect.",
+            {"channel": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 100}}, ["channel"],
+            lambda channel, limit=30: slack.read_channel(channel, limit))
+        add("read_slack_file", "Read a file attached in Slack (PDF, Excel, Word, CSV) by its file id.",
+            {"file_id": {"type": "string"}}, ["file_id"], lambda file_id: slack.read_file(file_id))
+    if learner:
+        add("learn", "Queue a new fact or rule Kareem taught you, for his approval. Use only when Kareem states a new or corrected rule.",
+            {"fact": {"type": "string"}, "audience": {"type": "string", "enum": ["owner", "team"]}}, ["fact"],
+            lambda fact, audience="owner": learner.propose(fact, audience))
+    return t

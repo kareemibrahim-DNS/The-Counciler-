@@ -1,0 +1,48 @@
+# Audience layers — decided by Kareem on 14 Nov 2026.
+#   owner : Kareem. Everything.
+#   team  : Partnerships team and managers (e.g. Hatem). Team files only: no contacts, trackers,
+#           contract status, pricing/markups, targets or strategy.
+#   sales : Sales and Account Managers, and ANYONE not listed below. Only three things:
+#           available resellers, list prices, and each partner's commercial (quote) structure.
+# Deny by default: a person not listed in `people` gets the sales layer.
+default_level: sales
+
+levels:
+  owner:
+    sees: [owner, team]
+    tools: [brain_catalog, salesforce_query, sheets_read, drive_search, drive_read, slack_read_channel, read_slack_file, learn]
+    instructions: "This is Kareem. Full detail, including pricing, targets and strategy."
+  team:
+    sees: [team]
+    # Salesforce, Drive and learn stay owner-only until the layers are agreed.
+    tools: [brain_catalog, sheets_read, slack_read_channel, read_slack_file]
+    instructions: "Partnerships team member or manager. Policy, rules, SLAs, processes and the catalogue. No partner contacts, trackers, contract status, pricing/markups, targets or strategy."
+  sales:
+    sees: [sales]
+    tools: [brain_catalog]
+    instructions: "Sales or Account Manager. Only available resellers, list prices and commercial structure. Nothing else."
+
+# Channels partners can read. The bot never answers there (it asks people to DM it instead).
+# Slack Connect channels and users from another workspace are always blocked.
+blocked_channels:
+  - "^(ksa|uae|egypt|kw-jo|kw|jo|eg)-"   # per-partner country channels, e.g. ksa-grubtech
+  - "^foodics-"                         # shared channels, e.g. foodics-urbanpiper
+# Internal channels that match a pattern above but have no partner members can be allowed here.
+allowed_channels: []
+
+# Map Slack user IDs to a level. Add Kareem's Slack ID (owner) and each Partnerships team member (team).
+# Everyone else is sales.
+people:
+  U08DW8E5WKW: { level: owner, name: Kareem Ibrahim }
+  U0BQKNQNF89: { level: team, name: Althurayyaa Alsaad }
+  U02VD9VGNA0: { level: team, name: Hatem Ashour }      # manager: team view only (Kareem, 14 Nov 2026)
+
+# Sources the tools may read. Only sheets listed here can be opened.
+sources:
+  sheets:
+    # audience: team → the team may read it. No audience → Kareem only.
+    # tickets: { id: "<spreadsheet id>", title: "TRACKER-NAME", range: "A1:Z1000", audience: team }
+    # example: { id: "<spreadsheet id>", title: "<sheet title>" }
+    # targets: { id: "<spreadsheet id>", title: "<sheet title>" }
+  drive_folders:
+    - 1w3T0Ql99xAt9n1a6HwalH3sY1AiB98uL   # Partnerships - Reseller Program

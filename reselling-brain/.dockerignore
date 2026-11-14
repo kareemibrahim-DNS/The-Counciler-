@@ -1,0 +1,4 @@
+slack-bot/.env
+slack-bot/learn_queue.json
+**/__pycache__
+**/*.pyc

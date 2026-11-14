@@ -1,0 +1,101 @@
+[
+ {
+  "id": "opm",
+  "name": "Ordering platform management",
+  "partners": [
+   "Grubtech",
+   "Deliverect",
+   "UrbanPiper",
+   "FeedUs"
+  ],
+  "pick": "Pick on which aggregators the merchant uses, single vs multi-brand, and country."
+ },
+ {
+  "id": "loyalty",
+  "name": "Loyalty & CRM",
+  "partners": [
+   "BrandWallet",
+   "Koinz",
+   "OptCulture",
+   "Prepit"
+  ],
+  "pick": "Pick on how deep the merchant goes: quick wallet cards, loyalty plus feedback and ordering, or a full CRM with campaigns."
+ },
+ {
+  "id": "ordering",
+  "name": "Online ordering & web store",
+  "partners": [
+   "Ordable",
+   "Zyda",
+   "Mnasati",
+   "wi-Q"
+  ],
+  "pick": "Pick on country first. Prices exist only in some currencies, so check that before anything else."
+ },
+ {
+  "id": "inventory",
+  "name": "Inventory",
+  "partners": [
+   "ShopBrain",
+   "Supy"
+  ],
+  "pick": "Pick on budget and depth: ShopBrain is tiered per branch, Supy is premium per outlet with a 3-license minimum."
+ },
+ {
+  "id": "accounting",
+  "name": "Accounting",
+  "partners": [
+   "Wafeq",
+   "Xero",
+   "Alpha (Xero)",
+   "QuickBooks"
+  ],
+  "pick": "Pick on branch count and whether the merchant needs setup help."
+ },
+ {
+  "id": "erp",
+  "name": "ERP",
+  "partners": [
+   "FlowERP",
+   "SAP",
+   "MS Dynamics"
+  ],
+  "pick": "Pick on size: FlowERP for KSA small and mid-size, SAP or Dynamics for enterprise groups."
+ },
+ {
+  "id": "einv",
+  "name": "E-invoicing & digital receipts",
+  "partners": [
+   "InvoiceQ",
+   "Iisal"
+  ],
+  "pick": "Both are licensed per account, not per branch. Pick on terminals and SMS vs invoice volume."
+ },
+ {
+  "id": "hr",
+  "name": "HR & payroll",
+  "partners": [
+   "VOLT",
+   "Malachite"
+  ],
+  "pick": "Both sit on top of SAP. Malachite cannot be sold without SAP."
+ },
+ {
+  "id": "table",
+  "name": "Table management",
+  "partners": [
+   "Servme"
+  ],
+  "pick": "Only partner in this category."
+ },
+ {
+  "id": "other",
+  "name": "Other",
+  "partners": [
+   "Ishbek",
+   "Roboost",
+   "Nitx"
+  ],
+  "pick": "Niche or inactive. Confirm with Partnerships before quoting."
+ }
+]
