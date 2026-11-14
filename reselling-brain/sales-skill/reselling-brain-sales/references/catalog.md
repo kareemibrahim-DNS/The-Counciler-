@@ -1,6 +1,6 @@
 # Reseller catalogue: available resellers, list prices, quote structure
 
-Source: Salesforce Standard Price Book + "USD 1 – International", exported 5 Nov 2026. LIST (selling) prices only.
+Source: Salesforce Standard Price Book + "USD 1 – International", refreshed 14 Nov 2026. LIST (selling) prices only.
 A blank price means the line is not sold in that country. Never convert between currencies.
 
 ## Categories
@@ -30,7 +30,7 @@ A blank price means the line is not sold in that country. Never convert between 
 | Grubtech - Virtual Brand [Annual] | Add-on | Annual | 710.5 | 970.9 | 82 | 101.5 | 7,150 | 268.2 |
 | Grubtech - Virtual Brand [Monthly] | Add-on | Monthly | 64.6 | 88.3 | 7.5 | 9.2 | 650 | 24.5 |
 | Grubtech - gOnline License [Annual] | Main | Annual | 1,421.1 | 1,942 | 164 | 203 | 14,300 | 536.3 |
-| Grubtech - gOnline License [Monthly] | Main | Monthly | 129.2 | 176.5 | 14.91 | 18.46 | 1,300 | 48.8 |
+| Grubtech - gOnline License [Monthly] | Main | Monthly | 129.2 | 176.5 | 14.911 | 18.46 | 1,300 | 48.8 |
 
 ## Deliverect
 - Category: Ordering platform management
@@ -59,10 +59,10 @@ A blank price means the line is not sold in that country. Never convert between 
 
 | Line item (exact Salesforce name) | Type | Billing | KSA (SAR) | UAE (AED) | Kuwait (KWD) | Jordan (JOD) | Egypt (EGP) | International (USD) |
 |---|---|---|---|---|---|---|---|---|
-| Urban Piper - Subscription License [Annual] | Main | Annual | 1,170 | 1,822.28 | 167.9 | 222.3 | 15,022.8 | 552.83 |
-| Urban Piper - Subscription License [Monthly] | Main | Monthly | 128.34 | 184.23 | 16.97 | 24.38 | 1,647.89 | 55.89 |
-| UrbanPiper - 1 Channel [Annual] | Add-on | Annual |  | 1,541.4 | 130.2 | 204.48 | 14,650.56 |  |
-| UrbanPiper - 1 Channel [Monthly] | Add-on | Monthly |  | 143.13 | 12.09 | 19.53 | 1,398.93 |  |
+| Urban Piper - Subscription License [Annual] | Main | Annual | 1,170 | 1,822.28 | 167.895 | 222.3 | 15,022.8 | 588 |
+| Urban Piper - Subscription License [Monthly] | Main | Monthly | 128.34 | 184.23 | 16.974 | 24.385 | 1,647.89 | 55.89 |
+| UrbanPiper - 1 Channel [Annual] | Add-on | Annual |  | 1,541.4 | 130.2 | 204.48 | 14,650.56 | 420 |
+| UrbanPiper - 1 Channel [Monthly] | Add-on | Monthly |  | 143.13 | 12.09 | 19.53 | 1,398.93 | 39 |
 
 ## FeedUs
 - Category: Ordering platform management
@@ -89,8 +89,8 @@ A blank price means the line is not sold in that country. Never convert between 
 
 | Line item (exact Salesforce name) | Type | Billing | KSA (SAR) | UAE (AED) | Kuwait (KWD) | Jordan (JOD) | Egypt (EGP) | International (USD) |
 |---|---|---|---|---|---|---|---|---|
-| BrandWallet - Additional Branch [Annual] | Additional | Annual | 900.01 | 882 | 73.57 | 171 | 11,280.15 | 240 |
-| BrandWallet - Additional Branch [Monthly] | Additional | Monthly | 75 | 73.45 | 6.13 | 14.2 | 940 | 20 |
+| BrandWallet - Additional Branch [Annual] | Additional | Annual | 900.01 | 882 | 73.573 | 171 | 11,280.15 | 240 |
+| BrandWallet - Additional Branch [Monthly] | Additional | Monthly | 75 | 73.45 | 6.131 | 14.2 | 940 | 20 |
 | BrandWallet - Basic Plan [Annual] | Main | Annual | 2,154.9 | 2,107.9 | 175.9 | 406.9 | 23,400 | 573.8 |
 | BrandWallet - Basic Plan [Monthly] | Main | Monthly | 219.9 | 214.9 | 17.9 | 41.49 | 2,280 | 58.5 |
 | BrandWallet - Growth Plan [Annual] | Main | Annual | 2,928.9 | 2,864.9 | 240 | 553 | 31,800 | 780 |
@@ -210,10 +210,10 @@ A blank price means the line is not sold in that country. Never convert between 
 
 | Line item (exact Salesforce name) | Type | Billing | KSA (SAR) | UAE (AED) | Kuwait (KWD) | Jordan (JOD) | Egypt (EGP) | International (USD) |
 |---|---|---|---|---|---|---|---|---|
-| wi-Q - Connect - [Annual] | Main | Annual | 2,000 | 1,255.99 | 105.97 | 242.48 | 16,689.2 | 342 |
-| wi-Q - Connect - [Monthly] | Main | Monthly | 170 | 106.5 | 8.99 | 20.56 | 1,415.17 | 29 |
-| wi-Q - Connect - [Quarterly] | Main | Quarterly | 509 | 319.51 | 26.96 | 61.68 | 4,245.5 | 87 |
-| wi-Q - Connect - [Semi-Annual] | Main | Semi-annual | 1,012 | 635.34 | 53.6 | 122.66 | 8,442.19 | 173 |
+| wi-Q - Connect - [Annual] | Main | Annual | 2,000 | 1,715 | 147 | 281.93 | 21,420 | 342 |
+| wi-Q - Connect - [Monthly] | Main | Monthly | 170 | 145.06 | 12.555 | 24.139 | 1,829.96 | 29 |
+| wi-Q - Connect - [Quarterly] | Main | Quarterly | 509 | 432.44 | 37.416 | 71.89 | 5,453.27 | 87 |
+| wi-Q - Connect - [Semi-Annual] | Main | Semi-annual | 1,012 | 859.37 | 74.368 | 142.722 | 10,833.33 | 173 |
 | wi-Q - Online Ordering - [Annual] | Main | Annual | 5,400 | 5,285 | 446 | 1,022 | 72,000 | 1,440 |
 | wi-Q - Online Ordering - [Monthly] | Main | Monthly | 488 | 477 | 40 | 92 | 6,500 | 130 |
 | wi-Q - Table Ordering - [Monthly] | Main | Monthly | 683 | 668 | 56 | 129 | 9,100 | 182 |
@@ -297,7 +297,7 @@ A blank price means the line is not sold in that country. Never convert between 
 |---|---|---|---|---|---|---|---|---|
 | Xero - "Hesab" Arabic Interface [Annual] | Add-on | Annual | 1,950 | 1,735.5 | 159.9 | 370.5 | 25,038 | 527 |
 | Xero - Additional Branch [Annual] | Additional | Annual | 780 | 694.2 | 63.96 | 148.2 | 10,015.2 | 211 |
-| Xero - Support Package [One-Time] | One-time | One-time | 2,608.7 | 2,321.74 | 213.91 | 495.65 | 33,495.71 | 704.35 |
+| Xero - Support Package [One-Time] | One-time | One-time | 2,608.7 | 2,321.74 | 213.913 | 495.653 | 33,495.71 | 704.35 |
 | Xero - Training Package [One-Time] | One-time | One-time | 2,500 | 2,225 | 205 | 475 | 32,100 | 675 |
 | Xero - Xero Main Subscription [Annual] | Main | Annual | 4,550 | 4,050 | 373 | 865 | 58,422 | 1,229 |
 
@@ -333,7 +333,7 @@ A blank price means the line is not sold in that country. Never convert between 
 |---|---|---|---|---|---|---|---|---|
 | QuickBooks - Online Plus Additional Branch [Annual] | Additional | Annual | 780 | 694.2 | 63.96 | 148.2 | 10,015.2 | 211 |
 | QuickBooks - Online Plus Subscription [Annual] | Main | Annual | 4,550 | 4,050 | 373 | 865 | 58,422 | 1,229 |
-| QuickBooks - Support Package [One-Time] | One-time | One-time | 2,608.7 | 2,321.74 | 213.91 | 495.65 | 33,495.71 | 704.35 |
+| QuickBooks - Support Package [One-Time] | One-time | One-time | 2,608.7 | 2,321.74 | 213.913 | 495.653 | 33,495.71 | 704.35 |
 | QuickBooks - Training Package [One-Time] | One-time | One-time | 2,500 | 2,225 | 205 | 475 | 32,100 | 675 |
 
 ## FlowERP
@@ -355,7 +355,7 @@ A blank price means the line is not sold in that country. Never convert between 
 | FlowERP - Advanced Package (Additional Branch) - [Annual] | Additional | Annual | 2,500 | 2,450 | 205 | 475 | 32,500 | 666.67 |
 | FlowERP - Advanced Package - [Annual] | Main | Annual | 4,250 | 4,165 | 348.5 | 807.5 | 55,250 | 1,133.33 |
 | FlowERP - B2B Invoicing - [Annual] | Add-on | Annual | 1,200 | 1,175.16 | 98.88 | 226.68 | 16,176 | 320 |
-| FlowERP - Basic Package (Additional Branch) - [Annual] | Additional | Annual | 1,171.88 | 1,148.5 | 96.12 | 222.62 | 15,234.38 | 312.5 |
+| FlowERP - Basic Package (Additional Branch) - [Annual] | Additional | Annual | 1,171.88 | 1,148.5 | 96.125 | 222.625 | 15,234.38 | 312.5 |
 | FlowERP - Basic Package - [Annual] | Main | Annual | 2,450 | 2,401 | 200.9 | 465.5 | 31,850 | 653.33 |
 | FlowERP - Central Kitchen - [Annual] | Add-on | Annual | 1,200 | 1,175.16 | 98.88 | 226.68 | 16,176 | 320 |
 | FlowERP - Cheques and Withdrawal - [Annual] | Add-on | Annual | 6,000 | 5,875.8 | 494.4 | 1,133.4 | 80,880 | 1,600 |
@@ -471,8 +471,8 @@ A blank price means the line is not sold in that country. Never convert between 
 | VOLT - HR License [Monthly] ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting. | Main | Monthly | 2 | 15.32 | 1.29 | 2.96 | 201.27 | 4.17 |
 | VOLT - HR License [One-Time Fee] | One-time | One-time | 19,500 | 19,500 | 1,599 | 3,900 | 127,953.09 | 5,200 |
 | VOLT - Hosting with SAP Included [Annual] | Add-on | Annual | 40,000 |  |  | 7,564.62 |  |  |
-| VOLT - Hosting with SAP Included [Monthly] | Add-on | Monthly | 1,750 | 1,750 |  | 330.95 |  | 5,000 |
-| VOLT - Implementation for One-Time Payment Based Deals [One-Time Fee] | One-time | One-time | 50.63 | 50.63 | 4.15 | 10,125 | 332.19 | 10.13 |
+| VOLT - Hosting with SAP Included [Monthly] ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting. | Add-on | Monthly | 1,750 | 1,750 |  | 330.95 |  | 5,000 |
+| VOLT - Implementation for One-Time Payment Based Deals [One-Time Fee] ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting. | One-time | One-time | 50.63 | 50.63 | 4.15 | 10,125 | 332.19 | 13.5 |
 | VOLT - Implementation for Subscription Based Deals [One-Time Fee] | One-time | One-time | 37,500 | 37,500 | 3,075 | 7,500 | 246,063.63 | 10,000 |
 | VOLT - Mobile App - per User [Annual] | Add-on | Annual | 8 | 8 | 0.67 | 1.55 | 105.24 | 2.18 |
 | VOLT - Mobile App - per User [Monthly] | Add-on | Monthly | 0.5 | 0.66 | 0.06 | 0.13 | 8.69 | 0.18 |
@@ -503,12 +503,12 @@ A blank price means the line is not sold in that country. Never convert between 
 
 | Line item (exact Salesforce name) | Type | Billing | KSA (SAR) | UAE (AED) | Kuwait (KWD) | Jordan (JOD) | Egypt (EGP) | International (USD) |
 |---|---|---|---|---|---|---|---|---|
-| Malachite - Attendance License  [Annual] | Main | Annual | 27.6 | 27 | 2.3 | 5.2 | 367.8 |  |
-| Malachite - Company Admin License  [Annual] | Main | Annual | 378 | 369.9 | 31.2 | 71.6 | 5,040 |  |
-| Malachite - Employee Self-Service License  [Annual] | Main | Annual | 9.6 | 9.4 | 0.8 | 1.8 | 127.8 |  |
-| Malachite - HR Employees [Annual] | Main | Annual | 129.6 | 120.72 | 10.8 | 24 | 1,728 |  |
-| Malachite - HR License  [Annual] | Main | Annual | 27.6 | 27 | 2.3 | 5.2 | 367.8 |  |
-| Malachite - Payroll License  [Annual] | Main | Annual | 76.5 | 74.9 | 6.3 | 14.5 | 1,020 |  |
+| Malachite - Attendance License  [Annual] | Main | Annual | 27.6 | 27 | 2.3 | 5.2 | 367.8 | 7.4 |
+| Malachite - Company Admin License  [Annual] | Main | Annual | 378 | 369.9 | 31.2 | 71.6 | 5,040 | 100.8 |
+| Malachite - Employee Self-Service License  [Annual] | Main | Annual | 9.6 | 9.4 | 0.8 | 1.8 | 127.8 | 2.6 |
+| Malachite - HR Employees [Annual] | Main | Annual | 129.6 | 120.72 | 10.8 | 24 | 1,728 | 34.8 |
+| Malachite - HR License  [Annual] | Main | Annual | 27.6 | 27 | 2.3 | 5.2 | 367.8 | 7.4 |
+| Malachite - Payroll License  [Annual] | Main | Annual | 76.5 | 74.9 | 6.3 | 14.5 | 1,020 | 20.4 |
 
 ## Servme
 - Category: Table management
@@ -550,7 +550,7 @@ A blank price means the line is not sold in that country. Never convert between 
 
 | Line item (exact Salesforce name) | Type | Billing | KSA (SAR) | UAE (AED) | Kuwait (KWD) | Jordan (JOD) | Egypt (EGP) | International (USD) |
 |---|---|---|---|---|---|---|---|---|
-| Roboost - DMS Solution | Usage | Usage | 0.3 | 0.24 | 0.02 | 0.05 | 3.25 | 0.07 |
+| Roboost - DMS Solution | Usage | Usage | 0.3 | 0.24 | 0.021 | 0.045 | 3.25 | 0.07 |
 
 ## Nitx — INACTIVE, do not quote
 - Category: Other

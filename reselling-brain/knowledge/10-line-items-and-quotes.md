@@ -1,13 +1,13 @@
 ---
 id: line-items-and-quotes
 audience: team
-source: Salesforce Standard Price Book + USD 1 – International (5 Nov 2026); the old internal price-list sheet Policy tab (3 Oct 2026)
+source: Salesforce Standard Price Book + USD 1 – International (refreshed 14 Nov 2026); the old internal price-list sheet Policy tab (3 Oct 2026)
 updated: 2026-11-14
 ---
 # Line items, list prices and quote structure
 
 ## Where the numbers come from
-- Every partner's line items and **list (selling) prices** are in the catalogue tool `brain_catalog`. Source: Salesforce Standard Price Book (SAR, AED, KWD, JOD, EGP) and "USD 1 – International", exported 5 Nov 2026. 29 partners, about 200 line items.
+- Every partner's line items and **list (selling) prices** are in the catalogue tool `brain_catalog`. Source: Salesforce Standard Price Book (SAR, AED, KWD, JOD, EGP) and "USD 1 – International", refreshed 14 Nov 2026. 29 partners, about 200 line items.
 - Always call `brain_catalog` for a price. Never quote a price from memory, from another country, or from an old sheet.
 - Use the **exact Salesforce line-item name** in every quote.
 - A line with no price in a currency is **not sellable in that country**. Say so; do not convert currencies.
@@ -50,5 +50,5 @@ Call `brain_catalog` with a `category` to get a side-by-side (best for, edge, li
 
 ## Known data issues (verify before quoting)
 - The the old internal price-list sheet price list does not match Salesforce, and its KSA column holds KWD values for Ordable, Zyda and Mnasati. Salesforce wins.
-- Six VOLT lines have inconsistent prices across currencies.
+- Eight VOLT lines have inconsistent prices across currencies (flagged ⚠).
 - ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.

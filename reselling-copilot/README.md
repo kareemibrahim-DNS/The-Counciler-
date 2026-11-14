@@ -24,7 +24,7 @@ npm run dev
 
 Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assistants: [`AGENTS.md`](AGENTS.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
-## Data sources (5 Nov 2026)
+## Data sources (prices refreshed 14 Nov 2026)
 
 | File | Source |
 |---|---|
@@ -33,8 +33,11 @@ Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assis
 | `data/policy.json` | Discount policy (3 Oct 2026) and Reseller Policy 2026 terms |
 | `data/channels.json` | Partner Slack channels from the Partner Guide |
 
+## Refreshing prices from Salesforce
+`node scripts/refresh-prices.mjs <result.json>…` updates the list prices in `data/catalog.json` from saved PricebookEntry query results (the SOQL is at the top of the script). It never adds or removes lines; it reports new and missing products, and flags lines whose currencies differ by 2× or more. Then copy `data/catalog.json` to `reselling-brain/catalog/`, run `npm run feed:salesforce` in `reseller-programs/` and `python build_sales_skill.py` in `reselling-brain/slack-bot/`.
+
 ## Known data issues
 
 - The the old internal price-list sheet price list doesn't match Salesforce (e.g. Grubtech gOnline Annual 1,311.75 vs 1,421.10 SAR). Its KSA column holds KWD values for Ordable, Zyda and Mnasati. This repo uses Salesforce.
-- Six VOLT lines have inconsistent prices across currencies (flagged ⚠ in the data).
+- Eight VOLT lines have inconsistent prices across currencies (flagged ⚠ in the data), e.g. VOLT Hosting with SAP [Monthly] is USD 5,000 but SAR 1,750.
 - ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.

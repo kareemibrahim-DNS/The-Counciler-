@@ -23,7 +23,7 @@ CURRENCIES = {"SAR": "KSA (SAR)", "AED": "UAE (AED)", "KWD": "Kuwait (KWD)", "JO
 
 def catalog_markdown(cat: tools.Catalog) -> str:
     lines = ["# Reseller catalogue: available resellers, list prices, quote structure", "",
-             "Source: Salesforce Standard Price Book + \"USD 1 – International\", exported 5 Nov 2026. LIST (selling) prices only.",
+             "Source: Salesforce Standard Price Book + \"USD 1 – International\", refreshed 14 Nov 2026. LIST (selling) prices only.",
              "A blank price means the line is not sold in that country. Never convert between currencies.", "", "## Categories"]
     cats = json.loads(cat.lookup(level="sales"))["categories"]
     lines += [f"- **{c['name']}**: {', '.join(c['partners'])}" for c in cats] + [""]

@@ -150,8 +150,8 @@ li-volt-hr-license-annual,VOLT - HR License [Annual],VOLT · Main,Main · Annual
 li-volt-hr-license-monthly,VOLT - HR License [Monthly],VOLT · Main. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,Main · Monthly
 li-volt-hr-license-one-time-fee,VOLT - HR License [One-Time Fee],VOLT · One-time,One-time · One-time
 li-volt-hosting-with-sap-included-annual,VOLT - Hosting with SAP Included [Annual],VOLT · Add-on,Add-on · Annual
-li-volt-hosting-with-sap-included-monthly,VOLT - Hosting with SAP Included [Monthly],VOLT · Add-on,Add-on · Monthly
-li-volt-implementation-for-one-time-payment-based-deals-one-time-fee,VOLT - Implementation for One-Time Payment Based Deals [One-Time Fee],VOLT · One-time,One-time · One-time
+li-volt-hosting-with-sap-included-monthly,VOLT - Hosting with SAP Included [Monthly],VOLT · Add-on. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,Add-on · Monthly
+li-volt-implementation-for-one-time-payment-based-deals-one-time-fee,VOLT - Implementation for One-Time Payment Based Deals [One-Time Fee],VOLT · One-time. ⚠ Prices are inconsistent across currencies in Salesforce. Verify before quoting.,One-time · One-time
 li-volt-implementation-for-subscription-based-deals-one-time-fee,VOLT - Implementation for Subscription Based Deals [One-Time Fee],VOLT · One-time,One-time · One-time
 li-volt-mobile-app-per-user-annual,VOLT - Mobile App - per User [Annual],VOLT · Add-on,Add-on · Annual
 li-volt-mobile-app-per-user-monthly,VOLT - Mobile App - per User [Monthly],VOLT · Add-on,Add-on · Monthly

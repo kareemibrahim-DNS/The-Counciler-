@@ -17,7 +17,7 @@ const partners = data("partners.json");
 const categories = data("categories.json");
 
 const CUR_COUNTRY = { SAR: "SA", AED: "AE", KWD: "KW", JOD: "JO", EGP: "EG" };
-const SOURCE = "Source: Salesforce Standard Price Book, list prices, exported 5 Nov 2026.";
+const SOURCE = "Source: Salesforce Standard Price Book, list prices, refreshed 14 Nov 2026.";
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const csvCell = (v) => {
