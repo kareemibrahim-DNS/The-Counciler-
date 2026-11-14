@@ -1,5 +1,7 @@
 # Reselling Copilot
 
+> **Slack: use the Reselling Brain bot, not this Worker.** The team-wide Slack bot is the Reselling Brain (`kareemibrahim-DNS/orbit-reselling-wizard`, folder `reselling-brain/slack-bot`). It uses the same catalogue (`reselling-brain/catalog` is a copy of `data/` here) plus policy, SLAs and processes, with owner/team layers. This Worker bot (`src/`) is on hold so the team never sees two bots. Keep `data/` and the Brain's `catalog/` in sync (roadmap COP-2).
+
 Quoting assistant for the Foodics Marketplace reselling team: partners, line items, list prices and quote structure, in a web page and in Slack.
 
 > **This repo holds selling data only.** No cost prices, wholesale terms or margins, ever. CI blocks them (`npm run guard`).

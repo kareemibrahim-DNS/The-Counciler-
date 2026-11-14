@@ -27,10 +27,12 @@ Status: ⬜ open · 🟨 in progress · ✅ done
 ## GitHub Copilot
 
 - ⬜ **COP-1 · Review every PR** against `.github/copilot-instructions.md` (enable Copilot code review on the repo).
-- ⬜ **COP-2 · Catalogue sync script.** `scripts/sync-salesforce.mjs`: reads an exported Salesforce price-book CSV (Product Name, Code, Currency, List Price, Description) and regenerates `data/catalog.json`. It must refuse any column named cost/margin.
+- ⬜ **COP-2 · Catalogue sync script.** `scripts/sync-salesforce.mjs`: reads an exported Salesforce price-book CSV (Product Name, Code, Currency, List Price, Description) and regenerates `data/catalog.json`. It must refuse any column named cost/margin. The same JSON is copied to `orbit-reselling-wizard/reselling-brain/catalog/` (the Reselling Brain); document the copy step.
 - ⬜ **COP-3 · Build web/index.html from data/.** `scripts/build-web.mjs` re-embeds `data/*.json` into the page so the page never drifts from the bot.
 
 ## Partnerships (humans)
+
+- ⬜ **H-0** Slack: deploy the Reselling Brain bot (Orbit repo, `reselling-brain/slack-bot`, Socket Mode, needs an always-on host). This repo's Worker bot stays on hold.
 
 - ⬜ **H-1** Slack admin approves the app; create it from `docs/SLACK_SETUP.md`.
 - ⬜ **H-2** Decide who owns the Cloudflare account and the Anthropic API key.
