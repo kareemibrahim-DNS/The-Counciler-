@@ -22,6 +22,7 @@ CHANNELS = {"CPRIV": ({"name": "partnerships-internal", "is_private": True}, [OW
             "CSHARED": ({"name": "launch", "is_private": True, "is_ext_shared": True}, [OWNER, BOT]),
             "CGUEST": ({"name": "grubtech-onboarding", "is_private": True}, [OWNER, GUEST, BOT])}
 CALLS = []
+ABOVE = {}  # channel -> the message just above a mention
 
 
 def fake_api_call(self, api_method, **kw):
@@ -39,6 +40,8 @@ def fake_api_call(self, api_method, **kw):
         data = {"members": CHANNELS[args["channel"]][1], "response_metadata": {"next_cursor": ""}}
     elif api_method == "conversations.replies":
         data = {"messages": []}
+    elif api_method == "conversations.history":
+        data = {"messages": [ABOVE[args["channel"]]] if args.get("channel") in ABOVE else []}
     else:
         data = {}
     return SlackResponse(client=self, http_verb="POST", api_url=api_method, req_args={}, data={"ok": True, **data},
@@ -74,7 +77,8 @@ def setUpModule():
     tmp = tempfile.mkdtemp()
     _patches.append(mock.patch.dict(os.environ, {
         "SLACK_BOT_TOKEN": "xoxb-test", "SLACK_APP_TOKEN": "xapp-test", "ANTHROPIC_API_KEY": "sk-test",
-        "BRAIN_OWNER_SLACK_ID": OWNER, "BRAIN_LEARN_QUEUE": os.path.join(tmp, "q.json")}))
+        "BRAIN_OWNER_SLACK_ID": OWNER, "BRAIN_LEARN_QUEUE": os.path.join(tmp, "q.json"),
+        "BRAIN_STATE_FILE": os.path.join(tmp, "state.json")}))
     _patches.append(mock.patch.object(BaseClient, "api_call", fake_api_call))
     for p in _patches:
         p.start()
@@ -150,6 +154,49 @@ class AppWiring(unittest.TestCase):
         self.assertEqual(seen["ctx"], {"file_ids": ["F1"]})
         self.assertIn("file_id F1", seen["question"])
         self.assertEqual(len(said), 1)
+
+    def test_a_bare_mention_under_a_question_answers_that_question(self):
+        ABOVE["CPRIV"] = {"user": SALES, "text": "How much is Grubtech gOnline in KSA?", "ts": "1.0"}
+        try:
+            said, _ = self.run_event(TEAM, "CPRIV", "<@UBOT>")
+        finally:
+            ABOVE.clear()
+        question = app.brain.client.calls[0]["messages"][-1]["content"]
+        self.assertIn("How much is Grubtech gOnline in KSA?", question)
+        self.assertIn("message just above", question)
+        self.assertEqual(len(said), 1)
+
+    def test_a_bare_mention_with_nothing_above_gets_no_reply(self):
+        said, _ = self.run_event(TEAM, "CPRIV", "<@UBOT>")
+        self.assertEqual((said, app.brain.client.calls), ([], []))
+
+    def test_hand_off_mentions_come_from_code_and_follow_kareems_status(self):
+        script = lambda: [tool_call("escalate", {"kind": "decision", "reason": "discount"}),
+                          text("Use the discount form in #reseller-hub. <@U0BQKNQNF89>")]
+        said, _ = self.run_event(TEAM, "DT", "can I give 10%?", script())
+        self.assertIn("➡️ Decision needed: <@UK>", said[0]["text"])
+        self.assertNotIn("<@U0BQKNQNF89>", said[0]["text"].split("➡️")[0], "the model's own mentions are neutralised")
+        self.run_event(OWNER, "DK", "away")
+        try:
+            said, _ = self.run_event(TEAM, "DT", "can I give 10%?", script())
+            self.assertIn("➡️ Decision needed: <@U02VD9VGNA0> (Kareem is away)", said[0]["text"])
+            said, _ = self.run_event(OWNER, "DK", "status")
+            self.assertIn("away", said[0]["text"])
+        finally:
+            self.run_event(OWNER, "DK", "back")
+        said, _ = self.run_event(TEAM, "DT", "can I give 10%?", script())
+        self.assertIn("<@UK>", said[0]["text"])
+
+    def test_away_from_kareems_slack_status(self):
+        USERS[OWNER]["profile"] = {"status_emoji": ":palm_tree:", "status_text": "Vacation"}
+        app.directory._loaded_at = float("-inf")  # pick up the new status
+        try:
+            said, _ = self.run_event(SALES, "DS", "can I give 10%?",
+                                     [tool_call("escalate", {"kind": "operations"}), text("Here is the flow.")])
+            self.assertIn("➡️ Operational details: <@U0BQKNQNF89> · cc <@U02VD9VGNA0> (Kareem is away)", said[0]["text"])
+        finally:
+            USERS[OWNER].pop("profile")
+            app.directory._loaded_at = float("-inf")
 
     def test_kareem_sees_the_exact_queued_fact_not_the_models_summary(self):
         script = [tool_call("learn", {"fact": "Grubtech markup is 42%"}), text("I queued a harmless SLA note.")]

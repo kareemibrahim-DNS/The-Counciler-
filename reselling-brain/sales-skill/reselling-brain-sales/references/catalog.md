@@ -15,11 +15,19 @@ A blank price means the line is not sold in that country. Never convert between 
 - **Table management**: Servme
 - **Other**: Ishbek, Roboost, Nitx
 
+# Category: Ordering platform management
+
+How to choose: Pick on which aggregators the merchant uses, single vs multi-brand, and country.
+
 ## Grubtech
 - Category: Ordering platform management
 - What it is: Connects online ordering channels to Foodics POS and adds kitchen management and delivery dispatch in one platform. 300+ integrations.
+- Best for: Multi-brand operators and cloud kitchens that want order flow, kitchen tracking and dispatch together.
+- Edge: Live order tracking from prep to dispatch; multi-brand, multi-location from one setup; widest integration list.
 - Licensing unit: gOnline License per branch (main line). Virtual Brand add-on for each extra brand on the same branch.
 - Countries: KSA, UAE, Kuwait, Jordan
+- Watch out: Menu sync is the most common support issue. Confirm menu setup ownership before go-live.
+- Submit deals with: https://share.hsforms.com/1rOFHTm1gTpepWC29FiQGzQ5c1ve (KSA approval form: No (Partnerships handles KSA))
 - Quote structure:
   - 1 gOnline License per physical branch.
   - Each additional brand on a branch = 1 Virtual Brand line.
@@ -35,8 +43,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Deliverect
 - Category: Ordering platform management
 - What it is: Connects online ordering channels to Foodics POS so orders and menus are managed in one place, with sales and third-party delivery analytics.
+- Best for: Brands that care most about central menu control and channel analytics.
+- Edge: Strongest menu management with location-specific variations; real-time sales analytics across channels.
 - Licensing unit: Physical License per physical branch; Virtual License per virtual branch.
 - Countries: KSA, UAE, Kuwait, Jordan
+- Watch out: Highest price in the category. Annual only in Salesforce.
+- Submit deals with: https://welcome.deliverect.com/foodics-bundle (KSA approval form: No (Partnerships handles KSA))
 - Quote structure:
   - 1 Physical License per physical branch (includes 1 physical branch).
   - 1 Virtual License per virtual branch (includes 1 virtual branch).
@@ -50,8 +62,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## UrbanPiper
 - Category: Ordering platform management
 - What it is: Connects online ordering channels to Foodics POS; control menus, stock availability and business data across platforms and outlets.
+- Best for: Price-sensitive merchants, and the only aggregator-management option for Egypt.
+- Edge: Lowest entry price in KSA; real-time stock availability across outlets.
 - Licensing unit: Subscription License per outlet. '1 Channel' license for merchants on a single aggregator.
 - Countries: KSA, UAE, Egypt
+- Watch out: The 1 Channel line has no SAR price. It can't be quoted in KSA.
+- Submit deals with: https://tally.so/r/Xx11k4 (KSA approval form: No (Partnerships handles KSA))
 - Quote structure:
   - 1 Subscription License per outlet.
   - 1 Channel variant is limited to one channel and has no KSA price.
@@ -67,8 +83,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## FeedUs
 - Category: Ordering platform management
 - What it is: Connects HungerStation, Jahez, Mrsool and other online channels to Foodics POS; unified menu control and branch-specific provider mapping.
+- Best for: KSA merchants whose orders come from local Saudi aggregators.
+- Edge: Local-aggregator focus and branch-level provider assignments.
 - Licensing unit: Subscription License per branch.
 - Countries: KSA only
+- Watch out: SAR only. Not sellable outside KSA.
+- Submit deals with: https://docs.google.com/forms/d/e/1FAIpQLSeHp1QSysXGWgxilSlD3mSiEgDexgPFQFAG4yUVDpGPZNI-tQ/viewform (KSA approval form: No (Partnerships handles KSA))
 - Quote structure:
   - 1 Subscription License per branch.
   - Annual, SAR only.
@@ -77,11 +97,19 @@ A blank price means the line is not sold in that country. Never convert between 
 |---|---|---|---|---|---|---|---|---|
 | FeedUs - Subscription License [Annual] | Main | Annual | 2,300 |  |  |  |  |  |
 
+# Category: Loyalty & CRM
+
+How to choose: Pick on how deep the merchant goes: quick wallet cards, loyalty plus feedback and ordering, or a full CRM with campaigns.
+
 ## BrandWallet
 - Category: Loyalty & CRM
 - What it is: Digital loyalty cards (stamp, multi-stamp, point, tiered) with automated rewards, coupons, location push alerts and QR table tents.
+- Best for: Cafés and QSRs that want wallet loyalty cards live fast, in any country.
+- Edge: Plans are tiered by number of cards: Basic 1, Standard 2, Growth 5.
 - Licensing unit: One plan for the main branch plus one Additional Branch line per extra branch.
 - Countries: Global
+- Watch out: License count must equal branch count. 6 branches = 1 plan + 5 Additional Branch.
+- Submit deals with: https://foodics-sales.brand-wallet.com/PZQ5AqGEWaO7LyY9 (KSA approval form: Yes)
 - Quote structure:
   - 1 Main plan (Basic / Standard / Growth) + (branches − 1) Additional Branch.
   - Additional Branch works with all plans.
@@ -101,8 +129,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Koinz
 - Category: Loyalty & CRM
 - What it is: Loyalty plus customer feedback, growth analytics, retargeting, and online ordering for pickup and delivery.
+- Best for: KSA or Egypt merchants who want loyalty, feedback and their own ordering in one package.
+- Edge: WhatsApp messaging in KSA, SMS in Egypt; Apple Wallet; built-in ordering.
 - Licensing unit: Single Loyalty Package.
 - Countries: KSA, Egypt, UAE (no AED price)
+- Watch out: Priced in SAR and EGP only.
+- Submit deals with: https://docs.google.com/forms/d/e/1FAIpQLScSNaZ0Ih5peHu2NBRMS0U1MYnLS7CcxereCUEqdzL-xI260g/viewform (KSA approval form: Yes)
 - Quote structure:
   - One Loyalty Package line.
   - WhatsApp is KSA only; SMS is Egypt only.
@@ -116,8 +148,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## OptCulture
 - Category: Loyalty & CRM
 - What it is: AI-powered loyalty and CRM: interactive digital receipts, personalized loyalty, automated campaigns, Apple and Google Wallet cards, Customer 360.
+- Best for: Mid-to-large brands that want a CRM with segmentation and automated campaigns, not just a stamp card.
+- Edge: Growth adds pre-built WhatsApp, SMS and email promotional campaigns on top of Loyalty.
 - Licensing unit: Loyalty or Growth license, plus messaging billed per usage.
 - Countries: KSA, UAE (also US, India)
+- Watch out: SMS and WhatsApp are charged per message on top of the license. Tell the merchant up front.
+- Submit deals with: Not provided (KSA approval form: Yes)
 - Quote structure:
   - Choose Loyalty or Growth (Growth includes all Loyalty features).
   - Add SMS Usage and/or WhatsApp Usage lines (per message, GCC).
@@ -135,8 +171,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Prepit
 - Category: Loyalty & CRM
 - What it is: Behavior-based loyalty rewards, automated promotions and SMS, plus online ordering, payments and a waiter app.
+- Best for: Egyptian merchants who want loyalty and ordering together.
+- Edge: Advanced adds loyalty points, commercial account management and instant rewards.
 - Licensing unit: Basic or Advanced license for the main branch + Additional Branch lines; Delivery Module and Mobile App add-ons.
 - Countries: Egypt (also KSA, Canada)
+- Watch out: EGP only in Salesforce. Advanced and Mobile App are high-value lines.
+- Submit deals with: https://docs.google.com/forms/d/e/1FAIpQLSf8GJb_U_N2UMV6EYvssgza4JfQRB_kCd4wiPhkjaTnc6V7vA/viewform (KSA approval form: Yes)
 - Quote structure:
   - 1 Main license (Basic or Advanced) + (branches − 1) matching Additional Branch.
   - Additional Branch must match the main tier.
@@ -151,11 +191,19 @@ A blank price means the line is not sold in that country. Never convert between 
 | Prepit - Delivery Management Module [Annual] | Add-on | Annual |  |  |  |  | 6,097 |  |
 | Prepit - Mobile Application [Annual] | Add-on | Annual |  |  |  |  | 66,053 |  |
 
+# Category: Online ordering & web store
+
+How to choose: Pick on which aggregators the merchant uses, single vs multi-brand, and country.
+
 ## Ordable
 - Category: Online ordering & web store
 - What it is: 0% commission online store connected to Foodics POS, with 60+ features, delivery, payment gateways and social marketing tools.
+- Best for: Kuwait merchants who want their own branded ordering store.
+- Edge: 0% commission; deep feature set; strong in Kuwait.
 - Licensing unit: Basic or Advance license + Additional Branch; Mobile Application add-on.
 - Countries: Kuwait, Bahrain, Qatar (Jordan priced)
+- Watch out: Priced in KWD and JOD only. No KSA or UAE price.
+- Submit deals with: Not provided (KSA approval form: Yes)
 - Quote structure:
   - 1 Main license (Basic / Advance) + (branches − 1) Additional Branch.
   - Mobile Application is an optional add-on.
@@ -171,8 +219,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Zyda
 - Category: Online ordering & web store
 - What it is: Direct ordering website set up in 24 hours at 0% commission, with one dashboard for orders, stock, delivery and marketing.
+- Best for: Merchants in UAE, Kuwait or Egypt who want a fast, low-effort web store.
+- Edge: Advanced already covers 3 branches, which is cheaper than stacking branches on Basic.
 - Licensing unit: Basic includes 1 branch; Advanced includes 3 branches; Additional Branch for each extra; Mobile Application add-on.
 - Countries: Global (priced KWD, AED, EGP)
+- Watch out: No SAR or JOD price. Can't be quoted in KSA or Jordan.
+- Submit deals with: https://mex87gdp4z7.typeform.com/to/S5JhEa0v (KSA approval form: Yes)
 - Quote structure:
   - Basic = 1 branch; Advanced = 3 branches included.
   - Extra branches beyond what's included = Additional Branch lines.
@@ -188,8 +240,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Mnasati
 - Category: Online ordering & web store
 - What it is: Own online store live in about 24 hours; syncs menu, branches, customers and orders with Foodics.
+- Best for: Kuwait merchants who need a store fast and know their catalog size.
+- Edge: Tiered by catalog size: Premium allows 50 main and 150 sub categories, 1,500 products and bulk upload.
 - Licensing unit: Basic or Premium package.
 - Countries: Kuwait, Qatar, KSA (priced KWD, AED)
+- Watch out: No SAR price in Salesforce, even though KSA is listed as a working country.
+- Submit deals with: https://docs.google.com/forms/d/13UZOcC_pX0Ic14QMSvILejgq0gMpPFsrCE7l9VDmj5U/edit?ts=696e1e47 (KSA approval form: Yes)
 - Quote structure:
   - One package line (Basic or Premium) chosen by catalog size.
   - Annual.
@@ -202,8 +258,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## wi-Q
 - Category: Online ordering & web store
 - What it is: Modular ordering: Connect, Online Ordering and Table (QR) Ordering.
+- Best for: Dine-in venues that want QR table ordering, or a modular online ordering setup.
+- Edge: The only partner here with QR table ordering, and the only one with Monthly, Quarterly, Semi-annual and Annual options.
 - Licensing unit: Module licenses: Connect, Online Ordering, Table Ordering.
 - Countries: Priced in all six currencies
+- Watch out: Table Ordering is the highest-priced module. Quote modules separately.
+- Submit deals with: Not provided (KSA approval form: No (Partnerships handles KSA))
 - Quote structure:
   - Quote each module as its own line.
   - Connect is available Monthly, Quarterly, Semi-annual and Annual.
@@ -219,11 +279,19 @@ A blank price means the line is not sold in that country. Never convert between 
 | wi-Q - Table Ordering - [Monthly] | Main | Monthly | 683 | 668 | 56 | 129 | 9,100 | 182 |
 | wi-Q - Table Ordering- [Annual] | Main | Annual | 7,560 | 7,399 | 625 | 1,431 | 100,800 | 2,016 |
 
+# Category: Inventory
+
+How to choose: Pick on budget and depth: ShopBrain is tiered per branch, Supy is premium per outlet with a 3-license minimum.
+
 ## ShopBrain
 - Category: Inventory
 - What it is: Real-time inventory with AI demand planning, a restaurant accounting module and F&B expert insights.
+- Best for: Single and multi-branch restaurants that want solid inventory at a mid price, with optional accounting.
+- Edge: Operation adds the full PR/PO cycle; Enterprise adds advanced adjustments and COGS. The accounting add-on runs on the same POS data.
 - Licensing unit: Tier per branch: Essential, Operation or Enterprise. Main license + Additional Branch. Accounting add-on (main + additional). Cost Center per warehouse or central kitchen.
 - Countries: KSA, UAE, Egypt, Qatar
+- Watch out: Essential has only Additional Branch lines in Salesforce, so the Essential main license is missing. Confirm before quoting Essential.
+- Submit deals with: https://docs.google.com/forms/d/e/1FAIpQLSeSgfMm0SOBlcvU56fhSTOWEJK4YQSQE6WsNnHaRUwmx5ceTg/viewform (KSA approval form: Yes)
 - Quote structure:
   - 1 Main (tier) + (branches − 1) Additional Branch of the same tier.
   - Accounting: 1 Accounting Main + (branches − 1) Accounting Additional Branch.
@@ -252,8 +320,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Supy
 - Category: Inventory
 - What it is: Inventory, smart procurement, invoices and supplier settlements, recipe and menu engineering, and BI on Foodics sales data.
+- Best for: Groups with central kitchens that want procurement, recipe costing and supplier control.
+- Edge: Deepest procurement and recipe-costing features in the category.
 - Licensing unit: Regular Outlet License per outlet; Central Kitchen License per central kitchen; Extra Cost Center; one-time Onboarding Fee.
 - Countries: KSA, UAE (also UK, Australia)
+- Watch out: Minimum 3 licenses. About 2× ShopBrain Operation per outlet.
+- Submit deals with: https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw (KSA approval form: Yes)
 - Quote structure:
   - Minimum 3 licenses in total.
   - 1 Regular Outlet per outlet; 1 Central Kitchen per central kitchen.
@@ -267,11 +339,19 @@ A blank price means the line is not sold in that country. Never convert between 
 | Supy - Onboarding Fee [One-Time] | One-time | One-time | 1,875 | 1,835 | 155 | 355 | 25,000 | 500 |
 | Supy - Regular Outlet License [Annual] | Main | Annual | 5,940 | 5,813 | 491 | 1,125 | 79,200 | 1,584 |
 
+# Category: Accounting
+
+How to choose: Pick on branch count and whether the merchant needs setup help.
+
 ## Wafeq
 - Category: Accounting
 - What it is: Cloud accounting that syncs Foodics sales; VAT returns, invoicing and payroll.
+- Best for: Saudi and UAE merchants who want local, VAT-ready accounting.
+- Edge: Local Arabic-first product; Enterprise covers 3 branches in one license.
 - Licensing unit: Premium (1 branch only) or Enterprise (includes 3 branches) + Additional Branch on Enterprise only.
 - Countries: KSA, UAE
+- Watch out: Premium can't take extra branches. With 2+ branches, quote Enterprise.
+- Submit deals with: https://docs.google.com/forms/d/e/1FAIpQLScDy932sEjgQ4M3BgGzsHnZ7A_O7tQDXoaS6L0e4Kd8DzDCCA/viewform (KSA approval form: Yes)
 - Quote structure:
   - 1 branch → Premium.
   - 2–3 branches → Enterprise.
@@ -287,8 +367,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Xero
 - Category: Accounting
 - What it is: Xero subscription sold directly, with an optional Hesab Arabic interface and separate training and support packages.
+- Best for: Merchants who already know Xero or need international accounting.
+- Edge: Global brand; Arabic interface available as an add-on.
 - Licensing unit: Main Subscription + Additional Branch; Hesab Arabic Interface add-on; Training and Support packages (one-time).
 - Countries: All markets
+- Watch out: Training and support are NOT included. Quote them separately if the merchant needs help.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - 1 Main Subscription + (branches − 1) Additional Branch.
   - Training and Support are separate one-time lines.
@@ -304,8 +388,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Alpha (Xero)
 - Category: Accounting
 - What it is: Xero delivered by implementation partner Alpha: subscription plus implementation, migration and training.
+- Best for: Merchants who want Xero fully set up for them: chart of accounts, templates, integrations.
+- Edge: Done-for-you setup and up to 1 year of historical data migration.
 - Licensing unit: Basic or Premium Subscription + Additional Branch; Implementation (one-time), Migration Package, Training Sessions.
 - Countries: All markets
+- Watch out: Don't quote Xero direct and Alpha (Xero) to the same merchant. Pick one route.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - 1 Subscription (Basic / Premium) + (branches − 1) Additional Branch.
   - Implementation is a one-time line.
@@ -323,8 +411,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## QuickBooks
 - Category: Accounting
 - What it is: QuickBooks Online Plus with separate training and support packages.
+- Best for: Merchants already on QuickBooks.
+- Edge: Familiar to many accountants.
 - Licensing unit: Online Plus Subscription + Additional Branch; Training and Support (one-time).
 - Countries: All markets
+- Watch out: Training and support are not included.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - 1 Subscription + (branches − 1) Additional Branch.
   - Training and Support are separate one-time lines.
@@ -336,11 +428,19 @@ A blank price means the line is not sold in that country. Never convert between 
 | QuickBooks - Support Package [One-Time] | One-time | One-time | 2,608.7 | 2,321.74 | 213.913 | 495.653 | 33,495.71 | 704.35 |
 | QuickBooks - Training Package [One-Time] | One-time | One-time | 2,500 | 2,225 | 205 | 475 | 32,100 | 675 |
 
+# Category: ERP
+
+How to choose: Pick on size: FlowERP for KSA small and mid-size, SAP or Dynamics for enterprise groups.
+
 ## FlowERP
 - Category: ERP
 - What it is: Finance and ERP that syncs Foodics sales into accounting: automated journals, inventory lifecycle, COGS, ZATCA e-invoicing.
+- Best for: KSA small and mid-size groups that need a real ERP without SAP-level cost.
+- Edge: Advanced adds assets, production (assembly), waste and payroll. Modular add-ons.
 - Licensing unit: Basic or Advanced Package + matching Additional Branch; Implementation per branch (one-time); add-ons (HR, Cost Center, Central Kitchen, B2B Invoicing and more).
 - Countries: KSA
+- Watch out: Additional Branch must match the package. Implementation is per branch.
+- Submit deals with: https://docs.google.com/forms/d/e/1FAIpQLScrAhuEzLPgQIjk01wYfdl5U4MaplE6P-5aTGBzLx4ce3_8Bw/viewform (KSA approval form: Yes)
 - Quote structure:
   - 1 Package (Basic / Advanced) + (branches − 1) Additional Branch of the SAME package.
   - Implementation: 1 line per branch (one-time).
@@ -367,8 +467,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## SAP
 - Category: ERP
 - What it is: SAP Business One for F&B groups: Pro and Limited users, hosting, Foodics integration, maintenance (AMC), implementation.
+- Best for: Enterprise and multi-entity groups.
+- Edge: Most complete ERP; the B1 Bundle simplifies quoting for a single brand.
 - Licensing unit: Users (Pro / Limited: annual, monthly or perpetual one-time) + Hosting + Foodics Integration + AMC + Implementation per engineer-day. B1 Bundle = 1 brand, up to 5 users + 1 indirect user.
 - Countries: All markets
+- Watch out: Many components. Use the B1 Bundle for a single brand with 5 users or fewer.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - Count Pro and Limited users separately.
   - Always add Hosting + Foodics Integration unless the merchant self-hosts.
@@ -399,8 +503,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## MS Dynamics
 - Category: ERP
 - What it is: Microsoft Dynamics 365 Finance with Foodics integration.
+- Best for: Groups standardized on Microsoft.
+- Edge: Microsoft ecosystem fit.
 - Licensing unit: Finance or Premium license + Attach licenses + Team Members + Foodics Integration + Implementation (one-time).
 - Countries: All markets
+- Watch out: The Foodics Integration line is required for the POS sync.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - Base license (Finance or Premium) + optional Attach and Team Member.
   - Add Foodics Integration and Implementation.
@@ -414,11 +522,19 @@ A blank price means the line is not sold in that country. Never convert between 
 | MS Dynamics - Implementation - [One-time] | One-time | One-time | 1,200 | 1,174 | 99 | 227 | 16,000 | 320 |
 | MS Dynamics - Premium License - [Annual] | Main | Annual | 16,200 | 15,854 | 1,339 | 3,067 | 216,000 | 4,320 |
 
+# Category: E-invoicing & digital receipts
+
+How to choose: Both are licensed per account, not per branch. Pick on terminals and SMS vs invoice volume.
+
 ## InvoiceQ
 - Category: E-invoicing & digital receipts
 - What it is: Compliant B2B and B2C e-invoicing from Foodics POS with tax-authority integration, credit and debit notes, and approval workflows.
+- Best for: KSA and Jordan merchants who need ZATCA-compliant invoicing per terminal.
+- Edge: Terminal-based model fits merchants with few issuing points.
 - Licensing unit: Licensed per account (not per branch). Basic = email only, up to 2 terminals. Advanced = unlimited invoicing + 2,000 SMS/year, per issuing terminal. Customization one-time.
 - Countries: KSA, Jordan
+- Watch out: Advanced is per issuing terminal. Count terminals, not branches.
+- Submit deals with: https://invoiceq.com/?ff_landing=26 (KSA approval form: Yes)
 - Quote structure:
   - Basic: one account line covers up to 2 terminals.
   - Advanced: 1 line per issuing terminal.
@@ -433,8 +549,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Iisal
 - Category: E-invoicing & digital receipts
 - What it is: Digital receipts: POS transactions become compliant e-invoices sent by SMS, with sales dashboards, consumer insights and a loyalty program.
+- Best for: Merchants who want paperless SMS receipts plus customer insights.
+- Edge: Receipts double as a customer-data and loyalty channel. ZATCA Phase 1 and 2.
 - Licensing unit: Licensed per account (not per branch). Tier by yearly invoice volume: up to 100, up to 500, 500+.
 - Countries: Global
+- Watch out: Pick the tier by invoice volume, not by branch count.
+- Submit deals with: https://docs.google.com/forms/d/e/1FAIpQLSdmC6bQAoGYvjo-7GKIaGFhQsbp4k-VcH2tPv1xO8sScq4_Fg/viewform (KSA approval form: Yes)
 - Quote structure:
   - One account line, tier chosen by invoice volume.
 
@@ -444,11 +564,19 @@ A blank price means the line is not sold in that country. Never convert between 
 | Iisal - B2B E-Invoicing (Up to 100 Invoice) [Annual] | Main | Annual | 1,430 | 1,399 | 117.2 | 270 |  | 380 |
 | Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual] | Main | Annual | 2,725 | 2,664 | 144.7 | 514.4 |  | 725 |
 
+# Category: HR & payroll
+
+How to choose: Both sit on top of SAP. Malachite cannot be sold without SAP.
+
 ## VOLT
 - Category: HR & payroll
 - What it is: HR, payroll, attendance and self-service suite with SAP finance integration.
+- Best for: SAP customers who need HR and payroll.
+- Edge: Native SAP finance link.
 - Licensing unit: Per-module licenses (HR, Payroll, Attendance, ESS, Company Admin, Superuser, Dashboard, Mobile per user) in Annual, Monthly or One-time; Hosting with SAP; Implementation.
 - Countries: All markets
+- Watch out: Several Monthly lines have inconsistent prices across currencies (flagged ⚠). Verify in Salesforce before quoting.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - Quote per module and per user where the line says per user.
   - Pick one billing model (Annual, Monthly or One-time) for all modules.
@@ -496,8 +624,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Malachite
 - Category: HR & payroll
 - What it is: HR, payroll, attendance and employee self-service licenses.
+- Best for: SAP customers only.
+- Edge: Alternative HR suite for SAP.
 - Licensing unit: Per-module annual licenses.
 - Countries: All markets
+- Watch out: Not a stand-alone solution. It must be activated with SAP.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - Only quote together with SAP.
 
@@ -510,11 +642,18 @@ A blank price means the line is not sold in that country. Never convert between 
 | Malachite - HR License  [Annual] | Main | Annual | 27.6 | 27 | 2.3 | 5.2 | 367.8 | 7.4 |
 | Malachite - Payroll License  [Annual] | Main | Annual | 76.5 | 74.9 | 6.3 | 14.5 | 1,020 | 20.4 |
 
+# Category: Table management
+
+How to choose: Only partner in this category.
+
 ## Servme
 - Category: Table management
 - What it is: Reservations and seat management, waitlist, CRM guest profiles and booking widget.
+- Best for: Dine-in and fine-dining venues that take reservations.
+- Edge: Only table-management partner; flexible billing frequency.
 - Licensing unit: Black Plan (Monthly, Quarterly, Semi-annual, Annual) or Advanced Plan (Annual) + one-time Onboarding Fee.
 - Countries: All markets
+- Submit deals with: Servme Submission Form (KSA approval form: —)
 - Quote structure:
   - One plan line + Onboarding Fee on new business.
 
@@ -527,11 +666,19 @@ A blank price means the line is not sold in that country. Never convert between 
 | Servme - Black Plan - [Semi Annual] | Main | Semi-annual | 4,182.75 | 4,093.52 | 345.77 | 476.27 | 33,540 | 1,115.4 |
 | Servme - Onboarding Fee - [One-Time] | One-time | One-time | 1,443.75 | 1,412.95 | 119.35 | 273.35 | 19,250 | 385 |
 
+# Category: Other
+
+How to choose: Niche or inactive. Confirm with Partnerships before quoting.
+
 ## Ishbek
 - Category: Other
 - What it is: License includes 1 branch.
+- Best for: Kuwait or Jordan only.
+- Edge: —
 - Licensing unit: 1 license per branch.
 - Countries: Kuwait, Jordan (priced)
+- Watch out: Priced in KWD and JOD only.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - 1 license per branch.
 
@@ -543,8 +690,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Roboost
 - Category: Other
 - What it is: Delivery management system (DMS).
+- Best for: Merchants running their own delivery fleet.
+- Edge: —
 - Licensing unit: Usage-priced line (very small unit price).
 - Countries: All markets
+- Watch out: Confirm the billing unit with Partnerships before quoting.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - Confirm the unit (per order or per driver) first.
 
@@ -555,8 +706,12 @@ A blank price means the line is not sold in that country. Never convert between 
 ## Nitx — INACTIVE, do not quote
 - Category: Other
 - What it is: Screen management software.
+- Best for: —
+- Edge: —
 - Licensing unit: Annual license.
 - Countries: —
+- Watch out: Partner is DEACTIVATED. Do not quote.
+- Submit deals with: — (KSA approval form: —)
 - Quote structure:
   - Do not quote: partner deactivated.
 

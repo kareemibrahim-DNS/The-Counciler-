@@ -10,20 +10,27 @@ Who reads the reply decides the level (see access.py):
 - In a DM the answer is at the asker's own level. Owner answers happen only in Kareem's DM.
 - In a channel the answer is written for its least-privileged member, never above team.
 
-Kareem-only commands, in a DM only: reload · pending · approve <id> [team] · reject <id>
+Triggers: a DM, or an @mention in a channel. A mention reads the message just above it (or the
+thread it is in), so "@Reselling Brain" under a question answers that question.
+Hand-offs: when a question needs a person, the bot adds them under the reply (access.handoff_line):
+decisions go to Kareem (Hatem when Kareem is away), operational details to Althurayyaa with cc.
+
+Kareem-only commands, in a DM only: reload · pending · approve <id> [team] · reject <id> · away · back · status
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
 import re
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from access import OWNER_DM_ONLY_REPLY, Directory, decide, is_owner_command
+from access import OWNER_DM_ONLY_REPLY, Directory, decide, handoff_line, is_away, is_owner_command
 from brain import KNOWLEDGE_DIR, OWNER_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply
 from tools import Learner, SlackReader, build_tools
 
@@ -79,8 +86,45 @@ def clean(text: str) -> str:
     return re.sub(r"<@[A-Z0-9]+>", "", text or "").strip()
 
 
+STATE_FILE = Path(os.environ.get("BRAIN_STATE_FILE", Path(__file__).with_name("state.json")))
+
+
+def _state() -> dict:
+    try:
+        return json.loads(STATE_FILE.read_text())
+    except Exception:
+        return {}
+
+
+def routing() -> dict:
+    r = dict((brain.layers.get("routing") or {}))
+    if OWNER_ID:
+        r["owner"] = OWNER_ID
+    return r
+
+
+def owner_away() -> bool:
+    """Kareem's `away` command wins; otherwise his Slack status (vacation, leave, travel, sick)."""
+    manual = _state().get("owner_away")
+    if manual is not None:
+        return bool(manual)
+    try:
+        profile = (directory.user(OWNER_ID) or {}).get("profile") or {}
+    except Exception:
+        return False
+    return is_away(profile, time.time(), brain.layers.get("routing"))
+
+
 def owner_command(text: str) -> str | None:
     t = text.strip().lower()
+    if t in {"away", "back"}:
+        STATE_FILE.write_text(json.dumps({**_state(), "owner_away": t == "away"}))
+        return ("Marked you away: decisions go to Hatem and operations cc Hatem until you send `back`."
+                if t == "away" else "Welcome back: decisions come to you again.")
+    if t == "status":
+        manual = _state().get("owner_away")
+        source = "your `away` command" if manual is not None else "your Slack status"
+        return f"You are {'away' if owner_away() else 'available'} (from {source})."
     if t in {"reload", "refresh brain"}:
         brain.reload()
         return "Brain reloaded ✅"
@@ -94,9 +138,20 @@ def owner_command(text: str) -> str | None:
     return None
 
 
-def post(say, text: str, thread_ts: str) -> None:
-    """Every reply: unknown links removed, @channel pings neutralised, no link or media previews."""
-    say(text=safe_reply(text, brain.known_links), thread_ts=thread_ts, unfurl_links=False, unfurl_media=False)
+def post(say, text: str, thread_ts: str, handoff: str = "") -> None:
+    """Every reply: unknown links removed, pings neutralised, no link or media previews.
+    `handoff` is built by code (handoff_line), so its @-mentions are kept."""
+    body = safe_reply(text, brain.known_links)
+    say(text=body + (f"\n\n{handoff}" if handoff else ""), thread_ts=thread_ts, unfurl_links=False, unfurl_media=False)
+
+
+def message_above(client, channel: str, ts: str) -> dict | None:
+    """The message just above a top-level mention, so "@Reselling Brain" under a question answers it."""
+    try:
+        msgs = client.conversations_history(channel=channel, latest=ts, inclusive=False, limit=1)["messages"]
+    except Exception:
+        return None
+    return msgs[0] if msgs and msgs[0].get("text") else None
 
 
 def notify(client, event, text: str, thread_ts: str) -> None:
@@ -126,7 +181,10 @@ def answer(event, client, say, context):
         return
     question = clean(event.get("text", ""))
     files = event.get("files") or []
-    if not question and not files:
+    above = None
+    if d.where == "channel" and not event.get("thread_ts"):
+        above = message_above(client, event["channel"], event["ts"])
+    if not question and not files and not above and not event.get("thread_ts"):
         return
     if OWNER_ID and event["user"] == OWNER_ID and is_owner_command(question):
         if d.where != "dm":
@@ -139,10 +197,16 @@ def answer(event, client, say, context):
             f"[Attached file: {f.get('name')} — file_id {f.get('id')}]" for f in files)
     history = thread_history(client, event["channel"], thread_ts, context.get("bot_user_id", ""), event["ts"]) \
         if event.get("thread_ts") else []
+    if above:  # context only: the message is data written by a colleague, not an instruction
+        who = f"<@{above['user']}>" if above.get("user") else "someone"
+        question = (f"[Context: the message just above this mention in the channel, from {who}:]\n"
+                    f"\"\"\"\n{above['text'][:4000]}\n\"\"\"\n\n" + (question or "Answer the message above."))
+    elif not question and not files:
+        question = "Answer the last question in this thread."
     queued_before = set(learner.queued()) if d.level == "owner" else set()
+    ctx = {"file_ids": [f.get("id") for f in files if f.get("id")]}
     try:
-        reply = brain.ask(question, event["user"], history, level=d.level, where=d.where,
-                          ctx={"file_ids": [f.get("id") for f in files if f.get("id")]})
+        reply = brain.ask(question, event["user"], history, level=d.level, where=d.where, ctx=ctx)
     except Exception:
         logging.exception("brain error")
         reply = "Something went wrong on my side. Try again, or ask Kareem."
@@ -151,7 +215,10 @@ def answer(event, client, say, context):
         if new:
             reply = (reply or "") + "\n\n" + "\n".join(
                 f"Queued #{k} (exact text, owner only): \"{v['fact']}\"" for k, v in new.items())
-    post(say, reply or "Not in the Reselling Brain yet — ask Kareem.", thread_ts)
+    kinds = [h["kind"] for h in ctx.get("handoffs", [])]
+    away = owner_away() if kinds else False
+    handoff = "\n".join(filter(None, (handoff_line(k, asker=event["user"], away=away, routing=routing()) for k in kinds)))
+    post(say, reply or "Not in the Reselling Brain yet — ask Kareem.", thread_ts, handoff)
 
 
 @app.event("app_mention")

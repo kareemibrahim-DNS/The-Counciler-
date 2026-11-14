@@ -50,7 +50,7 @@ for (const f of brainFiles) {
   const file = join(BRAIN, "knowledge", f);
   const text = readFileSync(file, "utf8");
   const audience = (text.match(/^audience:\s*(\S+)/m) || [])[1];
-  if (!["team", "sales"].includes(audience)) problems.push(`${file}: audience must be team or sales here (owner files stay out of this repo)`);
+  if (!["base", "sales", "team"].includes(audience)) problems.push(`${file}: audience must be base, sales or team here (manager, cost and owner files stay out of this repo)`);
   if (/\b(30|27|23|20)\s?%/.test(text) && /markup/i.test(text) && /\|\s*(Monthly|Annual|Quarterly)[^|]*\|\s*\d+\s?%/i.test(text)) problems.push(`${file}: looks like a markup table`);
   if (/TARGET-NUMBER|TARGET-KPI/i.test(text)) problems.push(`${file}: looks like owner targets`);
 }

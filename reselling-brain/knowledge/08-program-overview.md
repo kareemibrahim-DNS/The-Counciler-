@@ -1,6 +1,6 @@
 ---
 id: program-overview
-audience: team
+audience: base
 source: "Marketplace Reseller Program - Eng.pdf, Drive, Sep 2025"
 updated: 2026-11-14
 ---

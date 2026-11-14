@@ -20,7 +20,7 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 
-LEVEL_ORDER = {"sales": 0, "team": 1, "owner": 2}
+LEVEL_ORDER = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
 CHANNEL_MAX_LEVEL = "team"  # owner answers never leave Kareem's DM
 SHARED_FLAGS = ("is_ext_shared", "is_shared", "is_org_shared", "is_pending_ext_shared", "pending_shared")
 
@@ -28,7 +28,7 @@ PARTNER_SPACE_REPLY = ("I don't answer in channels that partners or other worksp
                        "Ask me in a DM, or in an internal Foodics channel.")
 CANNOT_CHECK_REPLY = "I can't check who can read this channel, so I won't answer here. Ask me in a DM."
 OWNER_DM_ONLY_REPLY = "Send owner commands to me in a DM."
-_OWNER_COMMAND = re.compile(r"^(reload|refresh brain|pending|(approve|reject)\s+#?[0-9a-f]{6}(\s+(team|owner))?)$")
+_OWNER_COMMAND = re.compile(r"^(reload|refresh brain|pending|away|back|status|(approve|reject)\s+#?[0-9a-f]{6}(\s+(team|owner))?)$")
 
 
 def is_owner_command(text: str) -> bool:
@@ -164,3 +164,45 @@ def decide(*, event: dict, directory: Directory, workspace_team: str, level_of: 
         return Decision(False, notice=CANNOT_CHECK_REPLY, reason="channel-unknown")
     level = lower(level_of(uid), channel_level(levels + [level_of(uid)]))
     return Decision(True, level=level, where="channel", reason="channel")
+
+
+# ---------- who gets pulled in (Kareem, 14 Nov 2026) ----------
+# decision   (discounts, exceptions, approvals, cost, contracts): Kareem; Hatem when Kareem is away.
+# operations (detailed solution and operations questions): Althurayyaa, cc Kareem; cc Hatem when Kareem is away.
+DEFAULT_AWAY_EMOJIS = (":palm_tree:", ":airplane:", ":desert_island:", ":beach_with_umbrella:", ":face_with_thermometer:")
+DEFAULT_AWAY_WORDS = ("vacation", "holiday", "on leave", "annual leave", "sick", "ooo", "out of office", "off today",
+                      "agaza", "إجازة", "اجازة", "عطلة")
+
+
+def is_away(profile: dict | None, now: float, routing: dict | None = None) -> bool:
+    """Away when the Slack status shows leave or travel and has not expired."""
+    routing = routing or {}
+    profile = profile or {}
+    exp = profile.get("status_expiration") or 0
+    if exp and exp < now:
+        return False
+    text = (profile.get("status_text") or "").lower()
+    emoji = profile.get("status_emoji") or ""
+    emojis = routing.get("away_emojis") or DEFAULT_AWAY_EMOJIS
+    words = routing.get("away_words") or DEFAULT_AWAY_WORDS
+    return emoji in emojis or any(w.lower() in text for w in words)
+
+
+def handoff_line(kind: str, *, asker: str, away: bool, routing: dict) -> str:
+    """The @-mentions the app adds under a reply. Built by code from layers.yaml, never by the model."""
+    owner, manager, ops = routing.get("owner", ""), routing.get("manager", ""), routing.get("operations", "")
+    lead = manager if away else owner
+    to, cc = ([lead], []) if kind == "decision" else ([ops], [lead])
+    to = [u for u in to if u and u != asker]
+    cc = [u for u in cc if u and u != asker and u not in to]
+    if not to and cc:
+        to, cc = cc, []
+    if not to:
+        return ""
+    label = "Decision needed" if kind == "decision" else "Operational details"
+    line = f"➡️ {label}: " + " ".join(f"<@{u}>" for u in to)
+    if cc:
+        line += " · cc " + " ".join(f"<@{u}>" for u in cc)
+    if away and manager and manager in to + cc:
+        line += " (Kareem is away)"
+    return line

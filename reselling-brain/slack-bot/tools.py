@@ -260,6 +260,12 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", str(s or "").lower())
 
 
+def no_discount(text: str) -> str:
+    """Drop the sentences that mention discounts (discount eligibility is team-only)."""
+    parts = re.split(r"(?<=[.!?])\s+", text or "")
+    return " ".join(s for s in parts if "discount" not in s.lower()).strip()
+
+
 class Catalog:
     """Partner profiles, quote rules and Salesforce LIST prices. Never cost or margin."""
 
@@ -299,8 +305,10 @@ class Catalog:
 
     def lookup(self, partner: str | None = None, category: str | None = None, country: str | None = None,
                level: str = "sales") -> str:
-        """Sales (and any unknown level) gets only: available resellers, list prices, commercial structure."""
-        full = level in ("owner", "team")
+        """Everyone gets resellers, list prices, quote structure, comparisons (best for, edge, how to choose),
+        watch-outs and submission forms. Discount wording is removed below team level. Partner Slack channels
+        are team-only: other teams must not contact partners directly."""
+        full = level in ("owner", "manager", "team")
         cur = CURRENCY.get(str(country).upper()) if country else None
         if country and not cur:
             return _clip({"error": f"unknown country '{country}'. Use SA, AE, KW, JO, EG or INT."})
@@ -315,9 +323,10 @@ class Catalog:
                    # Sales never sees discount rules or eligibility, not even "can't be discounted".
                    "quote_rules": m["rules"] if full else [r for r in m["rules"] if "discount" not in r.lower()],
                    "line_items": self._lines(name, cur)}
+            out.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"] if full else no_discount(m["watch"]),
+                       submission_form=m["form"], ksa_approval_form=m["ksaForm"])
             if full:
-                out.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"], submission_form=m["form"],
-                           ksa_approval_form=m["ksaForm"], slack=m["slack"])
+                out["slack"] = m["slack"]
             return _clip(out)
         if category:
             n = _norm(category)
@@ -330,16 +339,24 @@ class Catalog:
                 if not m:
                     continue
                 row = {"partner": p, "inactive": bool(m.get("inactive")), "licensing_unit": m["unit"], "countries": m["countries"]}
-                if full:
-                    row.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"])
+                row.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"] if full else no_discount(m["watch"]))
                 if cur:
                     row["entry_price"] = self._entry(p, cur)
                 rows.append(row)
-            out = {"category": c["name"], "partners": rows}
-            if full:
-                out["how_to_choose"] = c["pick"]
-            return _clip(out)
+            return _clip({"category": c["name"], "partners": rows, "how_to_choose": c["pick"]})
         return _clip({"categories": [{"id": c["id"], "name": c["name"], "partners": c["partners"]} for c in self.categories]})
+
+
+# ---------- escalation (the app turns it into @-mentions) ----------
+def escalate(kind: str, reason: str = "", ctx: dict | None = None) -> str:
+    if kind not in ("decision", "operations"):
+        raise ValueError("kind must be decision or operations")
+    if ctx is not None:
+        ctx.setdefault("handoffs", [])
+        if not any(h["kind"] == kind for h in ctx["handoffs"]):
+            ctx["handoffs"].append({"kind": kind, "reason": (reason or "")[:300]})
+    return ("Noted. The right person will be added to your reply automatically. Do not write any @-mention yourself. "
+            "Tell the asker which flow to follow to get a correct result.")
 
 
 # ---------- registry ----------
@@ -385,6 +402,13 @@ def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: 
             {"file_id": {"type": "string"}}, ["file_id"],
             lambda file_id, _ctx=None: slack.read_file(file_id, (_ctx or {}).get("file_ids")))
         t["read_slack_file"]["ctx_aware"] = True
+    add("escalate", "Call once when the question needs a person: kind 'decision' (discounts, exceptions, approvals, "
+        "cost, contracts, commercial terms, new partner outreach) or 'operations' (detailed operational questions about "
+        "a partner's solution, onboarding, activation, integration, tickets). The bot adds the right person to your reply. "
+        "Still tell the asker which flow to follow.",
+        {"kind": {"type": "string", "enum": ["decision", "operations"]}, "reason": {"type": "string"}}, ["kind"],
+        lambda kind, reason="", _ctx=None: escalate(kind, reason, _ctx))
+    t["escalate"]["ctx_aware"] = True
     if learner:
         add("learn", "Queue a new fact or rule Kareem taught you, for his approval. It is saved as owner-only; "
             "only Kareem can share it with the team. Use only when Kareem states a new or corrected rule.",

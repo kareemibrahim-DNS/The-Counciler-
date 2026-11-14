@@ -31,11 +31,21 @@ class Doc:
     body: str
 
 
-def owner_docs_from_env(value: str | None = None) -> list[Doc]:
-    """Owner-only knowledge (pricing/markups, targets, contacts, gaps) never lives in this shared repo.
+# Audiences (Kareem, 14 Nov 2026):
+#   base    everyone at Foodics: resellers, list prices, quotes, comparisons, merchant fit, flows, unified billing
+#   sales   instructions for the base level only (what is locked and how to point to the flow)
+#   team    Partnerships team: policy, discount eligibility, SLAs, processes, partner operations
+#   manager managers: program cycles, targets, strategy, internal trackers, partner contacts
+#   cost    cost prices and contracts: only the people in BRAIN_COST_SLACK_IDS (Hatem) and Kareem
+#   owner   Kareem only
+PRIVATE_AUDIENCES = ("manager", "cost", "owner")  # only ever loaded from the secret, never from this repo
 
-    It comes from the BRAIN_OWNER_KNOWLEDGE_B64 secret: base64 of a JSON list of {id, body}.
-    Every doc loaded this way is forced to audience "owner", whatever the payload says.
+
+def owner_docs_from_env(value: str | None = None) -> list[Doc]:
+    """Private knowledge (contacts, cycles and strategy, cost and contracts, gaps) never lives in this shared repo.
+
+    It comes from the BRAIN_OWNER_KNOWLEDGE_B64 secret: base64 of a JSON list of {id, body, audience?}.
+    audience may be manager, cost or owner; anything else (or nothing) is forced to owner.
     """
     import base64
     import json
@@ -43,7 +53,8 @@ def owner_docs_from_env(value: str | None = None) -> list[Doc]:
     if not raw.strip():
         return []
     items = json.loads(base64.b64decode(raw).decode("utf-8"))
-    return [Doc(id=str(i["id"]), audience="owner", body=str(i["body"]).strip()) for i in items if i.get("id") and i.get("body")]
+    return [Doc(id=str(i["id"]), audience=i.get("audience") if i.get("audience") in PRIVATE_AUDIENCES else "owner",
+                body=str(i["body"]).strip()) for i in items if i.get("id") and i.get("body")]
 
 
 def owner_docs_from_file(path: Path = OWNER_LEARNED_FILE) -> list[Doc]:
@@ -71,8 +82,9 @@ def load_docs(folder: Path = KNOWLEDGE_DIR, private: bool = True) -> list[Doc]:
 
 def load_layers(path: Path = LAYERS_FILE) -> dict:
     if not path.exists():
-        return {"levels": {"owner": {"sees": ["owner", "team"]}, "team": {"sees": ["team"]},
-                           "sales": {"sees": ["sales"], "tools": ["brain_catalog"]}},
+        return {"levels": {"owner": {"sees": ["owner", "cost", "manager", "team", "base"]},
+                           "manager": {"sees": ["manager", "team", "base"]}, "team": {"sees": ["team", "base"]},
+                           "sales": {"sees": ["sales", "base"], "tools": ["brain_catalog", "escalate"]}},
                 "people": {}, "default_level": "sales"}
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
 
@@ -115,10 +127,28 @@ def level_for(slack_user_id: str, layers: dict, owner_id: str | None = None) -> 
     return "sales" if level == "owner" else level
 
 
-def visible_docs(level: str, layers: dict, docs: list[Doc]) -> list[Doc]:
-    sees = set((layers.get("levels") or {}).get(level, {}).get("sees", ["sales"]))
-    # Owner material is owner-only whatever layers.yaml says.
-    return [d for d in docs if d.audience in sees and (d.audience != "owner" or level == "owner")]
+def cost_access(slack_user_id: str, value: str | None = None) -> bool:
+    """Cost prices and contracts: only the Slack IDs in the BRAIN_COST_SLACK_IDS secret (Hatem). Kareem has owner."""
+    raw = os.environ.get("BRAIN_COST_SLACK_IDS", "") if value is None else value
+    return bool(slack_user_id) and slack_user_id in {x.strip() for x in raw.split(",") if x.strip()}
+
+
+def visible_docs(level: str, layers: dict, docs: list[Doc], cost: bool = False) -> list[Doc]:
+    """Docs this level may see. Hard limits apply whatever layers.yaml (a shared file) says:
+    owner docs only at owner level; cost docs only for the owner or a cost grant; manager docs only from manager up."""
+    sees = set((layers.get("levels") or {}).get(level, {}).get("sees", ["sales", "base"]))
+
+    def allowed(d: Doc) -> bool:
+        if d.audience == "base":
+            return True  # the common layer everyone at Foodics sees
+        if d.audience == "owner":
+            return level == "owner"
+        if d.audience == "cost":
+            return level == "owner" or (cost and LEVEL_RANK.get(level, -1) >= LEVEL_RANK["manager"])
+        if d.audience == "manager":
+            return LEVEL_RANK.get(level, -1) >= LEVEL_RANK["manager"] and d.audience in sees
+        return d.audience in sees
+    return [d for d in docs if allowed(d)]
 
 
 WHERE_NOTES = {
@@ -128,17 +158,18 @@ WHERE_NOTES = {
 }
 
 
-def system_prompt(level: str, layers: dict, docs: list[Doc], where: str = "dm", capped: bool = False) -> str:
-    parts = [f"<knowledge id=\"{d.id}\">\n{d.body}\n</knowledge>" for d in visible_docs(level, layers, docs)]
+def system_prompt(level: str, layers: dict, docs: list[Doc], where: str = "dm", capped: bool = False,
+                  cost: bool = False) -> str:
+    parts = [f"<knowledge id=\"{d.id}\">\n{d.body}\n</knowledge>" for d in visible_docs(level, layers, docs, cost)]
     level_note = (layers.get("levels") or {}).get(level, {}).get("instructions", "")
     footer = f"\n\nThe answer is at level: {level}.\n{level_note}".rstrip()
     footer += "\n" + WHERE_NOTES.get(where, WHERE_NOTES["channel"])
     if capped:
         footer += ("\nThe asker has more access in a private DM. If the question needs more than this level allows, "
                    "say you can only share that in a DM, without hinting at the content.")
-    if level != "owner":
-        footer += ("\nThis person cannot see owner-only material (cost prices, markups, targets, strategy, "
-                   "negotiations). If asked for it, say it is restricted and to ask Kareem.")
+    if level != "owner" and not cost:
+        footer += ("\nCost prices, markups, margins and contracts are locked at this level. Never hint at or estimate them; "
+                   "point to the right flow and call `escalate` with kind decision.")
     return "\n\n".join(parts) + footer
 
 
@@ -215,8 +246,9 @@ def safe_reply(text: str, known: set[str]) -> str:
 
 SALES_TOOL_GUIDE = """
 ## Tools
-- Call `brain_catalog` for every partner, line item and price. Never quote a price from memory.
+- Call `brain_catalog` for every partner, line item, price and comparison. Never quote a price from memory.
 - If the tool fails or returns nothing, say so plainly; do not invent the result.
+- When the question needs a decision or operational detail you can't give, explain the flow, then call `escalate` once.
 """
 TOOL_GUIDE = """
 ## Tools
@@ -227,9 +259,10 @@ a partner's latest Slack thread, a ticket's status, a contract clause, an attach
 - Tools never send or change anything. To "send" something, write a draft for the person to send.
 - When drafting a deal or discount email reply, add the Standard T&C block from the policy.
 - Use `learn` only when Kareem states a new or corrected rule; tell him it waits for his approval.
+- When the question needs a person (a decision, or operational detail you don't have), explain the flow, then call `escalate` once.
 """
 MAX_TOOL_TURNS = 8
-LEVEL_RANK = {"sales": 0, "team": 1, "owner": 2}
+LEVEL_RANK = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
 
 
 def tools_for(level: str, layers: dict, tools: dict) -> dict:
@@ -254,15 +287,19 @@ class Brain:
 
     def ask(self, question: str, slack_user_id: str, history: list[dict] | None = None, *,
             level: str | None = None, where: str = "dm", ctx: dict | None = None) -> str:
-        """`level` caps the answer (it can only lower the asker's own level); `where` says who reads it."""
+        """`level` caps the answer (it can only lower the asker's own level); `where` says who reads it.
+        `ctx` carries per-request data to tools (attached file ids) and back (hand-offs from `escalate`)."""
+        ctx = {} if ctx is None else ctx
         own = level_for(slack_user_id, self.layers)
         level = own if level is None else (level if LEVEL_RANK.get(level, -1) <= LEVEL_RANK.get(own, -1) else own)
         if LEVEL_RANK.get(level, -1) < 0:
             level = "sales"
         capped = LEVEL_RANK.get(level, -1) < LEVEL_RANK.get(own, -1)
+        # Cost and contracts only in a private DM, at the person's own level, for a cost grant.
+        cost = where == "dm" and not capped and cost_access(slack_user_id)
         tools = tools_for(level, self.layers, self.all_tools)
         guide = (SALES_TOOL_GUIDE if level == "sales" else TOOL_GUIDE) if tools else ""
-        system = system_prompt(level, self.layers, self.docs, where=where, capped=capped) + guide
+        system = system_prompt(level, self.layers, self.docs, where=where, capped=capped, cost=cost) + guide
         messages = list(history or []) + [{"role": "user", "content": question}]
         kwargs = dict(model=MODEL, max_tokens=MAX_TOKENS,
                       # The knowledge block is cached so repeat questions are cheap and fast.
@@ -283,7 +320,7 @@ class Brain:
                     if tool and tool.get("level_aware"):
                         args["_level"] = level
                     if tool and tool.get("ctx_aware"):
-                        args["_ctx"] = dict(ctx or {})
+                        args["_ctx"] = ctx  # shared, so `escalate` can record hand-offs for the app
                     out = tool["fn"](**args) if tool else f"Tool '{u.name}' is not available at level {level}."
                     err = tool is None
                 except Exception as exc:  # report the failure to the model instead of crashing
