@@ -23,6 +23,14 @@ from tools import Learner, SlackReader, build_tools
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
+
+REQUIRED_ENV = ("SLACK_BOT_TOKEN", "SLACK_APP_TOKEN", "ANTHROPIC_API_KEY")
+_missing = [name for name in REQUIRED_ENV if not os.environ.get(name, "").strip()]
+if _missing:
+    logging.error("Reselling Brain cannot start. Missing variables: %s. "
+                  "Add them in Railway → The-Counciler- → Variables, then redeploy.", ", ".join(_missing))
+    raise SystemExit(1)
+
 BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 app = App(token=BOT_TOKEN)
 OWNER_ID = os.environ.get("BRAIN_OWNER_SLACK_ID", "")
