@@ -32,10 +32,13 @@ The owner is whoever the `BRAIN_OWNER_SLACK_ID` secret names. An `owner` line in
 | --- | --- |
 | A partner, a guest (single- or multi-channel), a Slack Connect user, or anyone the bot can't identify asks | Nothing at all, not even a refusal |
 | A channel that is Slack Connect (or pending), has any guest or outside member, or matches a partner name pattern | No answer. Only the asker gets a private note |
-| Any other channel | The least-privileged member's level, never above **team**. A channel with one Sales member gets a sales answer, even when Kareem asks |
+| A public channel | Always **sales**: every full member can open and search it, even without joining |
+| A private channel | The least-privileged member's level, never above **team**. One Sales member means a sales answer, even when Kareem asks. Deactivated accounts don't count; a deactivated guest still blocks |
 | A DM | The asker's own level. **Owner answers only ever happen in Kareem's DM** |
 
-If Slack can't tell who is asking or who can read the channel, the bot does not answer (fail closed). Replies never carry link or media previews, links to unknown sites are removed, and `@channel`/`@here` are neutralised.
+If Slack can't tell who is asking or who can read the channel, the bot does not answer (fail closed). Members and user records are re-checked at least every minute.
+
+Replies never carry link or media previews. A reply may only link to Foodics systems (`*.foodics.com`, the Foodics Slack and Salesforce), Google Drive files (trimmed to the file id), or a link written word for word in `knowledge/` or `catalog/`. Every other link, `mailto:` and bare domain is removed, and `@channel`, `@here`, group and user pings are neutralised.
 
 ## Slack bot setup (about 15 minutes)
 1. Go to api.slack.com/apps → **Create New App** → **From a manifest** → paste `slack-bot/manifest.yml`. It includes the `users:read` scope, which the bot needs to tell guests and other workspaces apart; without it the bot refuses to start.
@@ -66,9 +69,9 @@ A tool turns itself on only when its credentials are set, so you can start with 
 Which level gets which tool is set in `layers.yaml` (we finalize it when we define the layers).
 
 ### Teaching the bot (Kareem only, in a DM)
-Tell it a new or corrected rule. It queues it as owner-only and shows you the fact and an id. Then send:
+Tell it a new or corrected rule. It queues it as owner-only, and the bot adds the exact stored text and id under its reply (so you never approve the model's paraphrase). Then send:
 - `approve <id>` → kept for you only (owner level), live immediately
-- `approve <id> team` → shared with the team, live immediately
+- `approve <id> team` → shared with the team, live immediately. Facts about cost, margin, markup, wholesale, payout or commission are refused and stay pending
 - `reject <id>` → dropped
 - `pending` → list what's waiting
 - `reload` → re-read the knowledge files
@@ -76,7 +79,7 @@ Tell it a new or corrected rule. It queues it as owner-only and shows you the fa
 These commands work only in your DM with the bot. In a channel it tells you privately to DM it.
 
 ### Tests
-`cd slack-bot && python -m unittest test_brain` (offline, no real accounts needed). 55 tests.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 70 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 

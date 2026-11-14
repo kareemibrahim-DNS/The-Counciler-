@@ -96,7 +96,7 @@ def owner_command(text: str) -> str | None:
 
 def post(say, text: str, thread_ts: str) -> None:
     """Every reply: unknown links removed, @channel pings neutralised, no link or media previews."""
-    say(text=safe_reply(text, brain.link_hosts), thread_ts=thread_ts, unfurl_links=False, unfurl_media=False)
+    say(text=safe_reply(text, brain.known_links), thread_ts=thread_ts, unfurl_links=False, unfurl_media=False)
 
 
 def notify(client, event, text: str, thread_ts: str) -> None:
@@ -125,7 +125,8 @@ def answer(event, client, say, context):
             notify(client, event, d.notice, thread_ts)
         return
     question = clean(event.get("text", ""))
-    if not question:
+    files = event.get("files") or []
+    if not question and not files:
         return
     if OWNER_ID and event["user"] == OWNER_ID and is_owner_command(question):
         if d.where != "dm":
@@ -133,17 +134,23 @@ def answer(event, client, say, context):
             return
         post(say, owner_command(question) or "Unknown command.", thread_ts)
         return
-    files = event.get("files") or []
     if files:  # tell the model which attachments it can open with read_slack_file
-        question += "\n\n" + "\n".join(f"[Attached file: {f.get('name')} — file_id {f.get('id')}]" for f in files)
+        question = (question or "Read the attached file.") + "\n\n" + "\n".join(
+            f"[Attached file: {f.get('name')} — file_id {f.get('id')}]" for f in files)
     history = thread_history(client, event["channel"], thread_ts, context.get("bot_user_id", ""), event["ts"]) \
         if event.get("thread_ts") else []
+    queued_before = set(learner.queued()) if d.level == "owner" else set()
     try:
         reply = brain.ask(question, event["user"], history, level=d.level, where=d.where,
                           ctx={"file_ids": [f.get("id") for f in files if f.get("id")]})
     except Exception:
         logging.exception("brain error")
         reply = "Something went wrong on my side. Try again, or ask Kareem."
+    if d.level == "owner":  # show Kareem exactly what was queued, not the model's description of it
+        new = {k: v for k, v in learner.queued().items() if k not in queued_before}
+        if new:
+            reply = (reply or "") + "\n\n" + "\n".join(
+                f"Queued #{k} (exact text, owner only): \"{v['fact']}\"" for k, v in new.items())
     post(say, reply or "Not in the Reselling Brain yet — ask Kareem.", thread_ts)
 
 

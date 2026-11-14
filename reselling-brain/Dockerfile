@@ -9,5 +9,5 @@ COPY catalog catalog
 COPY slack-bot slack-bot
 WORKDIR /app/slack-bot
 # Fail the build if the offline tests (layers, partner-channel gate, catalogue) don't pass.
-RUN python -m unittest test_brain
+RUN python -m unittest test_brain test_app
 CMD ["python", "app.py"]

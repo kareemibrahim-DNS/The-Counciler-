@@ -143,32 +143,74 @@ def system_prompt(level: str, layers: dict, docs: list[Doc], where: str = "dm", 
 
 
 # ---------- reply safety ----------
-DEFAULT_LINK_HOSTS = ("foodics.com", "slack.com", "salesforce.com", "force.com", "google.com", "forms.gle")
+# A reply may only carry links to Foodics' own systems, Google Drive files (trimmed to the file id),
+# or a link that appears word for word in our own knowledge or catalogue. Everything else is removed:
+# prompt-injected text could otherwise hide data in a link to a site the attacker controls.
+COMPANY_DOMAINS = ("foodics.com",)  # and its subdomains
+COMPANY_HOSTS = ("foodics.slack.com", "foodics.lightning.force.com", "foodics.my.salesforce.com")
+GOOGLE_FILE_HOSTS = ("docs.google.com", "drive.google.com")
+_GOOGLE_FILE = re.compile(r"^/(?:(?:document|spreadsheets|presentation|file)/d/|drive/(?:u/\d+/)?folders/)[A-Za-z0-9_-]{10,}")
 _URL = re.compile(r"https?://[^\s<>|()\[\]\"'`]+", re.I)
-_HOST = re.compile(r"^https?://([^/:?#]+)", re.I)
+_ANGLE = re.compile(r"<([a-z][a-z0-9+.-]*:[^<>|]*)(?:\|([^<>]*))?>", re.I)  # Slack link markup, any scheme
+_BARE = re.compile(r"(?<![\w@/.:-])((?:[a-z0-9-]+\.)+[a-z]{2,})(?=[/?#])[^\s<>|()\[\]]*", re.I)
+_INVISIBLE = re.compile(r"[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\ufeff]")
+_TRAIL = ".,;:!?)'\""
 
 
-def link_hosts(texts: list[str]) -> set[str]:
-    """Hosts of the links in our own knowledge and catalogue: the only links a reply may carry."""
-    hosts = set(DEFAULT_LINK_HOSTS)
-    for t in texts:
-        for url in _URL.findall(t or ""):
-            m = _HOST.match(url)
-            if m:
-                hosts.add(m.group(1).lower())
-    return hosts
+def _strip(url: str) -> str:
+    return url.rstrip(_TRAIL)
 
 
-def _host_ok(url: str, hosts: set[str]) -> bool:
-    m = _HOST.match(url)
-    host = m.group(1).lower() if m else ""
-    return bool(host) and any(host == h or host.endswith("." + h) for h in hosts)
+def known_links(texts: list[str]) -> set[str]:
+    """Every link that appears in our own knowledge and catalogue, exactly as written."""
+    return {_strip(u) for t in texts for u in _URL.findall(t or "")}
 
 
-def safe_reply(text: str, hosts: set[str]) -> str:
-    """Remove links to unknown hosts (a prompt-injection exfiltration path) and @channel-style pings."""
-    text = _URL.sub(lambda m: m.group(0) if _host_ok(m.group(0), hosts) else "[link removed]", text or "")
-    return re.sub(r"<!(channel|here|everyone|subteam\^[A-Z0-9]+)[^>]*>", r"@\1", text)
+def allowed_link(url: str, known: set[str]) -> str | None:
+    """The link to keep (Drive links are trimmed to the file id), or None to remove it."""
+    from urllib.parse import urlsplit
+    url = _strip(url)
+    if url in known:
+        return url
+    try:
+        p = urlsplit(url)
+        port = p.port
+    except ValueError:
+        return None
+    host = (p.hostname or "").lower()
+    if (p.scheme.lower() not in ("http", "https") or "@" in p.netloc or "\\" in url or port not in (None, 80, 443)
+            or not host or not host.isascii()):
+        return None
+    if host in COMPANY_HOSTS or any(host == d or host.endswith("." + d) for d in COMPANY_DOMAINS):
+        return url
+    if host in GOOGLE_FILE_HOSTS:
+        m = _GOOGLE_FILE.match(p.path)
+        if m:
+            return f"https://{host}{m.group(0)}"
+    return None
+
+
+def safe_reply(text: str, known: set[str]) -> str:
+    """Remove unknown links (also in Slack <url|label> markup, other schemes and bare domains) and
+    neutralise @channel/@here/@group and user pings."""
+    text = _INVISIBLE.sub("", text or "")
+
+    def angle(m: re.Match) -> str:
+        target, label = m.group(1), m.group(2)
+        keep = allowed_link(target, known) if re.match(r"https?://", target, re.I) else None
+        if keep:
+            return f"<{keep}|{label}>" if label else f"<{keep}>"
+        return f"{label} [link removed]" if label else "[link removed]"
+
+    text = _ANGLE.sub(angle, text)
+    def bare_url(m: re.Match) -> str:
+        url = m.group(0)
+        return (allowed_link(url, known) or "[link removed]") + url[len(_strip(url)):]
+
+    text = re.sub(r"(?<![<|])" + _URL.pattern, bare_url, text, flags=re.I)
+    text = _BARE.sub(lambda m: m.group(0) if allowed_link("https://" + m.group(0), known) else "[link removed]", text)
+    text = re.sub(r"<!(channel|here|everyone|subteam\^[A-Z0-9]+)[^>]*>", r"@\1", text)
+    return re.sub(r"<@([UW][A-Z0-9]+)(?:\|[^>]*)?>", r"@\1", text)
 
 
 SALES_TOOL_GUIDE = """
@@ -205,7 +247,7 @@ class Brain:
         self.docs = load_docs()
         self.layers = load_layers()
         catalog = [p.read_text(encoding="utf-8") for p in sorted(CATALOG_DIR.glob("*.json"))] if CATALOG_DIR.exists() else []
-        self.link_hosts = link_hosts([d.body for d in self.docs] + catalog)
+        self.known_links = known_links([d.body for d in self.docs] + catalog)
 
     def level_of(self, slack_user_id: str) -> str:
         return level_for(slack_user_id, self.layers)

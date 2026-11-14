@@ -157,6 +157,13 @@ class Learning(unittest.TestCase):
         self.assertEqual(list(self.knowledge.glob("*")), [], "owner facts must never be written into knowledge/")
         self.assertIn("25%", (self.private / "learned_owner.md").read_text())
 
+    def test_cost_or_markup_facts_can_never_be_shared_with_the_team(self):
+        msg = self.lr.propose("Grubtech cost price is 1000 SAR; our markup is 42%")
+        out = self.lr.approve(pid_of(msg), "team")
+        self.assertIn("not shared", out)
+        self.assertFalse((self.knowledge / "10-learned-team.md").exists())
+        self.assertIn(pid_of(msg), self.lr.queued(), "it stays pending for Kareem")
+
     def test_owner_learned_file_loads_as_owner_only(self):
         f = self.private / "learned_owner.md"
         f.write_text("# Learned\n- markup 25%\n", encoding="utf-8")
@@ -381,6 +388,24 @@ class AccessTest(unittest.TestCase):
         d = decide("UK", "C1", "channel", channels=ch, members={"C1": ["UK", "UH", "US", "UBOT"]})
         self.assertEqual((d.answer, d.level, d.where), (True, "sales", "channel"))
 
+    def test_public_channels_always_get_sales(self):
+        for ch in [{"name": "partnerships-hub", "is_private": False}, {"name": "partnerships-hub"}]:
+            for asker in ["UK", "UH"]:
+                d = decide(asker, "C7", "channel", channels={"C7": ch}, members={"C7": ["UK", "UH", "UA", "UBOT"]})
+                self.assertEqual((d.answer, d.level), (True, "sales"), (ch, asker))
+
+    def test_deactivated_staff_and_removed_apps_do_not_block_but_a_deactivated_guest_does(self):
+        users = dict(USERS, UOLD={**MEMBER, "deleted": True}, UOLDBOT={**MEMBER, "deleted": True, "is_bot": True},
+                     UOLDGUEST={**MEMBER, "deleted": True, "is_restricted": True})
+        ch = {"C8": {"name": "partnerships", "is_private": True}}
+
+        def run(extra):
+            d = FakeDirectory(users, channels=ch, members={"C8": ["UK", "UH"] + extra})
+            return access.decide(event={"user": "UH", "channel": "C8"}, directory=d, workspace_team=T,
+                                 level_of=lambda u: PEOPLE.get(u, "sales"), name_blocked=lambda n: False)
+        self.assertEqual((run(["UOLD", "UOLDBOT"]).answer, run(["UOLD", "UOLDBOT"]).level), (True, "team"))
+        self.assertFalse(run(["UOLDGUEST"]).answer)
+
     def test_owner_answers_never_leave_the_dm(self):
         ch = {"C2": {"name": "partnerships-leads", "is_private": True}}
         self.assertEqual(decide("UK", "C2", "channel", channels=ch, members={"C2": ["UK"]}).level, "team")
@@ -416,7 +441,57 @@ class AccessTest(unittest.TestCase):
         for c in ["approve the deal", "what is pending for grubtech?"]:
             self.assertFalse(access.is_owner_command(c), c)
 
-    def test_directory_caches_and_fails_closed_on_missing_scope(self):
+    def test_directory_pages_refreshes_and_finds_outside_members(self):
+        calls = []
+
+        class Client:
+            def users_list(self, limit, cursor=None):
+                calls.append(("users_list", cursor))
+                if cursor is None:
+                    return {"members": [{"id": "UK", "team_id": T}], "response_metadata": {"next_cursor": "p2"}}
+                return {"members": [{"id": "UH", "team_id": T}], "response_metadata": {"next_cursor": ""}}
+
+            def users_info(self, user):
+                calls.append(("users_info", user))
+                return {"user": {"id": user, "team_id": "TPARTNER"}}
+
+            def conversations_info(self, channel):
+                return {"channel": {"name": "launch", "is_private": True}}
+
+            def conversations_members(self, channel, limit, cursor=None):
+                calls.append(("members", cursor))
+                if cursor is None:
+                    return {"members": ["UK"], "response_metadata": {"next_cursor": "m2"}}
+                return {"members": ["UEXT"], "response_metadata": {"next_cursor": ""}}
+        now = [0.0]
+        d = access.Directory(Client(), clock=lambda: now[0])
+        self.assertEqual(d.user("UH")["team_id"], T)
+        self.assertNotIn(("users_info", "UH"), calls)
+        dec = access.decide(event={"user": "UK", "channel": "C1"}, directory=d, workspace_team=T,
+                            level_of=lambda u: "owner", name_blocked=lambda n: False)
+        self.assertEqual(dec.reason, "outsider-member")
+        self.assertIn(("members", "m2"), calls)
+        n = len([c for c in calls if c[0] == "users_list"])
+        now[0] = 30
+        d.user("UK")
+        self.assertEqual(len([c for c in calls if c[0] == "users_list"]), n)
+        now[0] = 61
+        d.user("UK")
+        self.assertGreater(len([c for c in calls if c[0] == "users_list"]), n, "stale user records must be refreshed")
+
+    def test_missing_scope_fails_closed(self):
+        class Client:
+            def users_list(self, **k):
+                raise RuntimeError("missing_scope")
+        dec = access.decide(event={"user": "UK", "channel": "D1", "channel_type": "im"}, directory=access.Directory(Client()),
+                            workspace_team=T, level_of=lambda u: "owner", name_blocked=lambda n: False)
+        self.assertEqual((dec.answer, dec.reason), (False, "asker-unknown"))
+
+    def test_enterprise_grid_members_of_this_workspace_are_insiders(self):
+        self.assertFalse(access.is_outsider({"team_id": "E1", "enterprise_user": {"teams": [T]}}, T))
+        self.assertTrue(access.is_outsider({"team_id": "E1", "enterprise_user": {"teams": ["TOTHER"]}}, T))
+
+    def test_directory_caches_and_fails_closed_on_unknown_users(self):
         class Client:
             calls = 0
             def users_list(self, **k):
@@ -504,19 +579,42 @@ class SlackReadLimits(unittest.TestCase):
 
 
 class ReplySafety(unittest.TestCase):
-    def test_unknown_links_and_channel_pings_are_removed(self):
-        hosts = brain.link_hosts(["see https://share.hsforms.com/abc"])
-        out = brain.safe_reply("Form: https://share.hsforms.com/abc ![x](https://evil.example/p.png?d=markup30) "
-                               "<https://evil.example/x|click> https://foodics.lightning.force.com/r/1 <!channel> <!here|here>", hosts)
-        self.assertNotIn("evil.example", out)
-        self.assertIn("https://share.hsforms.com/abc", out)
-        self.assertIn("https://foodics.lightning.force.com/r/1", out)
-        self.assertNotIn("<!channel>", out)
-        self.assertNotIn("<!here", out)
+    KNOWN = brain.known_links(["Form: https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw.", "https://tally.so/r/abc"])
 
-    def test_lookalike_hosts_are_removed(self):
-        out = brain.safe_reply("https://foodics.com.evil.example/x https://evilfoodics.com/x", set(brain.DEFAULT_LINK_HOSTS))
-        self.assertEqual(out.count("[link removed]"), 2)
+    def safe(self, text):
+        return brain.safe_reply(text, self.KNOWN)
+
+    def test_only_our_own_links_survive(self):
+        kept = ["https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw", "https://tally.so/r/abc", "https://foodics.com/x",
+                "https://app.foodics.com/a?b=1", "https://foodics.lightning.force.com/r/1", "<https://foodics.com/x|Foodics>"]
+        for url in kept:
+            self.assertEqual(self.safe(url), url)
+        removed = ["https://share.hsforms.com/OTHER", "https://tally.so/r/OTHER", "https://evil.example/p.png?d=markup30",
+                   "https://script.google.com/macros/s/X/exec?d=1", "https://sites.google.com/view/x",
+                   "https://docs.google.com/forms/d/e/ATTACKER/viewform", "https://attacker.secure.force.com/x",
+                   "https://foodics.com.evil.example/x", "https://evilfoodics.com/x", "HTTPS://EVIL.EXAMPLE/X",
+                   "https://foodics.com:8443/x", "https://evil\u200b.example/x"]
+        for url in removed:
+            self.assertEqual(self.safe(url), "[link removed]", url)
+
+    def test_userinfo_tricks_and_other_schemes_are_removed(self):
+        for text in ["<https://foodics.lightning.force.com:443@evil.example/c?d=x|Salesforce record>",
+                     "https://foodics.com:x@evil.example/", "https://evil.example\\@foodics.com/",
+                     "<mailto:a@evil.example|mail>", "see evil.example/p.png?d=markup"]:
+            out = self.safe(text)
+            self.assertNotIn("evil.example", out, text)
+            self.assertIn("[link removed]", out, text)
+
+    def test_drive_links_are_trimmed_to_the_file(self):
+        out = self.safe("https://docs.google.com/spreadsheets/d/1AbCdEfGhIjKlMnOp/edit?d=markup#gid=0")
+        self.assertEqual(out, "https://docs.google.com/spreadsheets/d/1AbCdEfGhIjKlMnOp")
+
+    def test_pings_are_neutralised_and_text_is_kept(self):
+        out = self.safe("ping <!channel> <!here|here> <!subteam^S123|group> <@U012345> <@W0ABC|bob> <#C123|ksa-grubtech>")
+        for raw in ["<!channel>", "<!here", "<!subteam", "<@U012345>", "<@W0ABC"]:
+            self.assertNotIn(raw, out)
+        for text in ["Use Basic for <3 terminals", "Node.js, e.g. ARR 1.5", "Form: https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw."]:
+            self.assertEqual(self.safe(text), text)
 
 
 if __name__ == "__main__":

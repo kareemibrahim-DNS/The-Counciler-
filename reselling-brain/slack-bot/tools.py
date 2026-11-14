@@ -199,6 +199,11 @@ class Learner:
     def _save(self, q: dict) -> None:
         self.queue_file.write_text(json.dumps(q, ensure_ascii=False, indent=1))
 
+    OWNER_ONLY_WORDS = re.compile(r"\b(costs?|cost[- ]price|wholesale|margins?|mark-?ups?|payouts?|commissions?|buy[- ]price)\b", re.I)
+
+    def queued(self) -> dict:
+        return self._load()
+
     def propose(self, fact: str) -> str:
         fact = (fact or "").strip()
         if not fact:
@@ -216,6 +221,9 @@ class Learner:
         item = q.pop(pid, None)
         if not item:
             return f"No pending item #{pid}."
+        if audience == "team" and self.OWNER_ONLY_WORDS.search(item["fact"]):
+            return (f"#{pid} is still pending and was not shared: facts about cost, margin, markup, wholesale, "
+                    f"payout or commission are owner-only. Send `approve {pid}` to keep it for yourself, or `reject {pid}`.")
         if audience == "team":
             path = self.knowledge_dir / "10-learned-team.md"
             header = "---\nid: learned-team\naudience: team\n---\n# Learned from Kareem\n"

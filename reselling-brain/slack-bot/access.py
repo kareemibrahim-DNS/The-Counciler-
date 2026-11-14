@@ -3,8 +3,9 @@
 The bot decides two things before it answers:
 1. Is the asker a Foodics full member? Guests, Slack Connect users and anyone the bot
    cannot identify are partners or outsiders: they get nothing, not even a refusal.
-2. Who can read the reply? In a DM, only the asker. In a channel, every member, so the
-   answer is written for the least-privileged member and never above team level.
+2. Who can read the reply? In a DM, only the asker. In a private channel, every member, so
+   the answer is written for the least-privileged member and never above team level. A public
+   channel can be opened and searched by every full member, so it always gets the sales level.
    Owner-level answers only ever happen in Kareem's DM.
 
 Every check fails closed: if Slack cannot tell us who is asking or who can read the
@@ -78,7 +79,7 @@ class Decision:
 class Directory:
     """Cached Slack user list and channel members (needs the users:read scope)."""
 
-    def __init__(self, client, users_ttl: float = 600, members_ttl: float = 60, clock: Callable[[], float] = time.time):
+    def __init__(self, client, users_ttl: float = 60, members_ttl: float = 0, clock: Callable[[], float] = time.time):
         self.client, self.users_ttl, self.members_ttl, self.clock = client, users_ttl, members_ttl, clock
         self._users: dict[str, dict] = {}
         self._loaded_at = float("-inf")
@@ -150,10 +151,14 @@ def decide(*, event: dict, directory: Directory, workspace_team: str, level_of: 
         levels = []
         for m in directory.members(event["channel"]):
             u = directory.user(m)
+            if u and u.get("deleted") and (u.get("is_bot") or not is_outsider({**u, "deleted": False}, workspace_team)):
+                continue  # deactivated staff and removed apps can't read; a deactivated guest still blocks
             if is_outsider(u, workspace_team):
                 return Decision(False, notice=PARTNER_SPACE_REPLY, reason="outsider-member")
             if not u.get("is_bot"):
                 levels.append(level_of(m))
+        if ch.get("is_private") is not True:
+            levels.append("sales")  # any full member can preview and search a public channel
     except Exception as exc:
         logging.error("Cannot check who can read %s (%s). Not answering there.", event.get("channel"), exc)
         return Decision(False, notice=CANNOT_CHECK_REPLY, reason="channel-unknown")
