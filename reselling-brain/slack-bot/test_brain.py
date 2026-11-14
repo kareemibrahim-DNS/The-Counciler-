@@ -329,6 +329,42 @@ class RealLayersTest(unittest.TestCase):
         self.assertIn("can't be discounted", cat.lookup(partner="InvoiceQ", level="team"))
 
 
+# ---------- the sales-only skill for @Claude in Slack ----------
+import build_sales_skill
+
+
+@unittest.skipUnless(build_sales_skill.SKILL_DIR.exists(), "sales-skill/ is not in the Docker image")
+class SalesSkillTest(unittest.TestCase):
+    """Claude in Slack gives everyone the same knowledge, so the skill must hold the sales layer only."""
+
+    def setUp(self):
+        self.ref = build_sales_skill.SKILL_DIR / "references" / "catalog.md"
+        self.text = "\n".join(p.read_text(encoding="utf-8") for p in build_sales_skill.SKILL_DIR.rglob("*.md"))
+
+    def test_committed_catalogue_is_up_to_date(self):
+        fresh = build_sales_skill.catalog_markdown(tools.Catalog())
+        self.assertEqual(self.ref.read_text(encoding="utf-8"), fresh, "run: python build_sales_skill.py")
+
+    def test_no_team_or_owner_content(self):
+        import json
+        cat = tools.Catalog()
+        for name, m in cat.partners.items():
+            for k in ("bestFor", "edge", "watch"):
+                v = (m.get(k) or "").strip()
+                if len(v) > 12:
+                    self.assertNotIn(v, self.text, f"{name}.{k}")
+            for k in ("form", "slack"):
+                v = (m.get(k) or "").strip()
+                if v.startswith(("http", "#")):
+                    self.assertNotIn(v, self.text, f"{name}.{k}")
+        for c in cat.categories:
+            self.assertNotIn(c["pick"], self.text)
+        catalogue = self.ref.read_text(encoding="utf-8")
+        self.assertNotRegex(catalogue, r"https?://")
+        for word in ["discount", "markup", "margin", "wholesale", "payout", "cost price", "reseller@foodics"]:
+            self.assertNotIn(word, catalogue.lower(), word)
+
+
 # ---------- who reads the reply ----------
 T = "TFOODICS"
 MEMBER = {"team_id": T}

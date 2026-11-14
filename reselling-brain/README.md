@@ -13,6 +13,13 @@ All three read the same files in `knowledge/` (rules, policy, partners) and `cat
 - Orbit: copy the changed files to `orbit-reselling-wizard/reselling-brain/`, run `node scripts/build-brain-knowledge.mjs` there and open a PR.
 - Skill: ask Claude to update the Reselling Brain skill.
 
+## Sales skill for @Claude in Slack (no IT approval needed)
+The Claude app is already installed in the Foodics Slack. It gives **everyone the same knowledge** (no owner/team/sales layers), so it only ever gets the sales layer: `sales-skill/reselling-brain-sales/` (available resellers, list prices, quote structure). It is built from the bot's own sales view of `catalog/`:
+```sh
+cd slack-bot && python build_sales_skill.py --zip /tmp   # → /tmp/reselling-brain-sales.zip
+```
+Upload the zip in claude.ai → Settings → Capabilities → Skills (or ask the Foodics Claude admin to share it with the org). CI fails if the skill is out of date or holds anything above the sales layer. **Never** share the owner skill with the org.
+
 ## Owner-only knowledge stays out of this repo
 This repo is shared with other AI assistants. The owner files (pricing and markups, targets and strategy, partner contacts and trackers, gaps) are **not** committed here. The bot loads them from the Railway secret `BRAIN_OWNER_KNOWLEDGE_B64` (base64 of a JSON list of `{id, body}`); every doc loaded that way is forced to `audience: owner`. `npm run guard` in `reselling-copilot/` fails the build if an owner file or a markup table ever lands in `knowledge/`.
 
@@ -79,7 +86,7 @@ Tell it a new or corrected rule. It queues it as owner-only, and the bot adds th
 These commands work only in your DM with the bot. In a channel it tells you privately to DM it.
 
 ### Tests
-`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 70 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 72 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 
