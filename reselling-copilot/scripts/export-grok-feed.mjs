@@ -2,6 +2,8 @@
 // Regenerates ../reseller-programs/feed/*.csv (the Grok Agent SDK bot) from reselling-copilot/data.
 // One source of truth: Salesforce LIST prices only. No cost, markup or margin is ever written.
 // Only signed, active resellers are exported.
+// Sales layer (Kareem, 14 Nov 2026): only available resellers, list prices and commercial structure.
+// No discount rules, internal notes, forms or Slack channels.
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,7 +15,6 @@ const out = join(here, "..", "..", "reseller-programs", "feed");
 const catalog = data("catalog.json");
 const partners = data("partners.json");
 const categories = data("categories.json");
-const policy = data("policy.json");
 
 const CUR_COUNTRY = { SAR: "SA", AED: "AE", KWD: "KW", JOD: "JO", EGP: "EG" };
 const SOURCE = "Source: Salesforce Standard Price Book, list prices, exported 5 Nov 2026.";
@@ -25,10 +26,7 @@ const csvCell = (v) => {
 };
 const toCsv = (header, rows) => [header.join(","), ...rows.map((r) => header.map((h) => csvCell(r[h])).join(","))].join("\n") + "\n";
 
-const discountPolicy =
-  "Internal (do not share with merchants or partners): discounts on New Business only; none on Expansion, Renewal, Upgrade/Downgrade or Re-activation. " +
-  `Branch tiers: ${policy.tiers.map((t) => t.join(" → ")).join("; ")}. ` +
-  `Ranges: ${policy.ranges.map((t) => t.join(" ")).join("; ")}. Approver: Kareem Ibrahim; escalation Hatem Ashour.`;
+const ASK = "Not available here. Please ask the Partnerships team.";
 
 const partnerRows = [];
 const itemRows = [];
@@ -67,14 +65,14 @@ for (const cat of categories) {
       id: `partner-${slug(name)}`,
       name,
       countries: [...countries].join("|"),
-      nature: `${cat.name}. ${m.overview} Best for: ${m.bestFor}`,
+      nature: `${cat.name}. ${m.overview}`,
       billing_model: `${m.unit} Quote rules: ${m.rules.join(" ")}`,
       payment_terms: `Billing options in Salesforce: ${[...billings].join(", ")}.`,
-      discount_policy: discountPolicy,
-      commercial_notes: `Edge: ${m.edge} Watch out: ${m.watch} Prices are list (selling) prices per line per billing period. ${SOURCE}`,
-      fulfillment: `Partner submission form: ${m.form}. Form used for KSA approvals: ${m.ksaForm}.`,
-      support_model: `Slack: ${m.slack}.`,
-      sla: "Not loaded",
+      discount_policy: ASK,
+      commercial_notes: `Prices are list (selling) prices per line per billing period. ${SOURCE}`,
+      fulfillment: ASK,
+      support_model: ASK,
+      sla: ASK,
       operational_notes: `Working countries (partner guide): ${m.countries}. Quotable countries = countries with a Salesforce price.`,
     });
   }
