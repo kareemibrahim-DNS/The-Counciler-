@@ -279,12 +279,12 @@ def no_discount(text: str) -> str:
 def team_catalog_notes(value: str | None = None) -> dict:
     """Team-only partner notes (partner Slack channels, discount watch-outs) from the BRAIN_OWNER_KNOWLEDGE_B64
     secret; the shared repo's catalogue holds the common layer only."""
-    import base64
+    from brain import decode_secret
     raw = os.environ.get("BRAIN_OWNER_KNOWLEDGE_B64", "") if value is None else value
     if not raw.strip():
         return {}
     try:
-        items = json.loads(base64.b64decode(raw).decode("utf-8"))
+        items = decode_secret(raw)
     except Exception:
         return {}
     return next((i.get("catalog") or {} for i in items if isinstance(i, dict) and i.get("catalog")), {})

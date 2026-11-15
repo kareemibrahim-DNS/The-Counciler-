@@ -44,19 +44,28 @@ PRIVATE_AUDIENCES = ("team", "manager", "cost", "owner")  # only ever loaded fro
 REPO_AUDIENCES = ("base", "sales")  # the shared repo holds the common layer only
 
 
+def decode_secret(raw: str) -> list:
+    """BRAIN_OWNER_KNOWLEDGE_B64 is base64 of the JSON list, optionally gzipped first (smaller to paste)."""
+    import base64
+    import gzip
+    import json
+    data = base64.b64decode(raw.strip())
+    if data[:2] == b"\x1f\x8b":
+        data = gzip.decompress(data)
+    return json.loads(data.decode("utf-8"))
+
+
 def owner_docs_from_env(value: str | None = None) -> list[Doc]:
     """Everything above the common layer (team policy and processes, contacts, cycles and strategy, cost and
     contracts, gaps) lives only in the BRAIN_OWNER_KNOWLEDGE_B64 secret, never in this shared repo.
 
-    The secret is base64 of a JSON list of {id, body, audience?}. audience may be team, manager, cost or owner;
+    The secret is base64 of a JSON list (optionally gzipped) of {id, body, audience?}. audience may be team, manager, cost or owner;
     anything else (or nothing) is forced to owner. Items without a body (team catalogue notes) are not docs.
     """
-    import base64
-    import json
     raw = os.environ.get("BRAIN_OWNER_KNOWLEDGE_B64", "") if value is None else value
     if not raw.strip():
         return []
-    items = json.loads(base64.b64decode(raw).decode("utf-8"))
+    items = decode_secret(raw)
     return [Doc(id=str(i["id"]), audience=i.get("audience") if i.get("audience") in PRIVATE_AUDIENCES else "owner",
                 body=str(i["body"]).strip()) for i in items if i.get("id") and i.get("body")]
 

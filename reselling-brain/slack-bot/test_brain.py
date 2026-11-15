@@ -386,6 +386,12 @@ class RealLayersTest(unittest.TestCase):
         secret = base64.b64encode(json.dumps([{"id": "catalog-team-notes", "audience": "team",
                                                 "catalog": {"Supy": {"watch": "X"}}}]).encode()).decode()
         self.assertEqual(tools.team_catalog_notes(secret), {"Supy": {"watch": "X"}})
+        import gzip
+        items = [{"id": "p", "audience": "team", "body": "GZ-MARKER"}, {"id": "catalog-team-notes", "audience": "team",
+                                                                       "catalog": {"Supy": {"watch": "Y"}}}]
+        zipped = base64.b64encode(gzip.compress(json.dumps(items).encode())).decode()
+        self.assertEqual([(d.id, d.audience, d.body) for d in brain.owner_docs_from_env(zipped)], [("p", "team", "GZ-MARKER")])
+        self.assertEqual(tools.team_catalog_notes(zipped), {"Supy": {"watch": "Y"}})
 
     def test_sales_never_sees_discount_rules(self):
         cat = tools.Catalog()
