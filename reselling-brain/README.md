@@ -24,7 +24,7 @@ cd slack-bot && python build_sales_skill.py --zip /tmp   # → /tmp/reselling-br
 Upload the zip in claude.ai → Settings → Capabilities → Skills (or ask the Foodics Claude admin to share it with the org). CI fails if the skill is out of date or holds anything above the common layer. **Never** share the owner skill with the org.
 
 ## Private knowledge stays out of this repo
-This repo is shared with other AI assistants. Manager, cost and owner files (cycles and strategy, trackers and contacts, cost prices, contracts, gaps) are **not** committed here. The bot loads them from the Railway secret `BRAIN_OWNER_KNOWLEDGE_B64` (base64 of a JSON list of `{id, body, audience}`, audience `manager`, `cost` or `owner`; anything else is forced to `owner`). `npm run guard` in `reselling-copilot/` fails the build if a file in `knowledge/` has any audience other than `base`, `sales` or `team`, or looks like a markup table or targets.
+This repo is shared with other AI assistants, so it holds the **common layer only** (`base` and `sales`). Team, manager, cost and owner files (policy, discount eligibility, ARR and churn, SLAs, processes, partner notes and channels, cycles and strategy, trackers and contacts, cost prices, contracts, gaps) are **not** committed here. The bot loads them from the Railway secret `BRAIN_OWNER_KNOWLEDGE_B64`: base64 of a JSON list of `{id, body, audience}` with audience `team`, `manager`, `cost` or `owner` (anything else is forced to `owner`), plus one `{"id": "catalog-team-notes", "audience": "team", "catalog": {partner: {slack, watch}}}` item for the team's partner notes. A repo file in `knowledge/` with any other audience is treated as owner-only, and `npm run guard` in `reselling-copilot/` fails the build on it, on `policy.json`/`channels.json`, on partner channel names and on discount bands.
 
 ## Audience layers (decided by Kareem, 14 Nov 2026)
 | Level | Who | Sees |
@@ -116,11 +116,11 @@ It needs to run somewhere that stays on. Socket Mode means no public URL is need
 ### Deploy on Railway (recommended)
 1. railway.app → sign in with GitHub → **New Project → Deploy from GitHub repo** → `The-Counciler-`.
 2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `claude/reselling-copilot` until PR #5 is merged, then `main`. Railway reads `railway.json` and builds the `Dockerfile` (the build runs the offline tests and fails if they don't pass).
-3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). The service has a volume at `/data` for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`. Add Salesforce/Google variables later; each tool turns on only when its variables exist.
+3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). The service has a volume at `/data` for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`. Add Salesforce/Google variables later; each tool turns on only when its variables exist.
 4. Deploy. The log shows `Tools enabled: …` and `⚡️ Bolt app is running!`.
 
-Note: owner facts and the learn queue live on the `/data` volume and survive deploys. Team facts are written inside the container and are lost on the next deploy.
-- Team facts (`approve <id> team`, in `knowledge/10-learned-team.md`): copy them into the right team file in `knowledge/` with a PR.
+Note: learned facts and the learn queue live on the `/data` volume and survive deploys. None of them is written to `knowledge/`.
+- Team facts (`approve <id> team`, in `/data/learned_team.md` on Railway, `slack-bot/learned_team.md` locally): add them to the team part of the `BRAIN_OWNER_KNOWLEDGE_B64` secret when you want them permanent.
 - Owner facts (`approve <id>`, in `/data/learned_owner.md` on Railway, `slack-bot/learned_owner.md` locally, never in `knowledge/`): add them to the `BRAIN_OWNER_KNOWLEDGE_B64` secret when you want them permanent. **Never commit them.** The local files are in `.gitignore` and `.dockerignore`. Facts about cost, margin, markup, commission, contracts, targets or strategy can't be shared with the team.
 
 ## What the bot will never do

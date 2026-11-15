@@ -1,5 +1,5 @@
-import { CATALOG, CATEGORIES, PARTNERS, POLICY } from "./data";
-import { CURRENCIES, type Audience } from "./types";
+import { CATALOG, CATEGORIES, PARTNERS } from "./data";
+import { CURRENCIES, type Audience, type Policy } from "./types";
 
 const ALIAS: Record<string, string> = {
   grub: "Grubtech", deliverect: "Deliverect", urban: "UrbanPiper", feedus: "FeedUs", "feed us": "FeedUs",
@@ -79,18 +79,21 @@ HOW TO ANSWER:
 - COMPARISONS in a category: best for, edge, licensing unit, countries, entry price, watch-outs, then a one-line recommendation. Never blur two partners together.
 - This is Slack: use short lines, *bold* with single asterisks, and simple tables in code blocks. Reply in the user's language (English or Arabic).`;
 
-function audienceRules(a: Audience): string {
+function audienceRules(a: Audience, policy: Policy | null): string {
   if (a.mode === "partner")
     return `\n\nAUDIENCE: This channel includes staff from ${a.partner}. Answer ONLY about ${a.partner}. Do not name, price or compare any other partner. Do not mention discount rules, approval bands, or internal policy; give list prices and structure only. If asked about another partner, reply: "I can only discuss ${a.partner} in this channel."`;
-  return `\n\nAUDIENCE: Foodics internal. You may include "Discount eligibility" on quotes using the POLICY (branch tier × billing range × deal type; one-time fees are never discounted).\n\nPOLICY (internal):\nBranch tiers: ${POLICY.tiers.map((t) => t.join(": ")).join("; ")}.\nRanges: ${POLICY.ranges.map((t) => t.join(": ")).join("; ")}.\nDeal types: ${POLICY.deal.map((t) => t.join(": ")).join("; ")}.\nNotes: ${POLICY.notes.join(" ")}`;
+  if (!policy)
+    return `\n\nAUDIENCE: Foodics internal. Discount rules are not loaded here: for a discount, point to the "i need discount" form in #reseller-hub.`;
+  return `\n\nAUDIENCE: Foodics internal. You may include "Discount eligibility" on quotes using the POLICY (branch tier × billing range × deal type; one-time fees are never discounted).\n\nPOLICY (internal):\nBranch tiers: ${policy.tiers.map((t) => t.join(": ")).join("; ")}.\nRanges: ${policy.ranges.map((t) => t.join(": ")).join("; ")}.\nDeal types: ${policy.deal.map((t) => t.join(": ")).join("; ")}.\nNotes: ${policy.notes.join(" ")}`;
 }
 
 /** Stable part first (cacheable), then the audience-specific part. */
-export function buildSystem(a: Audience, sel: Set<string>): { stable: string; audience: string } {
+export function buildSystem(a: Audience, sel: Set<string>, policy: Policy | null = null): { stable: string; audience: string } {
   const only = a.mode === "partner" ? a.partner : undefined;
   const scoped = only ? new Set([only]) : sel;
+  const terms = a.mode === "internal" && policy?.terms?.length ? `\n\nTERMS (Reseller Policy 2026): ${policy.terms.join(" ")}` : "";
   return {
-    stable: `${BASE_RULES}\n\nTERMS (Reseller Policy 2026): ${POLICY.terms.join(" ")}`,
-    audience: `${audienceRules(a)}\n\nCATALOG:${catalogText(scoped, only)}`,
+    stable: BASE_RULES,
+    audience: `${audienceRules(a, policy)}${terms}\n\nCATALOG:${catalogText(scoped, only)}`,
   };
 }

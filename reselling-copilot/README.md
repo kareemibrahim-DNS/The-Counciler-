@@ -8,10 +8,10 @@ Quoting assistant for the Foodics Marketplace reselling team: partners, line ite
 
 ## What it does
 
-- **Builds quotes:** partner + country + branches + billing + deal type → exact Salesforce line items, quantities, list prices, totals, structure checks and discount eligibility.
+- **Builds quotes:** partner + country + branches + billing + deal type → exact Salesforce line items, quantities, list prices, totals, structure checks. Discounts go through the "i need discount" form in #reseller-hub.
 - **Tells partners apart in the same category**, e.g. Grubtech vs Deliverect vs UrbanPiper vs FeedUs, or ShopBrain vs Supy.
 - **Works in Slack:** `@Reselling Copilot quote Grubtech for 4 branches, KSA, annual` → reply in the thread.
-- **Protects you:** in partner channels (e.g. `#ksa-grubtech`) it only discusses that partner and never shows the discount rules. Unknown shared channels get no pricing. Cost questions are refused before reaching the model.
+- **Protects you:** partner channels (named `ksa-…`, `uae-…`, `egypt-…`, `kw-jo-…`, `foodics-…`) get no pricing unless the `POLICY_JSON` secret maps them to one partner; then it only discusses that partner and never shows discount rules. Unknown shared channels get no pricing. Cost questions are refused before reaching the model.
 
 ## Quick start
 
@@ -30,8 +30,7 @@ Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assis
 |---|---|
 | `data/catalog.json` | Salesforce Standard Price Book (SAR, AED, KWD, JOD, EGP) + "USD 1 – International", active Marketplace products |
 | `data/partners.json` | The internal partner guide + Salesforce product descriptions + Partnerships notes |
-| `data/policy.json` | Discount policy (3 Oct 2026) and Reseller Policy 2026 terms |
-| `data/channels.json` | Partner Slack channels from the Partner Guide |
+| `POLICY_JSON` secret (not in the repo) | Team-only: discount policy, Reseller Policy terms and the partner channel map, as `{"policy": {...}, "channels": {...}}` |
 
 ## Refreshing prices from Salesforce
 `node scripts/refresh-prices.mjs <result.json>…` updates the list prices in `data/catalog.json` from saved PricebookEntry query results (the SOQL is at the top of the script). It never adds or removes lines; it reports new and missing products, and flags lines whose currencies differ by 2× or more. Then copy `data/catalog.json` to `reselling-brain/catalog/`, run `npm run feed:salesforce` in `reseller-programs/` and `python build_sales_skill.py` in `reselling-brain/slack-bot/`.

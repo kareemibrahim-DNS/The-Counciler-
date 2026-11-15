@@ -136,7 +136,8 @@ class Learning(unittest.TestCase):
         root = Path(self.tmp.name)
         self.knowledge, self.private = root / "knowledge", root / "private"
         self.knowledge.mkdir(), self.private.mkdir()
-        self.lr = tools.Learner(self.knowledge, self.private / "q.json", owner_file=self.private / "learned_owner.md")
+        self.lr = tools.Learner(self.knowledge, self.private / "q.json", owner_file=self.private / "learned_owner.md",
+                                team_file=self.private / "learned_team.md")
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -147,9 +148,10 @@ class Learning(unittest.TestCase):
         self.assertIn("60 days", msg, "Kareem must see the fact before approving it")
         self.assertEqual(list(self.knowledge.glob("*.md")), [])
         self.assertIn("team", self.lr.approve(pid_of(msg), "team"))
-        saved = (self.knowledge / "10-learned-team.md").read_text()
-        self.assertIn("60 days", saved)
-        self.assertIn("audience: team", saved)
+        self.assertEqual(list(self.knowledge.glob("*")), [], "team facts stay out of the shared repo")
+        self.assertIn("60 days", (self.private / "learned_team.md").read_text())
+        docs = brain.team_docs_from_file(self.private / "learned_team.md")
+        self.assertEqual([(d.id, d.audience) for d in docs], [("learned-team", "team")])
         self.assertIn("No pending", self.lr.approve(pid_of(msg)))
 
     def test_plain_approve_keeps_the_fact_owner_only_and_out_of_knowledge(self):
@@ -162,7 +164,7 @@ class Learning(unittest.TestCase):
         msg = self.lr.propose("Grubtech cost price is 1000 SAR; our markup is 42%")
         out = self.lr.approve(pid_of(msg), "team")
         self.assertIn("not shared", out)
-        self.assertFalse((self.knowledge / "10-learned-team.md").exists())
+        self.assertFalse((self.private / "learned_team.md").exists())
         self.assertIn(pid_of(msg), self.lr.queued(), "it stays pending for Kareem")
 
     def test_owner_learned_file_loads_as_owner_only(self):
@@ -244,8 +246,11 @@ class RealLayersTest(unittest.TestCase):
     def setUpClass(cls):
         import base64, json, os
         cls.layers = brain.load_layers()
-        # Owner files are not in the repo; simulate the BRAIN_OWNER_KNOWLEDGE_B64 secret.
-        fake = [{"id": "trackers-and-contacts", "audience": "manager", "body": "Partner X: CONTACT-NAME. TRACKER-NAME tracker."},
+        # Everything above the common layer is not in the repo; simulate the BRAIN_OWNER_KNOWLEDGE_B64 secret.
+        fake = [{"id": "policy", "audience": "team", "body": "TEAM-POLICY-MARKER."},
+                {"id": "discount-eligibility", "audience": "team", "body": "DISCOUNT-BANDS-MARKER."},
+                {"id": "catalog-team-notes", "audience": "team", "catalog": {"Supy": {"watch": "TEAM-WATCH-MARKER."}}},
+                {"id": "trackers-and-contacts", "audience": "manager", "body": "Partner X: CONTACT-NAME. TRACKER-NAME tracker."},
                 {"id": "program-cycles", "audience": "manager", "body": "Q4 target TARGET-NUMBER USD."},
                 {"id": "cost-prices", "audience": "cost", "body": "| COST-TABLE-ROW |"},
                 {"id": "contracts", "audience": "cost", "body": "Partner Y CONTRACT-STATUS."},
@@ -258,10 +263,14 @@ class RealLayersTest(unittest.TestCase):
             del os.environ["BRAIN_OWNER_KNOWLEDGE_B64"]
 
     def test_secret_docs_keep_private_audiences_and_never_go_public(self):
-        ids = {d.id: d.audience for d in self.docs if d.id in ("trackers-and-contacts", "program-cycles", "cost-prices",
-                                                              "contracts", "gaps", "sneaky")}
-        self.assertEqual(ids, {"trackers-and-contacts": "manager", "program-cycles": "manager", "cost-prices": "cost",
-                               "contracts": "cost", "gaps": "owner", "sneaky": "owner"})
+        ids = {d.id: d.audience for d in self.docs if d.id in ("policy", "trackers-and-contacts", "program-cycles",
+                                                              "cost-prices", "contracts", "gaps", "sneaky")}
+        self.assertEqual(ids, {"policy": "team", "trackers-and-contacts": "manager", "program-cycles": "manager",
+                               "cost-prices": "cost", "contracts": "cost", "gaps": "owner", "sneaky": "owner"})
+        self.assertNotIn("catalog-team-notes", {d.id for d in self.docs}, "catalogue notes are not a knowledge doc")
+
+    def test_the_repo_holds_the_common_layer_only(self):
+        self.assertEqual({d.audience for d in brain.load_docs(private=False)}, {"base", "sales"})
 
     def test_repo_knowledge_has_no_owner_files(self):
         self.assertFalse([d.id for d in brain.load_docs(private=False) if d.audience not in ("base", "sales", "team")])
@@ -293,8 +302,8 @@ class RealLayersTest(unittest.TestCase):
         self.assertEqual(sorted(ids), ["cycles-at-a-glance", "how-to-answer", "line-items-and-quotes", "program-overview",
                                        "sales-scope", "working-with-resellers"])
         p = self.prompt("sales")
-        for secret in ["30 days of the invoice date", "Diamond", "CONTACT-NAME", "COST-TABLE-ROW", "TRACKER-NAME", "CONTRACT-STATUS",
-                       "TARGET-NUMBER", "GAP-LIST", "minimum of the range", "4%–10%", "never discounted"]:
+        for secret in ["TEAM-POLICY-MARKER", "DISCOUNT-BANDS-MARKER", "CONTACT-NAME", "COST-TABLE-ROW", "TRACKER-NAME",
+                       "CONTRACT-STATUS", "TARGET-NUMBER", "GAP-LIST"]:
             self.assertNotIn(secret, p, secret)
         for common in ["Unified billing", "i need discount", "Centralized Communication", "who fits this merchant",
                        "Renewal cycle", "This part I can't answer here", "Unified pricing", "no price burning"]:
@@ -312,7 +321,7 @@ class RealLayersTest(unittest.TestCase):
 
     def test_managers_see_cycles_and_contacts_but_cost_only_with_the_grant(self):
         p = self.prompt("manager")
-        for seen in ["CONTACT-NAME", "TRACKER-NAME", "TARGET-NUMBER", "minimum of the range"]:
+        for seen in ["CONTACT-NAME", "TRACKER-NAME", "TARGET-NUMBER", "DISCOUNT-BANDS-MARKER"]:
             self.assertIn(seen, p, seen)
         for locked in ["COST-TABLE-ROW", "CONTRACT-STATUS", "GAP-LIST"]:
             self.assertNotIn(locked, p, locked)
@@ -343,8 +352,8 @@ class RealLayersTest(unittest.TestCase):
         p = self.prompt("team")
         for secret in ["CONTACT-NAME", "TRACKER-NAME", "CONTRACT-STATUS", "CONTRACT-STATUS", "COST-TABLE-ROW", "TARGET-NUMBER", "GAP-LIST"]:
             self.assertNotIn(secret, p, secret)
-        self.assertIn("30 days of the invoice date", p)
-        self.assertIn("minimum of the range", p, "the Partnerships team sees discount eligibility")
+        self.assertIn("TEAM-POLICY-MARKER", p)
+        self.assertIn("DISCOUNT-BANDS-MARKER", p, "the Partnerships team sees discount eligibility")
 
     def test_owner_sees_everything_but_not_the_sales_restrictions(self):
         ids = {d.id for d in brain.visible_docs("owner", self.layers, self.docs)}
@@ -363,16 +372,20 @@ class RealLayersTest(unittest.TestCase):
         comp = json.loads(cat.lookup(category="opm", country="SA", level="sales"))
         self.assertIn("how_to_choose", comp)
         self.assertTrue(all("best_for" in r for r in comp["partners"]))
-        full = json.loads(cat.lookup(partner="Grubtech", country="SA", level="team"))
-        self.assertIn("slack", full)
+        team = tools.Catalog(team_notes={"Grubtech": {"slack": "#PARTNER-CHANNEL"}})
+        self.assertEqual(json.loads(team.lookup(partner="Grubtech", level="team"))["slack"], "#PARTNER-CHANNEL")
+        self.assertNotIn("slack", json.loads(team.lookup(partner="Grubtech", level="sales")))
 
-    def test_sales_watch_outs_drop_discount_sentences_only(self):
+    def test_team_watch_out_notes_come_from_the_secret(self):
         import json
-        cat = tools.Catalog()
-        supy = json.loads(cat.lookup(partner="Supy", level="sales"))["watch_out"]
-        self.assertNotIn("discount", supy.lower())
-        self.assertIn("Minimum 3 licenses", supy)
-        self.assertIn("discounted", json.loads(cat.lookup(partner="Supy", level="team"))["watch_out"])
+        cat = tools.Catalog(team_notes={"Supy": {"watch": "TEAM-WATCH-MARKER."}})
+        self.assertIn("Minimum 3 licenses", json.loads(cat.lookup(partner="Supy", level="sales"))["watch_out"])
+        self.assertNotIn("TEAM-WATCH-MARKER", json.loads(cat.lookup(partner="Supy", level="sales"))["watch_out"])
+        self.assertIn("TEAM-WATCH-MARKER", json.loads(cat.lookup(partner="Supy", level="team"))["watch_out"])
+        import base64
+        secret = base64.b64encode(json.dumps([{"id": "catalog-team-notes", "audience": "team",
+                                                "catalog": {"Supy": {"watch": "X"}}}]).encode()).decode()
+        self.assertEqual(tools.team_catalog_notes(secret), {"Supy": {"watch": "X"}})
 
     def test_sales_never_sees_discount_rules(self):
         cat = tools.Catalog()
@@ -380,7 +393,16 @@ class RealLayersTest(unittest.TestCase):
             out = __import__("json").loads(cat.lookup(partner=p, country="SA", level="sales"))
             self.assertFalse([r for r in out["quote_rules"] if "discount" in r.lower()], p)
             self.assertNotIn("discount", out["watch_out"].lower(), p)
-        self.assertIn("can't be discounted", cat.lookup(partner="InvoiceQ", level="team"))
+            self.assertNotIn("slack", out, p)
+
+    def test_repo_catalogue_holds_no_team_only_fields(self):
+        import json
+        for f in ("partners.json",):
+            data = json.loads((tools.CATALOG_DIR / f).read_text(encoding="utf-8"))
+            for name, m in data.items():
+                self.assertNotIn("slack", m, name)
+                self.assertNotIn("discount", (m.get("watch") or "").lower(), name)
+        self.assertFalse((tools.CATALOG_DIR / "policy.json").exists(), "the discount policy lives in the secret")
 
 
 # ---------- the sales-only skill for @Claude in Slack ----------
@@ -409,20 +431,11 @@ class SalesSkillTest(unittest.TestCase):
 
     def test_nothing_above_the_common_layer(self):
         cat = tools.Catalog()
-        for name, m in cat.partners.items():
-            v = (m.get("slack") or "").strip()
-            if v.startswith("#"):
-                self.assertNotIn(v, self.text, f"{name}.slack")
-        docs = brain.load_docs(private=False)
-        common = "\n".join(d.body for d in docs if d.audience == "base")
-        for d in (d for d in docs if d.audience == "team"):  # no team-only sentence leaks into the skill
-            for line in d.body.splitlines():
-                line = line.strip("-* ").strip()
-                if len(line) > 40 and not line.startswith("#") and line not in common:
-                    self.assertFalse(line in self.text, f"{d.id}: {line[:60]}")
-        for word in ["minimum of the range", "4%–10%", "can't be discounted", "never discounted", "Diamond", "CONTACT-NAME",
-                     "TRACKER-NAME", "CONTRACT-STATUS", "TARGET-NUMBER", "| COST-TABLE-ROW"]:
-            self.assertFalse(word.lower() in self.text.lower(), word)
+        self.assertEqual({d.audience for d in brain.load_docs(private=False)}, {"base", "sales"})
+        self.assertIsNone(re.search(r"#(ksa|uae|egypt|kw-jo|foodics)-[a-z]", self.text), "no partner channels")
+        for pattern in [r"\d+\s?%\s?[–-]\s?\d+\s?%", r"of the (range|maximum)", r"\bdiscounted\b", r"auto-reject",
+                        r"CONTACT-NAME|TRACKER-NAME|CONTRACT-STATUS|TARGET-NUMBER|COST-TABLE-ROW"]:
+            self.assertIsNone(re.search(pattern, self.text, re.I), pattern)
         catalogue = self.catalog.read_text(encoding="utf-8")
         for word in ["markup", "margin", "wholesale", "payout", "cost price", "discount"]:  # data, not "it's locked"
             self.assertFalse(word in catalogue.lower(), word)
@@ -766,7 +779,7 @@ class HardLimitsTest(unittest.TestCase):
             for fact in ["Supy contract is now signed", "Q1 target is 2M", "New strategy: bundles", "Grubtech commission 5%"]:
                 pid = pid_of(lr.propose(fact))
                 self.assertIn("not shared", lr.approve(pid, "team"), fact)
-            self.assertFalse((d / "10-learned-team.md").exists())
+            self.assertFalse((d / "learned_team.md").exists())
 
     def test_managers_read_manager_sheets_and_team_does_not(self):
         allow = {"trackers": {"id": "x", "audience": "manager"}, "tickets": {"id": "y", "audience": "team"}}

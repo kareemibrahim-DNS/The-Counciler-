@@ -13,7 +13,7 @@
    Note the Worker URL, e.g. `https://reselling-copilot.<account>.workers.dev`.
 4. In the app's *Event Subscriptions*, set the Request URL to `<worker-url>/slack/events`. Slack verifies it automatically.
 5. **Invite the bot** to the channels where people should use it: `/invite @Reselling Copilot`.
-6. **Partner channels:** check that every channel with partner staff is listed in `data/channels.json`. Unlisted shared channels get no pricing at all.
+6. **Partner channels:** map every channel with partner staff in the `POLICY_JSON` secret (`npx wrangler secret put POLICY_JSON`). Unmapped shared or partner-named channels get no pricing at all.
 
 ## Manifest
 

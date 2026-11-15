@@ -8,12 +8,12 @@ This repo is worked on by several AI assistants plus the Foodics Partnerships te
 
 - `web/index.html`: a self-contained page (partner catalogue, same-category comparison, quote rules, chat).
 - `src/`: a Slack bot (Cloudflare Worker). Mention it in a channel or DM it; it replies in the thread using Claude.
-- `data/`: the single source of truth: line items + **list prices** from the Salesforce price book, partner profiles, categories, discount policy, and the Slack channel → partner map.
+- `data/`: the single source of truth: line items + **list prices** from the Salesforce price book, partner profiles and categories. The discount policy and the Slack channel → partner map are team-only, so they are in the `POLICY_JSON` secret, not here.
 
 ## Golden rules (non-negotiable)
 
 1. **Selling data only.** Never add cost price, buy price, wholesale price, margin, markup, partner payout or commission, not in `data/`, `web/`, prompts, tests, fixtures, comments or commit messages. `npm run guard` and CI enforce this. Do not weaken or bypass the guard.
-2. **Partner channels are partner-only.** In channels listed in `data/channels.json` partner staff can read replies. The bot must only talk about that one partner and must never show the internal discount policy there. Keep `tests/bot.test.ts` passing; add a test whenever you touch `src/policy.ts` or `src/prompt.ts`.
+2. **Partner channels are partner-only.** In channels mapped in the `POLICY_JSON` secret partner staff can read replies; any other channel named like a partner channel gets no pricing. The bot must only talk about that one partner and must never show the internal discount policy there. Keep `tests/bot.test.ts` passing; add a test whenever you touch `src/policy.ts` or `src/prompt.ts`.
 3. **No secrets in git.** Tokens and API keys go in Wrangler secrets (`npx wrangler secret put ...`) or `.dev.vars` (ignored).
 4. **Exact Salesforce names.** Line-item names in `data/catalog.json` must match Salesforce exactly. Don't rename, translate or "fix" them.
 5. **Don't invent data.** If a price, partner or rule is missing, leave it missing and open an issue tagged `needs-data`.

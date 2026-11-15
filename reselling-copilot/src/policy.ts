@@ -1,4 +1,3 @@
-import { CHANNEL_PARTNER } from "./data";
 import type { Audience } from "./types";
 
 export interface ChannelInfo {
@@ -7,18 +6,21 @@ export interface ChannelInfo {
   isExtShared: boolean;
 }
 
+/** Partner channels follow these names (#ksa-…, #uae-…, #egypt-…, #kw-jo-…, #foodics-…). */
+export const PARTNER_CHANNEL = /^(ksa|uae|egypt|kw-jo|foodics)-/i;
+
 /**
  * Decide who can read the reply.
- * - Mapped partner channels (e.g. #ksa-grubtech) include partner staff → partner mode.
- * - Any other externally shared channel → external mode (no pricing at all).
+ * - Channels mapped in the POLICY_JSON secret include partner staff → partner mode.
+ * - Any other shared channel, or one named like a partner channel → external mode (no pricing at all).
  * - DMs and internal channels → internal mode.
- * A mapped channel is always partner mode, even if Slack doesn't mark it as shared,
+ * A partner-named channel is never internal, even if Slack doesn't mark it as shared,
  * because partner members are invited directly into these channels.
  */
-export function audienceFor(ch: ChannelInfo): Audience {
-  const partner = ch.name ? CHANNEL_PARTNER[ch.name] : undefined;
+export function audienceFor(ch: ChannelInfo, channels: Record<string, string> = {}): Audience {
+  const partner = ch.name ? channels[ch.name] : undefined;
   if (partner) return { mode: "partner", partner };
-  if (ch.isExtShared) return { mode: "external" };
+  if (ch.isExtShared || (ch.name && PARTNER_CHANNEL.test(ch.name))) return { mode: "external" };
   return { mode: "internal" };
 }
 
@@ -31,7 +33,7 @@ export function asksForCost(text: string): boolean {
 }
 
 export const COST_REFUSAL =
-  "Cost and margin data isn't in this bot on purpose. Ask Kareem directly. I can give you list prices, line-item structure and discount eligibility.";
+  "Cost and margin data isn't in this bot on purpose. Ask Kareem directly. I can give you list prices and line-item structure.";
 
 export const EXTERNAL_REFUSAL =
   "I can't share commercial details in this channel. Please contact the Foodics Partnerships team.";

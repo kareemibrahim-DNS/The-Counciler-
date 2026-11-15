@@ -31,7 +31,7 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from access import OWNER_DM_ONLY_REPLY, Directory, country_of, decide, handoff_lines, is_away, is_owner_command
-from brain import KNOWLEDGE_DIR, OWNER_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply
+from brain import KNOWLEDGE_DIR, OWNER_LEARNED_FILE, TEAM_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply
 from tools import Learner, SlackReader, build_tools
 
 load_dotenv()
@@ -55,7 +55,7 @@ BOT_ID, BOT_USER_ID = _AUTH.get("bot_id", ""), _AUTH.get("user_id", "")
 MAX_HISTORY = 12
 
 learner = Learner(KNOWLEDGE_DIR, Path(os.environ.get("BRAIN_LEARN_QUEUE", Path(__file__).with_name("learn_queue.json"))),
-                  owner_file=OWNER_LEARNED_FILE)
+                  owner_file=OWNER_LEARNED_FILE, team_file=TEAM_LEARNED_FILE)
 tools = build_tools(slack=SlackReader(app.client, BOT_TOKEN), learner=learner, sources=load_layers().get("sources") or {})
 brain = Brain(tools=tools)
 directory = Directory(app.client)

@@ -2,7 +2,6 @@
  "Grubtech": {
   "cat": "opm",
   "countries": "KSA, UAE, Kuwait, Jordan",
-  "slack": "#ksa-grubtech, #uae-grubtech, #kw-jo-grubtech",
   "form": "https://share.hsforms.com/1rOFHTm1gTpepWC29FiQGzQ5c1ve",
   "ksaForm": "No (Partnerships handles KSA)",
   "overview": "Connects online ordering channels to Foodics POS and adds kitchen management and delivery dispatch in one platform. 300+ integrations.",
@@ -19,7 +18,6 @@
  "Deliverect": {
   "cat": "opm",
   "countries": "KSA, UAE, Kuwait, Jordan",
-  "slack": "#ksa-deliverect, #uae-deliverect, #kw-jo-deliverect",
   "form": "https://welcome.deliverect.com/foodics-bundle",
   "ksaForm": "No (Partnerships handles KSA)",
   "overview": "Connects online ordering channels to Foodics POS so orders and menus are managed in one place, with sales and third-party delivery analytics.",
@@ -36,7 +34,6 @@
  "UrbanPiper": {
   "cat": "opm",
   "countries": "KSA, UAE, Egypt",
-  "slack": "#ksa-urbanpiper, #uae-urbanpiper, #egypt-urbanpiper",
   "form": "https://tally.so/r/Xx11k4",
   "ksaForm": "No (Partnerships handles KSA)",
   "overview": "Connects online ordering channels to Foodics POS; control menus, stock availability and business data across platforms and outlets.",
@@ -53,7 +50,6 @@
  "FeedUs": {
   "cat": "opm",
   "countries": "KSA only",
-  "slack": "To be confirmed",
   "form": "https://docs.google.com/forms/d/e/1FAIpQLSeHp1QSysXGWgxilSlD3mSiEgDexgPFQFAG4yUVDpGPZNI-tQ/viewform",
   "ksaForm": "No (Partnerships handles KSA)",
   "overview": "Connects HungerStation, Jahez, Mrsool and other online channels to Foodics POS; unified menu control and branch-specific provider mapping.",
@@ -69,7 +65,6 @@
  "BrandWallet": {
   "cat": "loyalty",
   "countries": "Global",
-  "slack": "To be confirmed",
   "form": "https://foodics-sales.brand-wallet.com/PZQ5AqGEWaO7LyY9",
   "ksaForm": "Yes",
   "overview": "Digital loyalty cards (stamp, multi-stamp, point, tiered) with automated rewards, coupons, location push alerts and QR table tents.",
@@ -86,7 +81,6 @@
  "Koinz": {
   "cat": "loyalty",
   "countries": "KSA, Egypt, UAE (no AED price)",
-  "slack": "To be confirmed",
   "form": "https://docs.google.com/forms/d/e/1FAIpQLScSNaZ0Ih5peHu2NBRMS0U1MYnLS7CcxereCUEqdzL-xI260g/viewform",
   "ksaForm": "Yes",
   "overview": "Loyalty plus customer feedback, growth analytics, retargeting, and online ordering for pickup and delivery.",
@@ -103,7 +97,6 @@
  "OptCulture": {
   "cat": "loyalty",
   "countries": "KSA, UAE (also US, India)",
-  "slack": "#ksa-optculture, #kw-jo-optculture, #uae-optculture, #egypt-optculture",
   "form": "Not provided",
   "ksaForm": "Yes",
   "overview": "AI-powered loyalty and CRM: interactive digital receipts, personalized loyalty, automated campaigns, Apple and Google Wallet cards, Customer 360.",
@@ -120,7 +113,6 @@
  "Prepit": {
   "cat": "loyalty",
   "countries": "Egypt (also KSA, Canada)",
-  "slack": "To be confirmed",
   "form": "https://docs.google.com/forms/d/e/1FAIpQLSf8GJb_U_N2UMV6EYvssgza4JfQRB_kCd4wiPhkjaTnc6V7vA/viewform",
   "ksaForm": "Yes",
   "overview": "Behavior-based loyalty rewards, automated promotions and SMS, plus online ordering, payments and a waiter app.",
@@ -137,7 +129,6 @@
  "Ordable": {
   "cat": "ordering",
   "countries": "Kuwait, Bahrain, Qatar (Jordan priced)",
-  "slack": "To be confirmed",
   "form": "Not provided",
   "ksaForm": "Yes",
   "overview": "0% commission online store connected to Foodics POS, with 60+ features, delivery, payment gateways and social marketing tools.",
@@ -154,7 +145,6 @@
  "Zyda": {
   "cat": "ordering",
   "countries": "Global (priced KWD, AED, EGP)",
-  "slack": "To be confirmed",
   "form": "https://mex87gdp4z7.typeform.com/to/S5JhEa0v",
   "ksaForm": "Yes",
   "overview": "Direct ordering website set up in 24 hours at 0% commission, with one dashboard for orders, stock, delivery and marketing.",
@@ -171,7 +161,6 @@
  "Mnasati": {
   "cat": "ordering",
   "countries": "Kuwait, Qatar, KSA (priced KWD, AED)",
-  "slack": "To be confirmed",
   "form": "https://docs.google.com/forms/d/13UZOcC_pX0Ic14QMSvILejgq0gMpPFsrCE7l9VDmj5U/edit?ts=696e1e47",
   "ksaForm": "Yes",
   "overview": "Own online store live in about 24 hours; syncs menu, branches, customers and orders with Foodics.",
@@ -187,7 +176,6 @@
  "wi-Q": {
   "cat": "ordering",
   "countries": "Priced in all six currencies",
-  "slack": "To be confirmed",
   "form": "Not provided",
   "ksaForm": "No (Partnerships handles KSA)",
   "overview": "Modular ordering: Connect, Online Ordering and Table (QR) Ordering.",
@@ -203,7 +191,6 @@
  "ShopBrain": {
   "cat": "inventory",
   "countries": "KSA, UAE, Egypt, Qatar",
-  "slack": "To be confirmed",
   "form": "https://docs.google.com/forms/d/e/1FAIpQLSeSgfMm0SOBlcvU56fhSTOWEJK4YQSQE6WsNnHaRUwmx5ceTg/viewform",
   "ksaForm": "Yes",
   "overview": "Real-time inventory with AI demand planning, a restaurant accounting module and F&B expert insights.",
@@ -221,14 +208,13 @@
  "Supy": {
   "cat": "inventory",
   "countries": "KSA, UAE (also UK, Australia)",
-  "slack": "To be confirmed",
   "form": "https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw",
   "ksaForm": "Yes",
   "overview": "Inventory, smart procurement, invoices and supplier settlements, recipe and menu engineering, and BI on Foodics sales data.",
   "bestFor": "Groups with central kitchens that want procurement, recipe costing and supplier control.",
   "unit": "Regular Outlet License per outlet; Central Kitchen License per central kitchen; Extra Cost Center; one-time Onboarding Fee.",
   "edge": "Deepest procurement and recipe-costing features in the category.",
-  "watch": "Minimum 3 licenses. The onboarding fee is one-time and can't be discounted. About 2× ShopBrain Operation per outlet.",
+  "watch": "Minimum 3 licenses. About 2× ShopBrain Operation per outlet.",
   "rules": [
    "Minimum 3 licenses in total.",
    "1 Regular Outlet per outlet; 1 Central Kitchen per central kitchen.",
@@ -239,7 +225,6 @@
  "Wafeq": {
   "cat": "accounting",
   "countries": "KSA, UAE",
-  "slack": "#ksa-wafeq, #uae-wafeq",
   "form": "https://docs.google.com/forms/d/e/1FAIpQLScDy932sEjgQ4M3BgGzsHnZ7A_O7tQDXoaS6L0e4Kd8DzDCCA/viewform",
   "ksaForm": "Yes",
   "overview": "Cloud accounting that syncs Foodics sales; VAT returns, invoicing and payroll.",
@@ -257,7 +242,6 @@
  "Xero": {
   "cat": "accounting",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "Xero subscription sold directly, with an optional Hesab Arabic interface and separate training and support packages.",
@@ -273,14 +257,13 @@
  "Alpha (Xero)": {
   "cat": "accounting",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "Xero delivered by implementation partner Alpha: subscription plus implementation, migration and training.",
   "bestFor": "Merchants who want Xero fully set up for them: chart of accounts, templates, integrations.",
   "unit": "Basic or Premium Subscription + Additional Branch; Implementation (one-time), Migration Package, Training Sessions.",
   "edge": "Done-for-you setup and up to 1 year of historical data migration.",
-  "watch": "Don't quote Xero direct and Alpha (Xero) to the same merchant. Pick one route. Implementation is one-time and can't be discounted.",
+  "watch": "Don't quote Xero direct and Alpha (Xero) to the same merchant. Pick one route.",
   "rules": [
    "1 Subscription (Basic / Premium) + (branches − 1) Additional Branch.",
    "Implementation is a one-time line.",
@@ -290,7 +273,6 @@
  "QuickBooks": {
   "cat": "accounting",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "QuickBooks Online Plus with separate training and support packages.",
@@ -306,7 +288,6 @@
  "FlowERP": {
   "cat": "erp",
   "countries": "KSA",
-  "slack": "#ksa-flowerp",
   "form": "https://docs.google.com/forms/d/e/1FAIpQLScrAhuEzLPgQIjk01wYfdl5U4MaplE6P-5aTGBzLx4ce3_8Bw/viewform",
   "ksaForm": "Yes",
   "overview": "Finance and ERP that syncs Foodics sales into accounting: automated journals, inventory lifecycle, COGS, ZATCA e-invoicing.",
@@ -323,7 +304,6 @@
  "SAP": {
   "cat": "erp",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "SAP Business One for F&B groups: Pro and Limited users, hosting, Foodics integration, maintenance (AMC), implementation.",
@@ -340,7 +320,6 @@
  "MS Dynamics": {
   "cat": "erp",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "Microsoft Dynamics 365 Finance with Foodics integration.",
@@ -356,7 +335,6 @@
  "VOLT": {
   "cat": "hr",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "HR, payroll, attendance and self-service suite with SAP finance integration.",
@@ -372,7 +350,6 @@
  "Malachite": {
   "cat": "hr",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "HR, payroll, attendance and employee self-service licenses.",
@@ -387,14 +364,13 @@
  "InvoiceQ": {
   "cat": "einv",
   "countries": "KSA, Jordan",
-  "slack": "To be confirmed",
   "form": "https://invoiceq.com/?ff_landing=26",
   "ksaForm": "Yes",
   "overview": "Compliant B2B and B2C e-invoicing from Foodics POS with tax-authority integration, credit and debit notes, and approval workflows.",
   "bestFor": "KSA and Jordan merchants who need ZATCA-compliant invoicing per terminal.",
   "unit": "Licensed per account (not per branch). Basic = email only, up to 2 terminals. Advanced = unlimited invoicing + 2,000 SMS/year, per issuing terminal. Customization one-time.",
   "edge": "Terminal-based model fits merchants with few issuing points.",
-  "watch": "Advanced is per issuing terminal. Count terminals, not branches. Customization is one-time and can't be discounted.",
+  "watch": "Advanced is per issuing terminal. Count terminals, not branches.",
   "rules": [
    "Basic: one account line covers up to 2 terminals.",
    "Advanced: 1 line per issuing terminal.",
@@ -404,7 +380,6 @@
  "Iisal": {
   "cat": "einv",
   "countries": "Global",
-  "slack": "To be confirmed",
   "form": "https://docs.google.com/forms/d/e/1FAIpQLSdmC6bQAoGYvjo-7GKIaGFhQsbp4k-VcH2tPv1xO8sScq4_Fg/viewform",
   "ksaForm": "Yes",
   "overview": "Digital receipts: POS transactions become compliant e-invoices sent by SMS, with sales dashboards, consumer insights and a loyalty program.",
@@ -419,14 +394,13 @@
  "Servme": {
   "cat": "table",
   "countries": "All markets",
-  "slack": "—",
   "form": "Servme Submission Form",
   "ksaForm": "—",
   "overview": "Reservations and seat management, waitlist, CRM guest profiles and booking widget.",
   "bestFor": "Dine-in and fine-dining venues that take reservations.",
   "unit": "Black Plan (Monthly, Quarterly, Semi-annual, Annual) or Advanced Plan (Annual) + one-time Onboarding Fee.",
   "edge": "Only table-management partner; flexible billing frequency.",
-  "watch": "The onboarding fee is one-time and can't be discounted.",
+  "watch": "",
   "rules": [
    "One plan line + Onboarding Fee on new business."
   ]
@@ -434,7 +408,6 @@
  "Ishbek": {
   "cat": "other",
   "countries": "Kuwait, Jordan (priced)",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "License includes 1 branch.",
@@ -449,7 +422,6 @@
  "Roboost": {
   "cat": "other",
   "countries": "All markets",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "overview": "Delivery management system (DMS).",
@@ -464,7 +436,6 @@
  "Nitx": {
   "cat": "other",
   "countries": "—",
-  "slack": "—",
   "form": "—",
   "ksaForm": "—",
   "inactive": true,

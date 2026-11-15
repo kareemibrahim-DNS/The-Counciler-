@@ -17,6 +17,8 @@ KNOWLEDGE_DIR = Path(os.environ.get("BRAIN_KNOWLEDGE_DIR", Path(__file__).resolv
 CATALOG_DIR = Path(os.environ.get("BRAIN_CATALOG_DIR", Path(__file__).resolve().parent.parent / "catalog"))
 # Facts Kareem approves as owner-only are kept OUT of knowledge/ (and out of git and the image).
 OWNER_LEARNED_FILE = Path(os.environ.get("BRAIN_OWNER_LEARNED_FILE", Path(__file__).resolve().parent / "learned_owner.md"))
+# Facts Kareem shares with the team (`approve <id> team`) are team-only, so they stay out of the repo too.
+TEAM_LEARNED_FILE = Path(os.environ.get("BRAIN_TEAM_LEARNED_FILE", Path(__file__).resolve().parent / "learned_team.md"))
 LAYERS_FILE = Path(os.environ.get("BRAIN_LAYERS_FILE", Path(__file__).resolve().parent / "layers.yaml"))
 MODEL = os.environ.get("BRAIN_MODEL", "claude-sonnet-5-5")
 MAX_TOKENS = int(os.environ.get("BRAIN_MAX_TOKENS", "1500"))
@@ -38,14 +40,16 @@ class Doc:
 #   manager managers: program cycles, targets, strategy, internal trackers, partner contacts
 #   cost    cost prices and contracts: only the people in BRAIN_COST_SLACK_IDS (Hatem) and Kareem
 #   owner   Kareem only
-PRIVATE_AUDIENCES = ("manager", "cost", "owner")  # only ever loaded from the secret, never from this repo
+PRIVATE_AUDIENCES = ("team", "manager", "cost", "owner")  # only ever loaded from the secret, never from this repo
+REPO_AUDIENCES = ("base", "sales")  # the shared repo holds the common layer only
 
 
 def owner_docs_from_env(value: str | None = None) -> list[Doc]:
-    """Private knowledge (contacts, cycles and strategy, cost and contracts, gaps) never lives in this shared repo.
+    """Everything above the common layer (team policy and processes, contacts, cycles and strategy, cost and
+    contracts, gaps) lives only in the BRAIN_OWNER_KNOWLEDGE_B64 secret, never in this shared repo.
 
-    It comes from the BRAIN_OWNER_KNOWLEDGE_B64 secret: base64 of a JSON list of {id, body, audience?}.
-    audience may be manager, cost or owner; anything else (or nothing) is forced to owner.
+    The secret is base64 of a JSON list of {id, body, audience?}. audience may be team, manager, cost or owner;
+    anything else (or nothing) is forced to owner. Items without a body (team catalogue notes) are not docs.
     """
     import base64
     import json
@@ -65,8 +69,16 @@ def owner_docs_from_file(path: Path = OWNER_LEARNED_FILE) -> list[Doc]:
     return [Doc(id="learned-owner", audience="owner", body=body)] if body else []
 
 
+def team_docs_from_file(path: Path = TEAM_LEARNED_FILE) -> list[Doc]:
+    """Facts Kareem shared with `approve <id> team`. Always audience team, never in the repo."""
+    if not path.exists():
+        return []
+    body = _FRONT.sub("", path.read_text(encoding="utf-8")).strip()
+    return [Doc(id="learned-team", audience="team", body=body)] if body else []
+
+
 def load_docs(folder: Path = KNOWLEDGE_DIR, private: bool = True) -> list[Doc]:
-    """The shared knowledge files, plus (private=True) the owner secret and owner-learned facts."""
+    """The shared knowledge files (common layer), plus (private=True) the secret and the learned facts."""
     docs = []
     for path in sorted(folder.glob("*.md")):
         text = path.read_text(encoding="utf-8")
@@ -75,9 +87,11 @@ def load_docs(folder: Path = KNOWLEDGE_DIR, private: bool = True) -> list[Doc]:
         if m:
             meta = yaml.safe_load(m.group(1)) or {}
             body = text[m.end():]
-        # Fail closed: a file with no audience tag is treated as owner-only.
-        docs.append(Doc(id=str(meta.get("id", path.stem)), audience=str(meta.get("audience", "owner")), body=body.strip()))
-    return docs + (owner_docs_from_env() + owner_docs_from_file() if private else [])
+        # Fail closed: a repo file may only be common layer; anything else (or no tag) is treated as owner-only.
+        audience = str(meta.get("audience", "owner"))
+        docs.append(Doc(id=str(meta.get("id", path.stem)), audience=audience if audience in REPO_AUDIENCES else "owner",
+                        body=body.strip()))
+    return docs + (owner_docs_from_env() + team_docs_from_file() + owner_docs_from_file() if private else [])
 
 
 def load_layers(path: Path = LAYERS_FILE) -> dict:
@@ -96,7 +110,7 @@ def partner_space(*, channel_name: str | None, is_shared: bool, is_im: bool, use
                   workspace_team: str | None, layers: dict) -> bool:
     """True when a partner could read the reply or is the one asking: never answer there.
 
-    Partner members sit in per-partner channels (#ksa-grubtech, #foodics-urbanpiper) and in
+    Partner members sit in per-partner channels (named ksa-…, uae-…, egypt-…, kw-jo-…, foodics-…) and in
     Slack Connect channels; Slack Connect users come from another workspace (user_team differs).
     """
     if user_team and workspace_team and user_team != workspace_team:

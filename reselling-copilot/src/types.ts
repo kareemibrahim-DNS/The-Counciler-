@@ -14,7 +14,7 @@ export interface LineItem {
 export interface Partner {
   cat: string;
   countries: string;
-  slack: string;
+  slack?: string; // team-only; not kept in this repo
   form: string;
   ksaForm: string;
   overview: string;

@@ -14,8 +14,8 @@ These files are the web version of the reseller bot that was built inside Orbit 
 
 ## Status
 - **Reference only.** These are Cloudflare Pages Functions written for Orbit. They depend on Orbit's sign-in (`getContext`, `levelFor`) and its database, so they don't run on their own here.
-- **Generated modules are not copied.** In Orbit they held the owner files. To rebuild them, run `scripts/build-brain-knowledge.mjs` against this repo's `knowledge/` and `catalog/` (team, base and sales files only).
+- **Generated modules are not copied.** In Orbit they held the owner files. This repo's `knowledge/` and `catalog/` now hold the common layer only (base and sales), so a rebuild from here gives the common layer. The team files (policy, discount eligibility, ARR and churn, SLAs, processes, partner notes) are in the Railway secret with the owner files.
 - **The live bot is `../slack-bot/`** on Railway, with the full layers (everyone, team, manager, cost, owner).
-- **Owner data stays out of this repo:** cost and markups, contracts, targets, contacts and trackers are in the Railway secret `BRAIN_OWNER_KNOWLEDGE_B64`.
+- **Only the common layer is in this repo:** team files (policy, discounts, SLAs, processes, partner notes and channels) and owner data (cost and markups, contracts, targets, contacts, trackers) are in the Railway secret `BRAIN_OWNER_KNOWLEDGE_B64`.
 
 To run this web page outside Orbit, it needs its own sign-in and host (for example Cloudflare Pages with Cloudflare Access). Ask Claude to port it when you want it.

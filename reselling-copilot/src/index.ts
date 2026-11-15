@@ -1,3 +1,4 @@
+import { teamData } from "./data";
 import { askClaude, type Turn } from "./llm";
 import { asksForCost, audienceFor, COST_REFUSAL, EXTERNAL_REFUSAL } from "./policy";
 import { buildSystem, relevantPartners } from "./prompt";
@@ -9,6 +10,7 @@ export interface Env {
   ANTHROPIC_API_KEY: string;
   CLAUDE_MODEL?: string; // default claude-opus-5-5
   CLAUDE_EFFORT?: "low" | "medium" | "high"; // default low: fast Slack replies
+  POLICY_JSON?: string; // team-only discount policy and partner-channel map; never in the repo
 }
 
 interface SlackEvent {
@@ -52,13 +54,14 @@ async function handle(ev: SlackEvent, env: Env): Promise<void> {
     const question = (ev.text ?? "").replace(MENTION, "").trim();
     if (!question) return postReply(env.SLACK_BOT_TOKEN, ev.channel, threadTs, "Ask me about a partner, a line item or a quote.");
 
-    const audience = audienceFor(await channelInfo(env.SLACK_BOT_TOKEN, ev.channel));
+    const team = teamData(env.POLICY_JSON);
+    const audience = audienceFor(await channelInfo(env.SLACK_BOT_TOKEN, ev.channel), team.channels);
     if (audience.mode === "external") return postReply(env.SLACK_BOT_TOKEN, ev.channel, threadTs, EXTERNAL_REFUSAL);
     if (asksForCost(question)) return postReply(env.SLACK_BOT_TOKEN, ev.channel, threadTs, COST_REFUSAL);
 
     const turns = await threadTurns(env, ev, threadTs, question);
     const sel = relevantPartners(turns.filter((t) => t.role === "user").map((t) => t.content));
-    const { stable, audience: audienceText } = buildSystem(audience, sel);
+    const { stable, audience: audienceText } = buildSystem(audience, sel, team.policy);
 
     const answer = await askClaude({
       apiKey: env.ANTHROPIC_API_KEY,

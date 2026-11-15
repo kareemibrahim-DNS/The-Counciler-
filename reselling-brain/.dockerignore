@@ -1,7 +1,7 @@
 slack-bot/.env
 slack-bot/learn_queue.json
 slack-bot/learned_owner.md
+slack-bot/learned_team.md
 slack-bot/state.json
-knowledge/10-learned-team.md
 **/__pycache__
 **/*.pyc

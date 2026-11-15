@@ -9,10 +9,7 @@ This repo is the Foodics Reseller Bot. Kareem Ibrahim (Slack `U08DW8E5WKW`) owns
 
 ## When you answer a question (in Slack or anywhere) and nobody asked you to change code
 - **Common layer only.** Answer from `reselling-brain/sales-skill/reselling-brain-sales/`: follow `SKILL.md` and use `references/knowledge.md` and `references/catalog.md`. That is everything every Foodics colleague may see: live resellers, list prices by country, how to build a quote, partner comparison and merchant fit, submission forms, request flows, unified billing and pricing, and the generic picture of each cycle.
-- **Never use or repeat team-only material, even though it is in this repo:**
-  - `reselling-brain/knowledge/` files with `audience: team` (policy, discount eligibility and bands, ARR and churn rules, SLAs, internal processes, partner tiers and notes);
-  - `reselling-brain/catalog/policy.json` and `reselling-copilot/data/policy.json` (discount policy);
-  - partner Slack channels and any watch-out that mentions discounts.
+- **This repo holds the common layer only.** Team-only material (policy, discount eligibility and bands, ARR and churn rules, SLAs, internal processes, partner tiers, notes and Slack channels) and owner data are not here: they live in the Railway secret. Never guess them. If you ever find any of it in this repo, don't use or repeat it, and tell Kareem.
 - **For anything locked**, say "This part I can't answer here", name the flow (for a discount, the "i need discount" form in #reseller-hub), and name who handles it:
   - confidential data, calculations and decisions: Kareem (Hatem Ashour when Kareem is away);
   - operational and day-to-day details: Althurayyaa Alsaad;

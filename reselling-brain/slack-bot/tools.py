@@ -195,9 +195,11 @@ class SlackReader:
 class Learner:
     """Every proposal is owner-only. Only Kareem's `approve <id> team` publishes a fact to the team."""
 
-    def __init__(self, knowledge_dir: Path, queue_file: Path, owner_file: Path | None = None):
-        self.knowledge_dir, self.queue_file = knowledge_dir, queue_file
+    def __init__(self, knowledge_dir: Path, queue_file: Path, owner_file: Path | None = None,
+                 team_file: Path | None = None):
+        self.knowledge_dir, self.queue_file = knowledge_dir, queue_file  # knowledge_dir is never written to
         self.owner_file = owner_file or queue_file.with_name("learned_owner.md")
+        self.team_file = team_file or queue_file.with_name("learned_team.md")
 
     def _load(self) -> dict:
         return json.loads(self.queue_file.read_text()) if self.queue_file.exists() else {}
@@ -233,8 +235,8 @@ class Learner:
                     f"contracts, targets or strategy can't go to the team. Send `approve {pid}` to keep it for yourself, "
                     f"or `reject {pid}`.")
         if audience == "team":
-            path = self.knowledge_dir / "10-learned-team.md"
-            header = "---\nid: learned-team\naudience: team\n---\n# Learned from Kareem\n"
+            path = self.team_file
+            header = "# Learned from Kareem (team)\n"
         else:
             path = self.owner_file
             header = "# Learned from Kareem (owner only)\n"
@@ -274,12 +276,32 @@ def no_discount(text: str) -> str:
     return " ".join(s for s in parts if "discount" not in s.lower()).strip()
 
 
+def team_catalog_notes(value: str | None = None) -> dict:
+    """Team-only partner notes (partner Slack channels, discount watch-outs) from the BRAIN_OWNER_KNOWLEDGE_B64
+    secret; the shared repo's catalogue holds the common layer only."""
+    import base64
+    raw = os.environ.get("BRAIN_OWNER_KNOWLEDGE_B64", "") if value is None else value
+    if not raw.strip():
+        return {}
+    try:
+        items = json.loads(base64.b64decode(raw).decode("utf-8"))
+    except Exception:
+        return {}
+    return next((i.get("catalog") or {} for i in items if isinstance(i, dict) and i.get("catalog")), {})
+
+
 class Catalog:
     """Partner profiles, quote rules and Salesforce LIST prices. Never cost or margin."""
 
-    def __init__(self, folder: Path = CATALOG_DIR):
+    def __init__(self, folder: Path = CATALOG_DIR, team_notes: dict | None = None):
         read = lambda f: json.loads((folder / f).read_text(encoding="utf-8"))
         self.items, self.partners, self.categories = read("catalog.json"), read("partners.json"), read("categories.json")
+        self.team_notes = team_catalog_notes() if team_notes is None else team_notes
+
+    def _watch(self, name: str, full: bool) -> str:
+        common = no_discount(self.partners[name].get("watch") or "")
+        extra = (self.team_notes.get(name) or {}).get("watch", "") if full else ""
+        return " ".join(x for x in (common, extra) if x).strip()
 
     def _partner(self, name: str) -> str | None:
         n = _norm(name)
@@ -331,10 +353,10 @@ class Catalog:
                    # Sales never sees discount rules or eligibility, not even "can't be discounted".
                    "quote_rules": m["rules"] if full else [r for r in m["rules"] if "discount" not in r.lower()],
                    "line_items": self._lines(name, cur)}
-            out.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"] if full else no_discount(m["watch"]),
+            out.update(best_for=m["bestFor"], edge=m["edge"], watch_out=self._watch(name, full),
                        submission_form=m["form"], ksa_approval_form=m["ksaForm"])
-            if full:
-                out["slack"] = m["slack"]
+            if full and (self.team_notes.get(name) or {}).get("slack"):
+                out["slack"] = self.team_notes[name]["slack"]
             return _clip(out)
         if category:
             n = _norm(category)
@@ -347,7 +369,7 @@ class Catalog:
                 if not m:
                     continue
                 row = {"partner": p, "inactive": bool(m.get("inactive")), "licensing_unit": m["unit"], "countries": m["countries"]}
-                row.update(best_for=m["bestFor"], edge=m["edge"], watch_out=m["watch"] if full else no_discount(m["watch"]))
+                row.update(best_for=m["bestFor"], edge=m["edge"], watch_out=self._watch(p, full))
                 if cur:
                     row["entry_price"] = self._entry(p, cur)
                 rows.append(row)

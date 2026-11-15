@@ -3,7 +3,7 @@
 Applies to `reselling-copilot/`. Follow `reselling-copilot/AGENTS.md`.
 
 - This repo holds **selling (list) prices only**. Never suggest code, data or tests containing cost price, wholesale price, margin, markup, payout or commission. `npm run guard` fails the build if you do.
-- In Slack channels listed in `reselling-copilot/data/channels.json`, the bot answers about that one partner only and never shows the internal discount policy.
+- Partner Slack channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`, `#foodics-…`) get no pricing. The discount policy and the channel map are team-only: they live in the `POLICY_JSON` secret, never in the repo.
 - Keep Salesforce line-item names exactly as they are in `reselling-copilot/data/catalog.json`.
 - Run `npm run check` before proposing a change. Add a test when you touch `reselling-copilot/src/policy.ts` or `reselling-copilot/src/prompt.ts`.
 - When reviewing PRs, flag any change that could leak one partner's pricing to another partner or expose discount rules in a partner channel.

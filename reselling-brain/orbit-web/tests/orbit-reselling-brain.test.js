@@ -24,7 +24,7 @@ test("team level never receives owner-only pricing, targets or strategy",()=>{
  assert.ok(!team.includes("COST-TABLE-ROW"),"markup table must not reach the team");
  assert.ok(!team.includes("TARGET-NUMBER"),"Q4 target must not reach the team");
  assert.ok(buildSystem("owner").includes("COST-TABLE-ROW"));
- assert.ok(team.includes("30 days of the invoice date"),"policy reaches the team");
+ assert.ok(team.includes("TEAM-POLICY-MARKER"),"policy reaches the team");
  assert.deepEqual(visibleDocs("partner"),[]);
 });
 
@@ -35,8 +35,8 @@ test("layers (14 Nov): team never sees partner contacts, trackers or contract st
  assert.ok(!visibleDocs("owner").some(d=>d.id==="sales-scope"));
  assert.ok(!visibleDocs("team").some(d=>d.id==="sales-scope"));
  assert.deepEqual(visibleDocs("sales").map(d=>d.id).sort(),["cycles-at-a-glance","how-to-answer","line-items-and-quotes","program-overview","sales-scope","working-with-resellers"]);
- for(const locked of ["minimum of the range","Diamond","CONTACT-NAME","COST-TABLE-ROW"])assert.ok(!buildSystem("sales").includes(locked),locked);
- assert.ok(team.includes("minimum of the range"),"the Partnerships team sees discount eligibility");
+ for(const locked of ["DISCOUNT-BANDS-MARKER","PARTNER-TIER-MARKER","CONTACT-NAME","COST-TABLE-ROW"])assert.ok(!buildSystem("sales").includes(locked),locked);
+ assert.ok(team.includes("DISCOUNT-BANDS-MARKER"),"the Partnerships team sees discount eligibility");
  assert.ok(team.includes("Unified billing")&&owner.includes("Unified billing"),"everyone sees the common layer");
 });
 

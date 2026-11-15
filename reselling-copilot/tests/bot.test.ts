@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { CATALOG, CATEGORIES, PARTNERS } from "../src/data";
+import { CATALOG, CATEGORIES, PARTNERS, teamData } from "../src/data";
 import { asksForCost, audienceFor } from "../src/policy";
 import { buildSystem, relevantPartners } from "../src/prompt";
+import type { Policy } from "../src/types";
+
+const POLICY: Policy = { tiers: [["TIER-MARKER", "x"]], ranges: [["RANGE-MARKER", "y"]], deal: [["DEAL-MARKER", "z"]],
+  notes: ["NOTE-MARKER"], terms: ["TERMS-MARKER"] };
 
 describe("audience", () => {
-  it("treats mapped partner channels as partner-only", () => {
-    expect(audienceFor({ name: "ksa-grubtech", isIm: false, isExtShared: false })).toEqual({ mode: "partner", partner: "Grubtech" });
+  it("treats channels mapped in the secret as partner-only", () => {
+    const channels = { "partner-x": "Grubtech" };
+    expect(audienceFor({ name: "partner-x", isIm: false, isExtShared: false }, channels)).toEqual({ mode: "partner", partner: "Grubtech" });
+  });
+  it("refuses partner-named channels even without the secret", () => {
+    for (const name of ["ksa-grubtech", "uae-supy", "egypt-x", "kw-jo-y", "foodics-z"])
+      expect(audienceFor({ name, isIm: false, isExtShared: false }).mode, name).toBe("external");
   });
   it("refuses unmapped shared channels", () => {
     expect(audienceFor({ name: "random-shared", isIm: false, isExtShared: true })).toEqual({ mode: "external" });
@@ -35,13 +44,25 @@ describe("prompt scoping", () => {
     expect(sel.has("Supy")).toBe(false);
   });
   it("in a partner channel, mentions no other partner's line items or the discount policy", () => {
-    const { audience } = buildSystem({ mode: "partner", partner: "Grubtech" }, new Set(["Grubtech", "Deliverect"]));
+    const { stable, audience } = buildSystem({ mode: "partner", partner: "Grubtech" }, new Set(["Grubtech", "Deliverect"]), POLICY);
     expect(audience).toContain("Grubtech - gOnline License");
     expect(audience).not.toContain("Deliverect - Physical License");
-    expect(audience).not.toContain("Branch tiers");
+    expect(stable + audience).not.toContain("Branch tiers");
+    expect(stable + audience).not.toContain("TERMS-MARKER");
   });
-  it("internal prompt includes the discount policy", () => {
-    expect(buildSystem({ mode: "internal" }, new Set()).audience).toContain("Branch tiers");
+  it("internal prompt includes the discount policy only when the secret provides it", () => {
+    expect(buildSystem({ mode: "internal" }, new Set(), POLICY).audience).toContain("Branch tiers: TIER-MARKER");
+    expect(buildSystem({ mode: "internal" }, new Set(), POLICY).audience).toContain("TERMS-MARKER");
+    const bare = buildSystem({ mode: "internal" }, new Set());
+    expect(bare.stable + bare.audience).not.toContain("Branch tiers");
+    expect(bare.audience).toContain("i need discount");
+  });
+  it("reads the policy and channel map from the secret, and survives a bad one", () => {
+    const t = teamData(JSON.stringify({ policy: POLICY, channels: { _note: "x", "partner-x": "Supy" } }));
+    expect(t.policy?.tiers[0][0]).toBe("TIER-MARKER");
+    expect(t.channels).toEqual({ "partner-x": "Supy" });
+    expect(teamData("not json")).toEqual({ policy: null, channels: {} });
+    expect(teamData(undefined)).toEqual({ policy: null, channels: {} });
   });
 });
 
