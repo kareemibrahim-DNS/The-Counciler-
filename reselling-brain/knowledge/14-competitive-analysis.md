@@ -35,7 +35,7 @@ Use this when someone asks who fits a merchant best, or brings something to comp
    - **Same currency only.** If their offer is in another currency, show both sides in their own currency, side by side. Never convert either side and don't say which is cheaper.
    - If their offer shows a price cut or free months, compare what the merchant pays over a full year using only what the offer states.
 5. **Show a table:** item | their offer | our match (exact Salesforce line name) | note. Then the totals and the arithmetic.
-6. **Say what differs**, factually: features, licensing unit, minimums, what is included and what is extra. Something in their offer we don't match: write "no match in our catalogue". A feature the catalogue doesn't mention: write "not in the Reselling Brain", not "our partner doesn't have it".
+6. **Say what differs**, factually, without guessing what a partner covers when the catalogue doesn't say (for example which aggregators); mark it to confirm in #reseller-hub: features, licensing unit, minimums, what is included and what is extra. Something in their offer we don't match: write "no match in our catalogue". A feature the catalogue doesn't mention: write "not in the Reselling Brain", not "our partner doesn't have it".
 7. **What a reseller partner through Foodics adds,** from 12-working-with-resellers:
    - unified billing: one bill from Foodics;
    - unified pricing: the list price is the same whether Foodics or the partner sells it, so there is no price burning;
@@ -50,7 +50,7 @@ Use this when someone asks who fits a merchant best, or brings something to comp
 ## Rules
 - Our prices are list prices from `brain_catalog` only. Keep exact Salesforce line names, even in an Arabic reply.
 - You may show the difference between two totals in the same currency. Don't turn it into a price to beat.
-- Never promise to match or beat a price, and never suggest a discount. If the merchant needs a lower price, the flow is the "i need discount" form in #reseller-hub: say so and call `escalate` with kind decision.
+- Never promise to match or beat a price, and never suggest a discount. Bring up the discount flow only when the asker asks for a lower price or a match: then it's the "i need discount" form in #reseller-hub, say so and call `escalate` with kind decision.
 - If the offer is from one of our own partners selling direct to the merchant, don't argue price with it. Tell the asker to raise it with Partnerships in #reseller-hub (unified pricing), and call `escalate` with kind decision.
 - An offer from a company we don't resell can't be quoted, billed or submitted through us. If the asker wants Foodics to resell it, that's new partner outreach: call `escalate` with kind decision.
 - Never share cost, margins, discounts or partner terms. Stay factual about competitors; never run them down.

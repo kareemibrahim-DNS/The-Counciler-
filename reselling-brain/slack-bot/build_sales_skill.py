@@ -70,8 +70,8 @@ SKILL_WORDING = [
     ("the bot pulls in Kareem or Hatem.", "ask Kareem Ibrahim or Hatem Ashour."),
     # 14-competitive-analysis
     ("Call `brain_catalog` with the category for that country.", "Use the category section in references/catalog.md for that country."),
-    ("If the merchant needs a lower price, the flow is the \"i need discount\" form in #reseller-hub: say so and call `escalate` with kind decision.",
-     "If the merchant needs a lower price, the flow is the \"i need discount\" form in #reseller-hub: say so, and name Kareem Ibrahim (Hatem Ashour when Kareem is away) for the decision."),
+    ("then it's the \"i need discount\" form in #reseller-hub, say so and call `escalate` with kind decision.",
+     "then it's the \"i need discount\" form in #reseller-hub, say so, and name Kareem Ibrahim (Hatem Ashour when Kareem is away) for the decision."),
     ("that's new partner outreach: call `escalate` with kind decision.", "that's new partner outreach: name Kareem Ibrahim (Hatem Ashour when Kareem is away)."),
     ("open the attached file with `read_slack_file`", "read the attached file"),
     ("**Find our match** with `brain_catalog`:", "**Find our match** in references/catalog.md:"),
