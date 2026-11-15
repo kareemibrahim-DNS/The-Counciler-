@@ -29,7 +29,7 @@ Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assis
 | File | Source |
 |---|---|
 | `data/catalog.json` | Salesforce Standard Price Book (SAR, AED, KWD, JOD, EGP) + "USD 1 – International", active Marketplace products |
-| `data/partners.json` | the old internal price-list sheet Partner Guide + Salesforce product descriptions + Partnerships notes |
+| `data/partners.json` | The internal partner guide + Salesforce product descriptions + Partnerships notes |
 | `data/policy.json` | Discount policy (3 Oct 2026) and Reseller Policy 2026 terms |
 | `data/channels.json` | Partner Slack channels from the Partner Guide |
 
@@ -38,6 +38,6 @@ Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assis
 
 ## Known data issues
 
-- The the old internal price-list sheet price list doesn't match Salesforce (e.g. Grubtech gOnline Annual 1,311.75 vs 1,421.10 SAR). Its KSA column holds KWD values for Ordable, Zyda and Mnasati. This repo uses Salesforce.
+- The old internal price-list sheet doesn't match Salesforce (e.g. Grubtech gOnline Annual 1,311.75 vs 1,421.10 SAR). Its KSA column holds KWD values for Ordable, Zyda and Mnasati. This repo uses Salesforce.
 - Eight VOLT lines have inconsistent prices across currencies (flagged ⚠ in the data), e.g. VOLT Hosting with SAP [Monthly] is USD 5,000 but SAR 1,750.
 - ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.
