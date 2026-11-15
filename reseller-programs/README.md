@@ -61,7 +61,7 @@ Follow [`GO_LIVE.md`](GO_LIVE.md).
 
 See [`FEED.md`](FEED.md). Short version:
 
-1. Edit `feed/partners.csv`, `feed/line_items.csv`, `feed/prices.csv` (or paste Orbit export in chat).
+1. Edit `../reselling-copilot/data/` (Salesforce list prices), never the CSVs, then `npm run feed:salesforce`.
 2. `npm run feed && npm run check`
 3. Validate / playground / deploy
 

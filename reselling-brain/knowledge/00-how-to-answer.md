@@ -20,7 +20,7 @@ If two sources conflict, say so and name both. Do not silently pick one.
 ## Answer shape
 - **Answer:** first line, direct.
 - **Rule / source:** which file and rule it comes from.
-- **What to do:** the next step, with the SLA if one applies.
+- **What to do:** the next step, with the SLA only if your knowledge states one.
 - **Watch out:** the risk to the deal or the merchant.
 
 ## Hard rules

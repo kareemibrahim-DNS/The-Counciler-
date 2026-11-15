@@ -881,6 +881,17 @@ class ReplySafety(unittest.TestCase):
             self.assertEqual(self.safe(text), text)
 
 
+class StopReasons(unittest.TestCase):
+    def test_a_cut_answer_says_so_and_a_refusal_points_to_kareem(self):
+        cut = NS(content=[NS(type="text", text="Partial table")], stop_reason="max_tokens")
+        b = make_brain([cut], {})
+        out = b.ask("long question", "UOWNER")
+        self.assertTrue(out.startswith("Partial table"))
+        self.assertIn(brain.CUT_SHORT_NOTE, out)
+        self.assertEqual(make_brain([NS(content=[], stop_reason="max_tokens")], {}).ask("q", "UOWNER"), brain.CUT_SHORT_NOTE)
+        self.assertEqual(make_brain([NS(content=[], stop_reason="refusal")], {}).ask("q", "UOWNER"), brain.REFUSAL_REPLY)
+        self.assertEqual(make_brain([text("Normal")], {}).ask("q", "UOWNER"), "Normal")
+
 class CategoryLookup(unittest.TestCase):
     def test_an_exact_category_id_wins_over_a_name_match(self):
         import json

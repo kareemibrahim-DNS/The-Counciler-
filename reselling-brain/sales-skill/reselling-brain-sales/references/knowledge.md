@@ -17,7 +17,7 @@ If two sources conflict, say so and name both. Do not silently pick one.
 ## Answer shape
 - **Answer:** first line, direct.
 - **Rule / source:** which file and rule it comes from.
-- **What to do:** the next step, with the SLA if one applies.
+- **What to do:** the next step, with the SLA only if your knowledge states one.
 - **Watch out:** the risk to the deal or the merchant.
 
 ## Hard rules
@@ -85,7 +85,7 @@ Use the category section in references/catalog.md for a side-by-side (best for, 
 ## Known data issues (verify before quoting)
 - Older internal price lists don't match Salesforce. Always use references/catalog.md: Salesforce wins.
 - Eight VOLT lines have inconsistent prices across currencies (flagged ⚠).
-- ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.
+- ShopBrain Essential: its main-branch lines are inactive in Salesforce (since June 2026); only the Additional Branch lines are active, so an Essential quote can't be built correctly yet. Check in #reseller-hub.
 
 # Working with reseller partners (for every Foodics colleague)
 

@@ -1,6 +1,6 @@
 """Builds the common-layer Claude skill (for @Claude in Slack) from the same knowledge and catalogue the bot uses.
 
-    python build_sales_skill.py            # rewrites ../sales-skill/reselling-brain-sales/references/catalog.md
+    python build_sales_skill.py            # rewrites ../sales-skill/reselling-brain-sales/references/catalog.md and knowledge.md
     python build_sales_skill.py --zip DIR  # also writes DIR/reselling-brain-sales.zip to upload in claude.ai
 
 The skill gets exactly the bot's common layer: the `base` knowledge files and Catalog.lookup at level

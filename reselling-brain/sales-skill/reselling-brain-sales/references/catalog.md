@@ -245,7 +245,7 @@ How to choose: Pick on country first. Prices exist only in some currencies, so c
 - Licensing unit: Basic or Premium package.
 - Countries: Kuwait, Qatar, KSA (priced KWD, AED)
 - Watch out: No SAR price in Salesforce, even though KSA is listed as a working country.
-- Submit deals with: https://docs.google.com/forms/d/13UZOcC_pX0Ic14QMSvILejgq0gMpPFsrCE7l9VDmj5U/edit?ts=696e1e47 (KSA approval form: Yes)
+- Submit deals with: https://docs.google.com/forms/d/13UZOcC_pX0Ic14QMSvILejgq0gMpPFsrCE7l9VDmj5U/viewform (KSA approval form: Yes)
 - Quote structure:
   - One package line (Basic or Premium) chosen by catalog size.
   - Annual.
