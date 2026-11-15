@@ -1,0 +1,798 @@
+<title>Reselling Copilot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: chat on the left; catalogue, comparison and quote rules on the right. Stacks on phones. */
+:root{
+  --bg:#f3f5f2; --panel:#ffffff; --ink:#14231f; --muted:#5a6b65; --line:#dbe2dd;
+  --accent:#0f6b55; --accent-ink:#ffffff; --saffron:#c98a10; --soft:#e6efe9;
+  --bubble-me:#0f6b55; --bubble-me-ink:#ffffff; --bubble-bot:#ffffff;
+  --good:#1d7a4a; --warn:#b26a00; --bad:#b3342b;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",ui-sans-serif,system-ui,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1513; --panel:#141f1c; --ink:#e4ece8; --muted:#93a39d; --line:#26332f;
+  --accent:#3fb994; --accent-ink:#06120e; --saffron:#e6b04a; --soft:#1a2925;
+  --bubble-me:#1f5e4d; --bubble-me-ink:#eaf5f0; --bubble-bot:#17231f;
+  --good:#5fc98f; --warn:#e6a446; --bad:#ec7a70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1513; --panel:#141f1c; --ink:#e4ece8; --muted:#93a39d; --line:#26332f;
+  --accent:#3fb994; --accent-ink:#06120e; --saffron:#e6b04a; --soft:#1a2925;
+  --bubble-me:#1f5e4d; --bubble-me-ink:#eaf5f0; --bubble-bot:#17231f;
+  --good:#5fc98f; --warn:#e6a446; --bad:#ec7a70; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,4vw,38px);letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:4px 0 0;max-width:64ch}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.stamp{font-family:var(--f-mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:6px 10px;background:var(--panel)}
+.stamp.lock{color:var(--good);border-color:currentColor}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;min-width:0}
+.chat{display:flex;flex-direction:column;height:min(80vh,800px);min-height:520px}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.chat-head b{font-family:var(--f-display);font-size:17px}
+.status{font-size:12px;font-family:var(--f-mono);color:var(--muted)}
+.status::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;background:var(--warn)}
+.status.on::before{background:var(--good)}
+.log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:92%;padding:10px 14px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word;min-width:0}
+.msg.me{align-self:flex-end;background:var(--bubble-me);color:var(--bubble-me-ink);border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:var(--bubble-bot);border:1px solid var(--line);border-bottom-left-radius:4px;font-size:14.5px}
+.msg.note{align-self:center;font-size:12.5px;color:var(--muted);padding:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer;text-align:left}
+.chip:hover{border-color:var(--accent)}
+.compose{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.compose textarea{flex:1;min-width:0;resize:none;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;height:46px}
+.btn{font:inherit;font-weight:600;border:0;border-radius:8px;padding:0 16px;min-height:40px;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.btn[disabled]{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);padding:0 8px}
+.tab{font:inherit;font-size:13.5px;font-weight:500;background:none;border:0;color:var(--muted);padding:12px 10px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--saffron)}
+.pane{padding:16px;max-height:calc(min(80vh,800px) - 46px);overflow-y:auto}
+.pane h3{font-family:var(--f-display);font-size:15px;margin:18px 0 8px}
+.pane h3:first-child{margin-top:0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;max-width:100%}
+.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 14px;font-size:13.5px;margin:0}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.facts a{color:var(--accent)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+td.na{color:var(--muted);text-align:right;font-family:var(--f-mono)}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.pill.Main{color:var(--accent)} .pill.Additional{color:var(--saffron)} .pill.Add-on{color:var(--muted)} .pill.One-time{color:var(--bad)} .pill.Usage{color:var(--warn)}
+.flag{color:var(--warn);font-weight:600}
+ul.list{padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px;font-size:13.5px}
+.callout{border-left:3px solid var(--saffron);background:var(--soft);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13.5px;margin-bottom:10px}
+.callout.bad{border-left-color:var(--bad)}
+.cmp th:first-child,.cmp td:first-child{position:sticky;left:0;background:var(--panel);min-width:110px}
+.cmp td{min-width:170px;font-size:12.5px}
+footer{font-size:12px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Reselling <span>Copilot</span></h1>
+      <p class="sub">Partners, line items and quote structure for the Foodics Marketplace. Ask it to build a quote, check a structure, or tell two partners in the same category apart.</p>
+    </div>
+    <div class="badges">
+      <span class="stamp lock">No cost data on this page</span>
+      <span class="stamp">Prices: Salesforce price book · 14 Nov 2026</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="panel chat" aria-label="Chat">
+      <div class="chat-head"><b>Ask the Copilot</b><span id="status" class="status">Connecting…</span></div>
+      <div id="log" class="log" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <form class="compose" id="form">
+        <textarea id="q" aria-label="Your question" placeholder="e.g. Quote ShopBrain Operation for 6 branches in KSA, annual" rows="1"></textarea>
+        <button class="btn" id="send" type="submit">Ask</button>
+        <button class="btn ghost" id="stop" type="button" hidden>Stop</button>
+      </form>
+    </section>
+
+    <section class="panel" aria-label="Reference">
+      <div class="tabs" role="tablist" id="tabs">
+        <button class="tab" role="tab" id="tab-cat" aria-selected="true">Partner catalogue</button>
+        <button class="tab" role="tab" id="tab-cmp" aria-selected="false">Compare in category</button>
+        <button class="tab" role="tab" id="tab-rules" aria-selected="false">Discounts</button>
+      </div>
+      <div class="pane" id="pane-cat">
+        <div class="controls">
+          <select id="selPartner" aria-label="Partner"></select>
+          <select id="selCur" aria-label="Currency">
+            <option value="SAR">KSA · SAR</option><option value="AED">UAE · AED</option><option value="KWD">Kuwait · KWD</option>
+            <option value="JOD">Jordan · JOD</option><option value="EGP">Egypt · EGP</option><option value="USD">International · USD</option>
+          </select>
+        </div>
+        <div id="profile"></div>
+      </div>
+      <div class="pane" id="pane-cmp" hidden>
+        <div class="controls">
+          <select id="selCat" aria-label="Category"></select>
+          <select id="selCur2" aria-label="Currency">
+            <option value="SAR">KSA · SAR</option><option value="AED">UAE · AED</option><option value="KWD">Kuwait · KWD</option>
+            <option value="JOD">Jordan · JOD</option><option value="EGP">Egypt · EGP</option><option value="USD">International · USD</option>
+          </select>
+        </div>
+        <div id="compare"></div>
+      </div>
+      <div class="pane" id="pane-rules" hidden></div>
+    </section>
+  </div>
+  <footer>List prices from the Salesforce Standard Price Book (SAR, AED, KWD, JOD, EGP) and "USD 1 – International". Partner profiles from the Partner Guide. Discount rules are not on this page: use the "i need discount" form in #reseller-hub. Cost prices, wholesale terms and margins are deliberately left out of this page.</footer>
+</div>
+
+<script>
+const CATALOG = {"Alpha (Xero)":[{"name":"Alpha - Xero Basic Subscription - [Annual]","code":"MP-ACC-SUB-ALP-XER02","desc":"Includes all Starter Plan features. Plus: bills, quotes, purchase orders, and inventory.","p":{"KWD":178,"JOD":409,"AED":2112,"SAR":2158,"EGP":28774,"USD":575},"f":"Annual","t":"Main"},{"name":"Alpha - Xero Migration Package - [Annual]","code":"MP-ACC-SUB-ALP-XER03","desc":"Additional Data to be added to Xero for previous years: Move prior period data up to 1 year to compare previous records with current books AP and AR migration for up to 1 year Adding any payroll information up to 1 year ","p":{"KWD":71,"JOD":163,"SAR":858,"AED":840,"EGP":11444,"USD":229},"f":"Annual","t":"Add-on"},{"name":"Alpha - Xero Premium Subscription - [Annual]","code":"MP-ACC-SUB-ALP-XER01","desc":"Includes all Standard Plan features. Plus: multiple currencies, project management, and advanced financial reporting.","p":{"USD":865,"EGP":43226,"KWD":268,"AED":3173,"SAR":3242,"JOD":614},"f":"Annual","t":"Main"},{"name":"Alpha - Xero Training Session - [One-time]","code":"MP-ACC-ALP-ONE-XER02","desc":"Training Per request - Including 4 sessions","p":{"JOD":193,"USD":272.48,"EGP":13624,"AED":1000,"SAR":1022,"KWD":84},"f":"One-time","t":"One-time"},{"name":"Alpha - Xero additional Branch [Annual]","code":"MP-ACC-SUB-ALP-XER04","desc":"Extra Branch","p":{"AED":490,"JOD":94.67,"KWD":41.33,"EGP":6666.67,"USD":133.33,"SAR":500},"f":"Annual","t":"Additional"},{"name":"Alpha- Xero Implementation - [One-time]","code":"MP-ACC-ALP-ONE-XER01","desc":"Uploading the Chart of Accounts 3rd Party API Integration Support Customized Xero templates for invoices, credit notes, statements of account, etc Setting up VAT codes and any specific tax settings Setting up Tracking Ca","p":{"SAR":2044,"AED":2000,"KWD":169,"USD":545,"JOD":387,"EGP":27248},"f":"One-time","t":"One-time"}],"BrandWallet":[{"name":"BrandWallet - Additional Branch [Annual]","code":"MP-FDA-SUB-BRW08","desc":"Adding an extra branch license for all plans","p":{"USD":240,"EGP":11280.15,"JOD":171,"KWD":73.57,"SAR":900.01,"AED":882},"f":"Annual","t":"Additional"},{"name":"BrandWallet - Additional Branch [Monthly]","code":"MP-FDA-SUB-BRW07","desc":"Adding an extra branch license for all plans","p":{"EGP":940,"KWD":6.13,"SAR":75,"USD":20,"JOD":14.2,"AED":73.45},"f":"Monthly","t":"Additional"},{"name":"BrandWallet - Basic Plan [Annual]","code":"MP-FDA-SUB-BRW02","desc":"- 1 CARD (Stamp / Point Card) - Automatic Birthday Celebration & Location Push Notification - Unlimited Push Notifications - Data Export","p":{"SAR":2154.9,"AED":2107.9,"JOD":406.9,"KWD":175.9,"EGP":23400,"USD":573.8},"f":"Annual","t":"Main"},{"name":"BrandWallet - Basic Plan [Monthly]","code":"MP-FDA-SUB-BRW01","desc":"- 1 CARD (Stamp / Point Card) - Automatic Birthday Celebration & Location Push Notification - Unlimited Push Notifications - Data Export","p":{"AED":214.9,"EGP":2280,"SAR":219.9,"JOD":41.49,"USD":58.5,"KWD":17.9},"f":"Monthly","t":"Main"},{"name":"BrandWallet - Growth Plan [Annual]","code":"MP-FDA-SUB-BRW06","desc":"- 5 CARDS (Stamp card/ Point Card/ Double Stamp Card/ Triple Stamp Card/Quadruple Card/ Event - Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coup","p":{"JOD":553,"KWD":240,"USD":780,"AED":2864.9,"EGP":31800,"SAR":2928.9},"f":"Annual","t":"Main"},{"name":"BrandWallet - Growth Plan [Monthly]","code":"MP-FDA-SUB-BRW05","desc":"- 5 CARDS (Stamp card/ Point Card/ Double Stamp Card/ Triple Stamp Card/Quadruple Card/ Event - Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coup","p":{"USD":84.5,"SAR":317,"EGP":3300,"KWD":26,"JOD":59.9,"AED":310},"f":"Monthly","t":"Main"},{"name":"BrandWallet - Standard Plan [Annual]","code":"MP-FDA-SUB-BRW04","desc":"- 2 CARDS (Stamp Card/ Point Card/ Double Stamp Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coupon - Unlimited Push Notifications - Data Export ","p":{"JOD":542.5,"KWD":235,"AED":2809.9,"USD":765,"EGP":29400,"SAR":2872},"f":"Annual","t":"Main"},{"name":"BrandWallet - Standard Plan [Monthly]","code":"MP-FDA-SUB-BRW03","desc":"- 2 CARDS (Stamp Card/ Point Card/ Double Stamp Card/ Membership Card/ Discount Card) - Automatic Birthday Celebration & Location Push Notification & Free Digital Gift Coupon - Unlimited Push Notifications - Data Export ","p":{"EGP":2880,"JOD":54.9,"USD":78,"KWD":24,"AED":286.49,"SAR":292.9},"f":"Monthly","t":"Main"}],"Deliverect":[{"name":"Deliverect - Physical License - [Annual]","code":"MP-FDA-SUB-DLV02","desc":"This license includes 1 physical branch.","p":{"AED":3438.79,"USD":937,"JOD":665.27,"SAR":3150,"KWD":290.47,"EGP":46850},"f":"Annual","t":"Main"},{"name":"Deliverect - Virtual License - [Annual]","code":"MP-FDA-SUB-DLV04","desc":"This license includes 1 virtual branch","p":{"SAR":1688,"EGP":28800,"USD":576,"AED":2113.92,"KWD":178.56,"JOD":408.96},"f":"Annual","t":"Add-on"}],"FeedUs":[{"name":"FeedUs - Subscription License [Annual]","code":"MP-FDA-SUB-FUS01","desc":"","p":{"SAR":2300},"f":"Annual","t":"Main"}],"FlowERP":[{"name":"FlowCRM - Lead App - [Annual]","code":"MP-FDA-SUB-FLWC02","desc":"","p":{"USD":959.68,"SAR":3598.8,"EGP":48511.82,"AED":3524.3,"JOD":679.81,"KWD":296.54},"f":"Annual","t":"Add-on"},{"name":"FlowChat - Employee Chat App - [Annual]","code":"MP-FDA-SUB-FLWC01","desc":"","p":{"EGP":66305.42,"KWD":405.31,"SAR":4918.8,"JOD":929.16,"USD":1311.68,"AED":4816.98},"f":"Annual","t":"Add-on"},{"name":"FlowERP - Additional Employees - [Annual]","code":"MP-FDA-SUB-FLWA08","desc":"","p":{"JOD":113.34,"AED":587.58,"EGP":8088,"SAR":600,"KWD":49.44,"USD":160},"f":"Annual","t":"Additional"},{"name":"FlowERP - Advanced Inventory - [Annual]","code":"MP-FDA-SUB-FLWA03","desc":"","p":{"AED":1175.16,"JOD":226.68,"EGP":16176,"USD":320,"KWD":98.88,"SAR":1200},"f":"Annual","t":"Add-on"},{"name":"FlowERP - Advanced Package (Additional Branch) - [Annual]","code":"MP-FDA-SUB-FLWA02","desc":"Additonal Branch - fits only Advanced package","p":{"USD":666.67,"AED":2450,"SAR":2500,"JOD":475,"KWD":205,"EGP":32500},"f":"Annual","t":"Additional"},{"name":"FlowERP - Advanced Package - [Annual]","code":"MP-FDA-SUB-FLWA01","desc":"Basic Features Plus: Assets Production (Assembly) Waste Personnel and Payroll","p":{"EGP":55250,"USD":1133.33,"KWD":348.5,"JOD":807.5,"AED":4165,"SAR":4250},"f":"Annual","t":"Main"},{"name":"FlowERP - B2B Invoicing - [Annual]","code":"MP-FDA-SUB-FLWA04","desc":"","p":{"USD":320,"KWD":98.88,"AED":1175.16,"JOD":226.68,"SAR":1200,"EGP":16176},"f":"Annual","t":"Add-on"},{"name":"FlowERP - Basic Package (Additional Branch) - [Annual]","code":"MP-FDA-SUB-FLWB02","desc":"Additonal Branch - fits only basic package","p":{"AED":1148.5,"SAR":1171.88,"JOD":222.62,"KWD":96.12,"EGP":15234.38,"USD":312.5},"f":"Annual","t":"Additional"},{"name":"FlowERP - Basic Package - [Annual]","code":"MP-FDA-SUB-FLWB01","desc":"Accounts Purchases Sales Inventory","p":{"EGP":31850,"USD":653.33,"AED":2401,"JOD":465.5,"SAR":2450,"KWD":200.9},"f":"Annual","t":"Main"},{"name":"FlowERP - Central Kitchen - [Annual]","code":"MP-FDA-SUB-FLWA05","desc":"","p":{"JOD":226.68,"AED":1175.16,"EGP":16176,"SAR":1200,"USD":320,"KWD":98.88},"f":"Annual","t":"Add-on"},{"name":"FlowERP - Cheques and Withdrawal - [Annual]","code":"MP-FDA-SUB-FLWA09","desc":"","p":{"JOD":1133.4,"USD":1600,"AED":5875.8,"KWD":494.4,"SAR":6000,"EGP":80880},"f":"Annual","t":"Add-on"},{"name":"FlowERP - Cost Center - [Annual]","code":"MP-FDA-SUB-FLWA07","desc":"","p":{"SAR":1560,"KWD":120,"EGP":20280,"USD":416,"JOD":283.64,"AED":1528.8},"f":"Annual","t":"Add-on"},{"name":"FlowERP - HR App - [Annual]","code":"MP-FDA-SUB-FLWA06","desc":"","p":{"SAR":4918.8,"USD":1311.68,"EGP":66305.42,"KWD":405.31,"AED":4816.98,"JOD":929.16},"f":"Annual","t":"Add-on"},{"name":"FlowERP - Implementation Per Branch - [One Time]","code":"MP-ERP-ONE-FLW01","desc":"One time implementation","p":{"JOD":178.1,"AED":918.8,"USD":250,"SAR":937.5,"EGP":12187.5,"KWD":76.9},"f":"One-time","t":"One-time"},{"name":"FlowERP - Pre and Scheduled Orders - [Annual]","code":"MP-FDA-SUB-FLWA10","desc":"","p":{"JOD":226.68,"USD":320,"SAR":1200,"KWD":98.88,"AED":1175.16,"EGP":16176},"f":"Annual","t":"Add-on"}],"Grubtech":[{"name":"Grubtech - Virtual Brand [Annual]","code":"MP-FDA-SUB-GRT07","desc":"","p":{"EGP":7150,"KWD":82,"USD":268.2,"JOD":101.5,"SAR":710.5,"AED":970.9},"f":"Annual","t":"Add-on"},{"name":"Grubtech - Virtual Brand [Monthly]","code":"MP-FDA-SUB-GRT08","desc":"","p":{"KWD":7.5,"SAR":64.6,"JOD":9.2,"AED":88.3,"EGP":650,"USD":24.5},"f":"Monthly","t":"Add-on"},{"name":"Grubtech - gOnline License [Annual]","code":"MP-FDA-SUB-GRT03","desc":"","p":{"KWD":164,"JOD":203,"AED":1942,"SAR":1421.1,"USD":536.3,"EGP":14300},"f":"Annual","t":"Main"},{"name":"Grubtech - gOnline License [Monthly]","code":"MP-FDA-SUB-GRT01","desc":"","p":{"JOD":18.46,"KWD":14.91,"AED":176.5,"USD":48.8,"SAR":129.2,"EGP":1300},"f":"Monthly","t":"Main"}],"Iisal":[{"name":"Iisal - B2B E-Invoicing (500+ Invoice) [Annual]","code":"MP-LSL-B2B-EINV3","desc":"","p":{"AED":6649,"KWD":557,"JOD":1284,"USD":1810,"SAR":6800},"f":"Annual","t":"Main"},{"name":"Iisal - B2B E-Invoicing (Up to 100 Invoice) [Annual]","code":"MP-LSL-B2B-EINV1","desc":"","p":{"USD":380,"AED":1399,"SAR":1430,"JOD":270,"KWD":117.2},"f":"Annual","t":"Main"},{"name":"Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual]","code":"MP-LSL-B2B-EINV2","desc":"","p":{"AED":2664,"KWD":144.7,"SAR":2725,"USD":725,"JOD":514.4},"f":"Annual","t":"Main"}],"InvoiceQ":[{"name":"InvoiceQ - Advanced Package - [Annual]","code":"MP-BI-SUB-PACK01","desc":"Unlimited Invoicing + 2,000 SMS Per year, This license is per issuing terminal.","p":{"JOD":545,"AED":2867,"USD":780,"SAR":3150,"KWD":240,"EGP":24999},"f":"Annual","t":"Main"},{"name":"InvoiceQ - Basic Package - [Annual]","code":"MP-INV-B2B-EINV1","desc":"This line item doesn't include SMS, Just email. This works Up to 2 Terminals Only.","p":{"KWD":119.9,"SAR":1470,"JOD":275,"USD":390,"EGP":14999,"AED":1440},"f":"Annual","t":"Main"},{"name":"InvoiceQ - Customization - [One Time]","code":"MP-INV-BI-CUST-ONE01","desc":"One Time Payment for Invoice Layout Customization","p":{"SAR":10000,"KWD":820,"EGP":124194,"AED":9800,"JOD":1862,"USD":2667},"f":"One-time","t":"One-time"}],"Ishbek":[{"name":"Ishbek - [Annual]","code":"MP-FDA-SUB-ISH01","desc":"This license inludes 1 branch","p":{"KWD":157,"JOD":360},"f":"Annual","t":"Main"},{"name":"Ishbek - [Monthly]","code":"MP-FDA-SUB-ISH02","desc":"This license inludes 1 branch","p":{"JOD":33,"KWD":14},"f":"Monthly","t":"Main"}],"Koinz":[{"name":"Koinz - Loyalty Package - [Annual]","code":"MP-FDA-SUB-KNZ02","desc":"WhatsApp customer communication \"KSA Only\" SMS customer communication \"EGY\" Stamps & points loyalty programs Apple Wallet integration Location-based notifications CRM & reviews program Social following & push notificatio","p":{"SAR":1800,"EGP":14400},"f":"Annual","t":"Main"},{"name":"Koinz - Loyalty Package - [Monthly]","code":"MP-FDA-SUB-KNZ01","desc":"WhatsApp customer communication \"KSA Only\" SMS customer communication \"EGY\" Stamps & points loyalty programs Apple Wallet integration Location-based notifications CRM & reviews program Social following & push notificatio","p":{"EGP":1200,"SAR":300},"f":"Monthly","t":"Main"}],"MS Dynamics":[{"name":"MS Dynamics - Adding Team Member - [Annual]","code":"MP-ERP-SUB-DYN04","desc":"","p":{"SAR":432,"AED":423,"USD":115.2,"JOD":82,"KWD":36,"EGP":5760},"f":"Annual","t":"Additional"},{"name":"MS Dynamics - Attach License - [Annual]","code":"MP-ERP-SUB-DYN02","desc":"","p":{"KWD":134,"JOD":307,"AED":1585,"USD":432,"SAR":1620,"EGP":21600},"f":"Annual","t":"Add-on"},{"name":"MS Dynamics - Finance License - [Annual]","code":"MP-ERP-SUB-DYN01","desc":"","p":{"JOD":2147,"KWD":937,"AED":11098,"USD":3024,"SAR":11340,"EGP":151200},"f":"Annual","t":"Main"},{"name":"MS Dynamics - Foodics Integration [Annual]","code":"MP-ERP-SUB-DYN05","desc":"","p":{"EGP":210000,"AED":15414,"JOD":2982,"KWD":1302,"SAR":15750,"USD":4200},"f":"Annual","t":"Add-on"},{"name":"MS Dynamics - Implementation - [One-time]","code":"MP-ERP-PSV-DYN06","desc":"","p":{"EGP":16000,"JOD":227,"SAR":1200,"AED":1174,"USD":320,"KWD":99},"f":"One-time","t":"One-time"},{"name":"MS Dynamics - Premium License - [Annual]","code":"MP-ERP-SUB-DYN03","desc":"","p":{"KWD":1339,"SAR":16200,"USD":4320,"AED":15854,"JOD":3067,"EGP":216000},"f":"Annual","t":"Main"}],"Malachite":[{"name":"Malachite - Attendance License  [Annual]","code":"MP-ERP-SUB-MLC-ATD","desc":"This is not a stand alone solution - it should be activated with SAP","p":{"KWD":2.3,"EGP":367.8,"SAR":27.6,"JOD":5.2,"AED":27},"f":"Annual","t":"Main"},{"name":"Malachite - Company Admin License  [Annual]","code":"MP-ERP-SUB-MLC-COM","desc":"This is not a stand alone solution - it should be activated with SAP","p":{"JOD":71.6,"KWD":31.2,"EGP":5040,"AED":369.9,"SAR":378},"f":"Annual","t":"Main"},{"name":"Malachite - Employee Self-Service License  [Annual]","code":"MP-ERP-SUB-MLC-EMP","desc":"This is not a stand alone solution - it should be activated with SAP","p":{"AED":9.4,"EGP":127.8,"SAR":9.6,"JOD":1.8,"KWD":0.8},"f":"Annual","t":"Main"},{"name":"Malachite - HR Employees [Annual]","code":"MP-ERP-SUB-MLC-HRE","desc":"This is not a stand alone solution - it should be activated with SAP","p":{"JOD":24,"KWD":10.8,"SAR":129.6,"EGP":1728,"AED":120.72},"f":"Annual","t":"Main"},{"name":"Malachite - HR License  [Annual]","code":"MP-ERP-SUB-MLC-HRL","desc":"This is not a stand alone solution - it should be activated with SAP","p":{"EGP":367.8,"KWD":2.3,"AED":27,"SAR":27.6,"JOD":5.2},"f":"Annual","t":"Main"},{"name":"Malachite - Payroll License  [Annual]","code":"MP-ERP-SUB-MLC-PAY","desc":"This is not a stand alone solution - it should be activated with SAP","p":{"EGP":1020,"AED":74.9,"JOD":14.5,"KWD":6.3,"SAR":76.5},"f":"Annual","t":"Main"}],"Mnasati":[{"name":"Mnasati - Basic Package [Annual]","code":"MP-BI-SUB-MNS01","desc":"Payment Gateway Integration Delivery Integration Flexible Theme No. of Main Categories — 20 No. of Sub Categories — 60 No. of Products — 400 Products Bulk Upload No. of Main Users — 1 No. of Sub Users — 10 No. of Branche","p":{"AED":3500,"KWD":250},"f":"Annual","t":"Main"},{"name":"Mnasati - Premium Package - [Annual]","code":"MP-BI-SUB-MNS02","desc":"Basic Package features Plus: No. of Main Categories — 50 No. of Sub Categories — 150 No. of Products — 1500 Products Bulk Upload No. of Main Users — 1 No. of Sub Users — 20 No. of Branches — 20 No. of Orders — Unlimited ","p":{"AED":4500,"KWD":350},"f":"Annual","t":"Main"}],"Nitx":[{"name":"Nitx- SW Only Screen Management [Annual]","code":"SW-NTX-SCN-MA01","desc":"","p":{"JOD":102,"SAR":540,"AED":529,"KWD":44,"EGP":4449,"USD":149},"f":"Annual","t":"Main"}],"OptCulture":[{"name":"OptCulture - Growth - [Annual]","code":"MP-FDA-SUB-OPTGR-01","desc":"This license includes: - All features in the Loyalty license. - Pre-built WhatsApp, SMS, and Email integrations for Promotional campaigns. - Campaign Reports with ROI - Customer Segmentation and Campaign Management. NPS ","p":{"USD":1296,"JOD":920,"KWD":402,"EGP":64800,"SAR":4860,"AED":4756},"f":"Annual","t":"Main"},{"name":"OptCulture - Growth - [Monthly]","code":"MP-FDA-SUB-OPTGR-02","desc":"This license includes: - All features in the Loyalty license. - Pre-built WhatsApp, SMS, and Email integrations for Promotional campaigns. - Campaign Reports with ROI - Customer Segmentation and Campaign Management. NPS ","p":{"JOD":77,"AED":396,"USD":108,"KWD":33,"EGP":5400,"SAR":405},"f":"Monthly","t":"Main"},{"name":"OptCulture - Loyalty - [Annual]","code":"MP-BI-SUB-OPTLO-01","desc":"This license includes: - Interactive Digital Receipts. - Pre-built WhatsApp, SMS, and Email integrations for Transactional Messages - Coupons, Discounts, and Gift Cards (Apple, Huawei, Google Wallet enabled). - Multi-Tie","p":{"EGP":39000,"JOD":553.8,"AED":2863,"SAR":2925,"USD":780,"KWD":242},"f":"Annual","t":"Main"},{"name":"OptCulture - Loyalty - [Monthly]","code":"MP-LO-SUB-OPTLO-02","desc":"This license includes: - Interactive Digital Receipts. - Pre-built WhatsApp, SMS, and Email integrations for Transactional Messages - Coupons, Discounts, and Gift Cards (Apple, Huawei, Google Wallet enabled). - Multi-Tie","p":{"KWD":20,"AED":239,"USD":65,"EGP":3250,"SAR":244,"JOD":46.15},"f":"Monthly","t":"Main"},{"name":"OptCulture - SMS Usage - GCC","code":"MP-FDA-SUB-SMS-GCC01","desc":"","p":{"AED":0.1,"JOD":0.02,"EGP":1.36,"USD":0.03,"KWD":0.01,"SAR":0.1},"f":"Usage","t":"Usage"},{"name":"OptCulture - WhatsApp usage - GCC","code":"MP-FDA-SUB-WTS-GCC01","desc":"","p":{"JOD":0.05,"USD":0.07,"AED":0.25,"SAR":0.25,"KWD":0.02,"EGP":3.4},"f":"Usage","t":"Usage"}],"Ordable":[{"name":"Ordable - Additional Branch [Annual]","code":"MP-ORD-LCN-ANUL3","desc":"","p":{"KWD":20,"JOD":44},"f":"Annual","t":"Additional"},{"name":"Ordable - Advance License [Annual]","code":"MP-ORD-LCN-ANUL2","desc":"","p":{"KWD":410,"JOD":947},"f":"Annual","t":"Main"},{"name":"Ordable - Basic License [Annual]","code":"MP-ORD-LCN-ANUL1","desc":"","p":{"KWD":275,"JOD":635},"f":"Annual","t":"Main"},{"name":"Ordable - Mobile Application [Annual]","code":"MP-ORD-LCN-ANUL4","desc":"This is an add-on mobile application license.","p":{"KWD":250,"JOD":473},"f":"Annual","t":"Add-on"}],"Prepit":[{"name":"Prepit - Advanced License (Additional Branch) [Annual]","code":"MP-ORD-LCN-PRPT4","desc":"","p":{"EGP":2456},"f":"Annual","t":"Additional"},{"name":"Prepit - Advanced license [Annual]","code":"MP-ORD-LCN-PRPT2","desc":"Online Ordering & Payments Management App Waiter’s App Loyalty Pointing System Commercial Account Management Instant Rewards for Customer Service Digital Pager","p":{"EGP":50088},"f":"Annual","t":"Main"},{"name":"Prepit - Basic License (Additional Branch) [Annual]","code":"MP-ORD-LCN-PRPT3","desc":"","p":{"EGP":1255},"f":"Annual","t":"Additional"},{"name":"Prepit - Basic License [Annual]","code":"MP-ORD-LCN-PRPT1","desc":"Online Ordering & Payments Management App Waiter’s App","p":{"EGP":6539},"f":"Annual","t":"Main"},{"name":"Prepit - Delivery Management Module [Annual]","code":"MP-ORD-LCN-PRPT6","desc":"Delivery live tracking","p":{"EGP":6097},"f":"Annual","t":"Add-on"},{"name":"Prepit - Mobile Application [Annual]","code":"MP-ORD-LCN-PRPT5","desc":"","p":{"EGP":66053},"f":"Annual","t":"Add-on"}],"QuickBooks":[{"name":"QuickBooks - Online Plus Additional Branch [Annual]","code":"MP-ACC-SUB-QBS06","desc":"This license doesn't include Training or Support.","p":{"SAR":780,"USD":211,"KWD":63.96,"AED":694.2,"JOD":148.2,"EGP":10015.2},"f":"Annual","t":"Additional"},{"name":"QuickBooks - Online Plus Subscription [Annual]","code":"MP-ACC-SUB-QBS05","desc":"This license doesn't include Training or Support.","p":{"SAR":4550,"KWD":373,"AED":4050,"JOD":865,"USD":1229,"EGP":58422},"f":"Annual","t":"Main"},{"name":"QuickBooks - Support Package [One-Time]","code":"MP-ACC-SUB-QBS08","desc":"","p":{"AED":2321.74,"EGP":33495.71,"JOD":495.65,"SAR":2608.7,"USD":704.35,"KWD":213.91},"f":"One-time","t":"One-time"},{"name":"QuickBooks - Training Package [One-Time]","code":"MP-ACC-SUB-QBS07","desc":"","p":{"JOD":475,"SAR":2500,"EGP":32100,"AED":2225,"USD":675,"KWD":205},"f":"One-time","t":"One-time"}],"Roboost":[{"name":"Roboost - DMS Solution","code":"MP-RBS-BI-SUB-DMS01","desc":"","p":{"JOD":0.05,"AED":0.24,"SAR":0.3,"USD":0.07,"KWD":0.02,"EGP":3.25},"f":"Usage","t":"Usage"}],"SAP":[{"name":"SAP - Annual Maintenance Contract (AMC) [Annual]","code":"MP-ERP-SUB-SAP05","desc":"","p":{"SAR":0},"f":"Annual","t":"Add-on"},{"name":"SAP - Customer Check Out Retail [Annual]","code":"MP-ERP-SUB-SAP03","desc":"","p":{"USD":600,"AED":2250,"JOD":425.51,"KWD":186,"SAR":2250},"f":"Annual","t":"Main"},{"name":"SAP - Customer Check Out Retail [Monthly]","code":"MP-ERP-SUB-SAP12","desc":"","p":{"KWD":15.5,"AED":187.5,"JOD":35.45,"USD":50,"SAR":187.5},"f":"Monthly","t":"Main"},{"name":"SAP - Foodics Integration [Annual]","code":"MP-ERP-SUB-SAP06","desc":"","p":{"KWD":554,"JOD":1276,"SAR":6750,"USD":1800,"AED":6750},"f":"Annual","t":"Add-on"},{"name":"SAP - Foodics Integration [Monthly]","code":"MP-ERP-SUB-SAP14","desc":"","p":{"SAR":562.5,"KWD":46.17,"JOD":106.37,"USD":150,"AED":562.5},"f":"Monthly","t":"Add-on"},{"name":"SAP - HANA Engine [One-Time Fee]","code":"MP-ERP-SUB-SAP09","desc":"","p":{"SAR":7500,"AED":7500,"JOD":1418.36},"f":"One-time","t":"One-time"},{"name":"SAP - Hosting [Annual]","code":"MP-ERP-SUB-SAP04","desc":"","p":{"JOD":6000,"EGP":196850.9,"SAR":30000,"AED":30000,"KWD":2460,"USD":8000},"f":"Annual","t":"Add-on"},{"name":"SAP - Hosting [Monthly]","code":"MP-ERP-SUB-SAP13","desc":"","p":{"AED":2500,"KWD":205,"SAR":2500,"USD":666.67,"JOD":472.78},"f":"Monthly","t":"Add-on"},{"name":"SAP - Implementation (Per Engineer/day) [One-Time Fee]","code":"MP-ERP-PSV-IMP01","desc":"","p":{"AED":1500,"KWD":124,"SAR":1500,"USD":400,"JOD":283.67},"f":"One-time","t":"One-time"},{"name":"SAP - Limited User [Annual]","code":"MP-ERP-SUB-SAP02","desc":"","p":{"USD":1200,"SAR":4500,"KWD":372,"AED":4500,"JOD":849.34},"f":"Annual","t":"Main"},{"name":"SAP - Limited User [Monthly]","code":"MP-ERP-SUB-SAP11","desc":"","p":{"USD":100,"AED":375,"SAR":375,"KWD":31,"JOD":70.91},"f":"Monthly","t":"Main"},{"name":"SAP - Limited User [One-Time Fee]","code":"MP-ERP-SUB-SAP08","desc":"","p":{"KWD":431,"AED":5250,"SAR":5250,"USD":1400,"JOD":1050,"EGP":34448.91},"f":"One-time","t":"One-time"},{"name":"SAP - Pro User [Annual]","code":"MP-ERP-SUB-SAP01","desc":"","p":{"AED":6750,"KWD":558,"USD":1800,"JOD":1274,"SAR":6750},"f":"Annual","t":"Main"},{"name":"SAP - Pro User [Monthly]","code":"MP-ERP-SUB-SAP10","desc":"","p":{"SAR":562.5,"AED":562.5,"USD":150,"KWD":46.5,"JOD":106.37},"f":"Monthly","t":"Main"},{"name":"SAP - Pro User [One-Time Fee]","code":"MP-ERP-SUB-SAP07","desc":"","p":{"KWD":830,"JOD":2025,"USD":2700,"AED":10125,"EGP":66437.18,"SAR":10125},"f":"One-time","t":"One-time"},{"name":"SAP B1 Bundle - Annual","code":"MP-ERP-SUB-IND03","desc":"1 brand Licenses:Upto 5 users+1 indirect user Scope: ⁠Finance(AR,AP,GL,Tax Codes) Sales(B2C-Foodics–Consolidated end of Day-and B2B in SAP) Purchasing(Store Purchases in Foodics,Central Purchases in SAP, Purchases from C","p":{"SAR":44999,"AED":44499,"EGP":610900,"JOD":8499,"KWD":3699,"USD":12000},"f":"Annual","t":"Main"},{"name":"SAP Indirect License - Annual","code":"MP-ERP-SUB-IND01","desc":"","p":{"KWD":110.45,"JOD":255,"USD":360,"EGP":17046,"AED":1322,"SAR":1350},"f":"Annual","t":"Main"},{"name":"SAP Indirect License - Monthly","code":"MP-ERP-SUB-IND02","desc":"","p":{"USD":30,"EGP":1419,"KWD":9.2,"SAR":112,"JOD":21,"AED":110},"f":"Monthly","t":"Main"},{"name":"SAP Indirect License - One Time","code":"MP-ERP-PSV-IND03","desc":"","p":{"EGP":11820,"USD":250,"SAR":937.63,"KWD":76.7,"AED":918.15,"JOD":177},"f":"One-time","t":"One-time"}],"Servme":[{"name":"Servme - Advanced Plan - [Annual]","code":"MP-FDA-SUB-SERV02","desc":"","p":{"SAR":9288,"EGP":82080,"JOD":1165.56,"USD":2476.8,"AED":9089.88,"KWD":767.76},"f":"Annual","t":"Main"},{"name":"Servme - Black Plan - [Annual]","code":"MP-FDA-SUB-SERV01","desc":"This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party","p":{"SAR":8365.56,"USD":2230.8,"EGP":67080,"KWD":691.56,"JOD":952.56,"AED":8187},"f":"Annual","t":"Main"},{"name":"Servme - Black Plan - [Monthly]","code":"MP-FDA-SUB-SERV03","desc":"This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party","p":{"AED":682.25,"EGP":5590,"USD":185.9,"KWD":57.63,"JOD":79.38,"SAR":697.13},"f":"Monthly","t":"Main"},{"name":"Servme - Black Plan - [Quarterly]","code":"MP-FDA-SUB-SERV05","desc":"This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party","p":{"KWD":172.89,"SAR":2091.38,"JOD":238.13,"USD":557.7,"AED":2046.76,"EGP":16770},"f":"Quarterly","t":"Main"},{"name":"Servme - Black Plan - [Semi Annual]","code":"MP-FDA-SUB-SERV04","desc":"This license is only used for Black bundle, and includes: Reservation + seat management Waitlist CRM guest profiles Widget booking experience Event upselling on the widget Free online bookings integrated with third party","p":{"EGP":33540,"AED":4093.52,"SAR":4182.75,"USD":1115.4,"JOD":476.27,"KWD":345.77},"f":"Semi-annual","t":"Main"},{"name":"Servme - Onboarding Fee - [One-Time]","code":"MP-ERP-ONE-SERV01","desc":"","p":{"USD":385,"JOD":273.35,"AED":1412.95,"SAR":1443.75,"EGP":19250,"KWD":119.35},"f":"One-time","t":"One-time"}],"ShopBrain":[{"name":"ShopBrain - Accounting Additional Branch [Annual]","code":"MP-FDA-SUB-SHBA2","desc":"Accounting License add-on (additional branch), billed annually. Adds real-time accounting integrated with Inventory and POS.","p":{"EGP":2400,"AED":221,"KWD":19,"SAR":226,"USD":60,"JOD":43},"f":"Annual","t":"Additional"},{"name":"ShopBrain - Accounting Additional Branch [Quarterly]","code":"MP-FDA-SUB-SHBAQ2","desc":"Accounting License add-on (additional branch), billed quarterly. Adds real-time accounting integrated with Inventory and POS.","p":{"JOD":11,"AED":58,"SAR":59,"KWD":5,"EGP":630,"USD":16},"f":"Quarterly","t":"Additional"},{"name":"ShopBrain - Accounting Main [Annual]","code":"MP-FDA-SUB-SHBA1","desc":"Accounting License add-on (main branch), billed annually. Adds real-time accounting integrated with Inventory and POS.","p":{"KWD":131,"JOD":299,"USD":420,"SAR":1576,"AED":1542,"EGP":10800},"f":"Annual","t":"Add-on"},{"name":"ShopBrain - Accounting Main [Quarterly]","code":"MP-FDA-SUB-SHBAQ1","desc":"Accounting License add-on (main branch), billed quarterly. Adds real-time accounting integrated with Inventory and POS.","p":{"USD":110,"EGP":2835,"AED":405,"JOD":78,"KWD":34,"SAR":414},"f":"Quarterly","t":"Add-on"},{"name":"ShopBrain - Cost Center [Annual]","code":"MP-FDA-SUB-CC01","desc":"Cost Center add-on, per cost center, billed annually. Adds a warehouse, central kitchen or other non-sales location.","p":{"USD":300,"SAR":1126,"AED":1102,"JOD":214,"KWD":94,"EGP":9600},"f":"Annual","t":"Add-on"},{"name":"ShopBrain - Cost Center [Quarterly]","code":"MP-FDA-SUB-CC02","desc":"Cost Center add-on, per cost center, billed quarterly. Adds a warehouse, central kitchen or other non-sales location.","p":{"JOD":56,"EGP":2520,"SAR":295,"USD":79,"KWD":25,"AED":289},"f":"Quarterly","t":"Add-on"},{"name":"ShopBrain - Enterprise Plan - Additional Branch - [Annual]","code":"MP-FDA-SUB-SHBG02","desc":"Enterprise package, each additional branch, billed annually. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI r","p":{"USD":480,"AED":1762.74,"EGP":24264,"SAR":1800,"JOD":340.02,"KWD":148.32},"f":"Annual","t":"Additional"},{"name":"ShopBrain - Enterprise Plan - [Annual]","code":"MP-FDA-SUB-SHBG1","desc":"Enterprise package, per branch, billed annually. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI reports, prem","p":{"JOD":852,"USD":1200,"KWD":372,"EGP":21000,"AED":4404,"SAR":4500},"f":"Annual","t":"Main"},{"name":"ShopBrain - Enterprise Plan- Additional Branch - [Monthly]","code":"MP-FDA-SUB-SHBG4","desc":"Enterprise package, each additional branch, billed monthly. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI re","p":{"JOD":33.77,"KWD":14.73,"AED":175.05,"USD":47.67,"SAR":178.75,"EGP":2409.55},"f":"Monthly","t":"Additional"},{"name":"ShopBrain - Enterprise Plan- [Quarterly]","code":"MP-FDA-SUB-SHBGQ2","desc":"Enterprise package, per branch, billed quarterly. Includes everything in Operations, plus advanced inventory adjustments, cost of goods sold (COGS) recalculation, internal ordering between branches, Power BI reports, pre","p":{"AED":1156,"JOD":224,"SAR":1181,"KWD":98,"USD":315,"EGP":5513},"f":"Quarterly","t":"Main"},{"name":"ShopBrain - Essential Plan - Additional Branch - [Monthly]","code":"MP-FDA-SUB-SHOP-ES06","desc":"Essential package, each additional branch, billed monthly. Core inventory for single-location restaurants. Covers inventory and non-stockable items, recipes and costing, waste tracking, receiving without a request, simpl","p":{"SAR":97.5,"JOD":18.42,"USD":26,"AED":95.48,"EGP":1314.3,"KWD":8.03},"f":"Monthly","t":"Additional"},{"name":"ShopBrain - Essential Plan- Additional Branch - [Annual]","code":"MP-FDA-SUB-SHOP-ES05","desc":"Essential package, each additional branch, billed annually. Core inventory for single-location restaurants. Covers inventory and non-stockable items, recipes and costing, waste tracking, receiving without a request, simp","p":{"JOD":170.01,"SAR":900,"AED":881.37,"USD":240,"EGP":12132,"KWD":74.16},"f":"Annual","t":"Additional"},{"name":"ShopBrain - Operation Plan - Additional Branch - [Annual]","code":"MP-FDA-SUB-SHBS01","desc":"Operations package, each additional branch, billed annually. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, report","p":{"EGP":16984.8,"KWD":103.82,"SAR":1260,"AED":1233.92,"JOD":238.01,"USD":336},"f":"Annual","t":"Additional"},{"name":"ShopBrain - Operation Plan - [Quarterly]","code":"MP-FDA-SUB-SHBSQ1","desc":"Operations package, per branch, billed quarterly. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, reports and insig","p":{"JOD":157,"KWD":68,"SAR":827,"AED":809,"USD":221,"EGP":5040},"f":"Quarterly","t":"Main"},{"name":"ShopBrain - Operation Plan- Additional Branch - [Monthly]","code":"MP-FDA-SUB-SHBG5","desc":"Operations package, each additional branch, billed monthly. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, reports","p":{"JOD":24.56,"EGP":1752.4,"KWD":10.71,"AED":127.31,"SAR":130,"USD":34.67},"f":"Monthly","t":"Additional"},{"name":"ShopBrain - Operation Plan- [Annual]","code":"MP-FDA-SUB-SHBS1","desc":"Operations package, per branch, billed annually. Includes everything in Essential, plus the full purchase request / purchase order (PR/PO) cycle, stock transfers with approvals, production, butchering, reports and insigh","p":{"AED":3083,"KWD":260,"USD":840,"EGP":19200,"JOD":596,"SAR":3150},"f":"Annual","t":"Main"}],"Supy":[{"name":"Supy - Central Kitchen License [Annual]","code":"MP-SUP-LCN-ANUL2","desc":"Minimum license is 3","p":{"EGP":93600,"USD":1872,"SAR":7020,"JOD":1329,"KWD":580,"AED":6870},"f":"Annual","t":"Main"},{"name":"Supy - Extra Cost Center [Annual]","code":"MP-SUP-LCN-ANUL3","desc":"Minimum license is 3","p":{"SAR":540,"KWD":45,"EGP":7200,"AED":528,"JOD":102,"USD":144},"f":"Annual","t":"Add-on"},{"name":"Supy - Onboarding Fee [One-Time]","code":"MP-SUP-LCN-ONET1","desc":"Minimum license is 3","p":{"AED":1835,"USD":500,"SAR":1875,"KWD":155,"JOD":355,"EGP":25000},"f":"One-time","t":"One-time"},{"name":"Supy - Regular Outlet License [Annual]","code":"MP-SUP-LCN-ANUL1","desc":"Minimum license is 3","p":{"JOD":1125,"USD":1584,"EGP":79200,"SAR":5940,"AED":5813,"KWD":491},"f":"Annual","t":"Main"}],"UrbanPiper":[{"name":"Urban Piper - Subscription License [Annual]","code":"MP-FDA-SUB-URP02","desc":"","p":{"EGP":15022.8,"AED":1822.28,"SAR":1170,"KWD":167.9,"JOD":222.3,"USD":552.83},"f":"Annual","t":"Main"},{"name":"Urban Piper - Subscription License [Monthly]","code":"MP-FDA-SUB-URP01","desc":"","p":{"EGP":1647.89,"USD":55.89,"KWD":16.97,"AED":184.23,"JOD":24.38,"SAR":128.34},"f":"Monthly","t":"Main"},{"name":"UrbanPiper - 1 Channel [Annual]","code":"MP-FDA-SUB-URP04","desc":"This license is limited maximum to 1 channel.","p":{"JOD":204.48,"KWD":130.2,"AED":1541.4,"EGP":14650.56},"f":"Annual","t":"Add-on"},{"name":"UrbanPiper - 1 Channel [Monthly]","code":"MP-FDA-SUB-URP03","desc":"This license is limited maximum to 1 channel.","p":{"AED":143.13,"KWD":12.09,"JOD":19.53,"EGP":1398.93},"f":"Monthly","t":"Add-on"}],"VOLT":[{"name":"VOLT - Additional Company License with SAP Finance Integration Included [Annual]","code":"MP-ERP-SUB-VLT06","desc":"","p":{"KWD":51.66,"AED":630,"JOD":126,"SAR":630,"USD":168,"EGP":4133.87},"f":"Annual","t":"Additional"},{"name":"VOLT - Additional Company License with SAP Finance Integration Included [Monthly]","code":"MP-ERP-SUB-VLT21","desc":"","p":{"AED":51,"USD":13.9,"JOD":9.9,"KWD":4.5,"SAR":52.5,"EGP":702},"f":"Monthly","t":"Additional"},{"name":"VOLT - Additional Company License with SAP Finance Integration Included [One-Time Fee]","code":"MP-ERP-SUB-VLT13","desc":"","p":{"AED":5625,"JOD":1125,"KWD":461,"SAR":5625,"EGP":36909.54,"USD":1500},"f":"One-time","t":"One-time"},{"name":"VOLT - Attendance License [Annual]","code":"MP-ERP-SUB-VLT03","desc":"","p":{"EGP":151.54,"AED":23,"JOD":4.6,"USD":6,"KWD":1.89,"SAR":23},"f":"Annual","t":"Main"},{"name":"VOLT - Attendance License [Monthly]","code":"MP-ERP-SUB-VLT14","desc":"","p":{"JOD":39.41,"AED":204.04,"EGP":2681.55,"SAR":2,"USD":55.56,"KWD":17.12},"f":"Monthly","t":"Main","flag":"Prices are inconsistent across currencies in Salesforce. Verify before quoting."},{"name":"VOLT - Attendance License [One-Time Fee]","code":"MP-ERP-SUB-VLT10","desc":"","p":{"AED":15750,"JOD":3150,"USD":4200,"EGP":103346.72,"KWD":1292,"SAR":15750},"f":"One-time","t":"One-time"},{"name":"VOLT - Company Admin License [Annual]","code":"MP-ERP-SUB-VLT05","desc":"","p":{"KWD":25.83,"SAR":315,"USD":84,"AED":315,"EGP":2066.93,"JOD":63},"f":"Annual","t":"Main"},{"name":"VOLT - Company Admin License [Monthly]","code":"MP-ERP-SUB-VLT17","desc":"","p":{"USD":12.5,"SAR":26.25,"EGP":603.35,"JOD":8.87,"AED":45.91,"KWD":3.85},"f":"Monthly","t":"Main","flag":"Prices are inconsistent across currencies in Salesforce. Verify before quoting."},{"name":"VOLT - Company Admin License [One-Time Fee]","code":"MP-ERP-SUB-VLT12","desc":"","p":{"AED":1125,"JOD":225,"KWD":92,"SAR":1125,"USD":300,"EGP":7381.91},"f":"One-time","t":"One-time"},{"name":"VOLT - Employee Self Services License [Annual]","code":"MP-ERP-SUB-VLT04","desc":"","p":{"KWD":0.66,"AED":8,"JOD":1.6,"EGP":53.12,"SAR":8,"USD":2},"f":"Annual","t":"Main"},{"name":"VOLT - Employee Self Services License [Monthly]","code":"MP-ERP-SUB-VLT19","desc":"","p":{"EGP":402.08,"AED":30.59,"SAR":0.6,"JOD":5.91,"KWD":2.57,"USD":8.33},"f":"Monthly","t":"Main","flag":"Prices are inconsistent across currencies in Salesforce. Verify before quoting."},{"name":"VOLT - Employee Self Services License [One-Time Fee]","code":"MP-ERP-SUB-VLT11","desc":"","p":{"EGP":124.67,"JOD":3.8,"AED":19,"USD":5,"SAR":19,"KWD":2},"f":"One-time","t":"One-time"},{"name":"VOLT - HR License [Annual]","code":"MP-ERP-SUB-VLT01","desc":"","p":{"KWD":1.89,"EGP":151.54,"AED":23,"USD":6,"SAR":23,"JOD":4.6},"f":"Annual","t":"Main"},{"name":"VOLT - HR License [Monthly]","code":"MP-ERP-SUB-VLT16","desc":"","p":{"JOD":2.96,"USD":4.17,"EGP":201.27,"AED":15.32,"KWD":1.29,"SAR":2},"f":"Monthly","t":"Main","flag":"Prices are inconsistent across currencies in Salesforce. Verify before quoting."},{"name":"VOLT - HR License [One-Time Fee]","code":"MP-ERP-SUB-VLT08","desc":"","p":{"KWD":1599,"AED":19500,"EGP":127953.09,"JOD":3900,"USD":5200,"SAR":19500},"f":"One-time","t":"One-time"},{"name":"VOLT - Hosting with SAP Included [Annual]","code":"MP-ERP-SUB-VLT07","desc":"","p":{"JOD":7564.62,"SAR":40000},"f":"Annual","t":"Add-on"},{"name":"VOLT - Hosting with SAP Included [Monthly]","code":"MP-ERP-SUB-VLT18","desc":"","p":{"SAR":1750,"AED":1750,"USD":5000,"JOD":330.95},"f":"Monthly","t":"Add-on"},{"name":"VOLT - Implementation for One-Time Payment Based Deals [One-Time Fee]","code":"MP-ERP-PSV-VLT08","desc":"","p":{"SAR":50.63,"KWD":4.15,"JOD":10125,"USD":10.13,"AED":50.63,"EGP":332.19},"f":"One-time","t":"One-time"},{"name":"VOLT - Implementation for Subscription Based Deals [One-Time Fee]","code":"MP-ERP-PSV-VLT01","desc":"","p":{"KWD":3075,"JOD":7500,"EGP":246063.63,"AED":37500,"USD":10000,"SAR":37500},"f":"One-time","t":"One-time"},{"name":"VOLT - Mobile App - per User [Annual]","code":"MP-ERP-PSV-VLT14","desc":"","p":{"KWD":0.67,"USD":2.18,"SAR":8,"JOD":1.55,"AED":8,"EGP":105.24},"f":"Annual","t":"Add-on"},{"name":"VOLT - Mobile App - per User [Monthly]","code":"MP-ERP-PSV-VLT20","desc":"","p":{"JOD":0.13,"AED":0.66,"USD":0.18,"SAR":0.5,"EGP":8.69,"KWD":0.06},"f":"Monthly","t":"Add-on"},{"name":"VOLT - Payroll License [Annual]","code":"MP-ERP-SUB-VLT02","desc":"","p":{"USD":17,"JOD":12.8,"SAR":64,"AED":64,"KWD":5.25,"EGP":420.26},"f":"Annual","t":"Main"},{"name":"VOLT - Payroll License [Monthly]","code":"MP-ERP-SUB-VLT15","desc":"","p":{"JOD":8.87,"SAR":5.5,"KWD":3.85,"AED":45.91,"EGP":603.35,"USD":12.5},"f":"Monthly","t":"Main","flag":"Prices are inconsistent across currencies in Salesforce. Verify before quoting."},{"name":"VOLT - Payroll License [One-Time Fee]","code":"MP-ERP-SUB-VLT09","desc":"","p":{"KWD":2306,"USD":7500,"EGP":184547.72,"JOD":5625,"AED":28125,"SAR":28125},"f":"One-time","t":"One-time"},{"name":"VOLT - Upgrade from admin to Superuser Admin License [Annual]","code":"MP-ERP-SUB-VLT22","desc":"","p":{"KWD":26.21,"JOD":60.29,"SAR":318.8,"USD":85,"AED":312.2,"EGP":4103.94},"f":"Annual","t":"Add-on"},{"name":"VOLT - Upgrade from admin to Superuser Admin License [Monthly]","code":"MP-ERP-SUB-VLT23","desc":"","p":{"KWD":2.47,"EGP":386.14,"USD":8,"JOD":5.67,"AED":29.38,"SAR":30},"f":"Monthly","t":"Add-on"},{"name":"VOLT - Upgrade from admin to Superuser Admin License [One-Time Fee]","code":"MP-ERP-OTP-VLT01","desc":"","p":{"USD":300,"SAR":1125.18,"EGP":14480.31,"AED":1101.81,"JOD":212.79,"KWD":92.47},"f":"One-time","t":"One-time"},{"name":"VOLT -Superuser Admin License [Annual]","code":"MP-ERP-SUB-VLT24","desc":"","p":{"EGP":8205.51,"KWD":52.4,"JOD":120.58,"SAR":618,"USD":170,"AED":624.36},"f":"Annual","t":"Main"},{"name":"VOLT -Superuser Admin License [Monthly]","code":"MP-ERP-SUB-VLT25","desc":"","p":{"EGP":683.46,"SAR":51.5,"KWD":4.36,"AED":52.01,"JOD":10.04,"USD":14.16},"f":"Monthly","t":"Main"},{"name":"VOLT -Superuser Admin License [One-Time Fee]","code":"MP-ERP-OTP-VLT02","desc":"","p":{"USD":600,"SAR":2250.37,"AED":2203.62,"EGP":28960.61,"KWD":184.94,"JOD":425.58},"f":"One-time","t":"One-time"},{"name":"VOLT – Dashboard [Annual]","code":"MP-ERP-SUB-VLT26","desc":"","p":{"SAR":11.25,"AED":11.02,"EGP":144.81,"JOD":2.13,"KWD":0.92,"USD":3},"f":"Annual","t":"Add-on"},{"name":"VOLT – Dashboard [Monthly]","code":"MP-ERP-SUB-VLT27","desc":"","p":{"SAR":0.94,"USD":0.25,"KWD":0.08,"JOD":0.18,"EGP":12.06,"AED":0.92},"f":"Monthly","t":"Add-on"},{"name":"VOLT – Dashboard [One-Time Fee]","code":"MP-ERP-OTP-VLT03","desc":"","p":{"JOD":1418.6,"USD":2000,"KWD":616.48,"EGP":96535.37,"SAR":3375,"AED":7345.4},"f":"One-time","t":"One-time","flag":"Prices are inconsistent across currencies in Salesforce. Verify before quoting."},{"name":"Volt Performance (Annual)","code":"MP-ERP-SUB-VLT28","desc":"","p":{"USD":2.93,"SAR":11,"JOD":2.08},"f":"Annual","t":"Add-on"},{"name":"Volt Performance (Monthly)","code":"MP-ERP-SUB-VLT30","desc":"","p":{"JOD":0.18,"SAR":1,"USD":0.27},"f":"Monthly","t":"Add-on"},{"name":"Volt Training (Annual)","code":"MP-ERP-SUB-VLT29","desc":"","p":{"SAR":11,"USD":2.93,"JOD":2.08},"f":"Annual","t":"Add-on"},{"name":"Volt Training (Monthly)","code":"MP-ERP-SUB-VLT31","desc":"","p":{"JOD":0.18,"SAR":1,"USD":0.27},"f":"Monthly","t":"Add-on"}],"Wafeq":[{"name":"Wafeq - Additional Branch -  Enterprise [Annual]","code":"MP-ACC-SUB-WAF03","desc":"This is an additional branch add-on only for Enterprise license","p":{"EGP":3981,"SAR":540,"KWD":45.45,"USD":147.14,"JOD":104.25,"AED":540},"f":"Annual","t":"Additional"},{"name":"Wafeq - Enterprise Plan [Annual]","code":"MP-ACC-SUB-WAF02","desc":"The license includes 3 branches.","p":{"KWD":282.83,"EGP":38217.6,"SAR":3360,"USD":915.53,"AED":3360,"JOD":648.65},"f":"Annual","t":"Main"},{"name":"Wafeq - Premium Plan [Annual]","code":"MP-ACC-SUB-WAF01","desc":"The license is limited only to one branch accounts.","p":{"JOD":451.74,"SAR":2340,"EGP":24151.4,"AED":2340,"KWD":196.97,"USD":637.6},"f":"Annual","t":"Main"}],"Xero":[{"name":"Xero - \"Hesab\" Arabic Interface [Annual]","code":"MP-ACC-FAD-XER07","desc":"","p":{"SAR":1950,"EGP":25038,"AED":1735.5,"KWD":159.9,"USD":527,"JOD":370.5},"f":"Annual","t":"Add-on"},{"name":"Xero - Additional Branch [Annual]","code":"MP-ACC-SUB-XER06","desc":"This license doesn't include Training or Support.","p":{"AED":694.2,"EGP":10015.2,"KWD":63.96,"USD":211,"JOD":148.2,"SAR":780},"f":"Annual","t":"Additional"},{"name":"Xero - Support Package [One-Time]","code":"MP-ACC-PKG-XER01","desc":"","p":{"JOD":495.65,"AED":2321.74,"SAR":2608.7,"KWD":213.91,"USD":704.35,"EGP":33495.71},"f":"One-time","t":"One-time"},{"name":"Xero - Training Package [One-Time]","code":"MP-ACC-PSV-XER02","desc":"","p":{"KWD":205,"USD":675,"EGP":32100,"JOD":475,"SAR":2500,"AED":2225},"f":"One-time","t":"One-time"},{"name":"Xero - Xero Main Subscription [Annual]","code":"MP-ACC-SUB-XER07","desc":"This license doesn't include Training or Support.","p":{"KWD":373,"AED":4050,"JOD":865,"USD":1229,"EGP":58422,"SAR":4550},"f":"Annual","t":"Main"}],"Zyda":[{"name":"Zyda - Additional Branch [Annual]","code":"MP-BI-SUB-ZYD-ANUL03","desc":"Adding Extra Branch to Any package","p":{"KWD":144,"AED":1728,"EGP":15000},"f":"Annual","t":"Additional"},{"name":"Zyda - Advanced Package [Annual]","code":"MP-BI-SUB-ZYD-ANUL01","desc":"Includes 3 Branches","p":{"EGP":52500,"AED":5040,"KWD":420},"f":"Annual","t":"Main"},{"name":"Zyda - Basic Package [Annual]","code":"MP-BI-SUB-ZYD-ANUL02","desc":"Includes 1 Branch","p":{"KWD":218,"AED":2940,"EGP":17500},"f":"Annual","t":"Main"},{"name":"Zyda - Mobile Application [Annual]","code":"MP-BI-SUB-ZYD-ANUL04","desc":"Create Mobile Application","p":{"AED":7200,"KWD":600,"EGP":75000},"f":"Annual","t":"Add-on"}],"wi-Q":[{"name":"wi-Q - Connect - [Annual]","code":"MP-FDA-SUB-WIQ-C01","desc":"","p":{"SAR":2000,"AED":1255.99,"USD":342,"EGP":16689.2,"JOD":242.48,"KWD":105.97},"f":"Annual","t":"Main"},{"name":"wi-Q - Connect - [Monthly]","code":"MP-FDA-SUB-WIQ-C02","desc":"","p":{"USD":29,"EGP":1415.17,"SAR":170,"AED":106.5,"JOD":20.56,"KWD":8.99},"f":"Monthly","t":"Main"},{"name":"wi-Q - Connect - [Quarterly]","code":"MP-FDA-SUB-WIQ-C04","desc":"","p":{"JOD":61.68,"EGP":4245.5,"KWD":26.96,"AED":319.51,"SAR":509,"USD":87},"f":"Quarterly","t":"Main"},{"name":"wi-Q - Connect - [Semi-Annual]","code":"MP-FDA-SUB-WIQ-C03","desc":"","p":{"AED":635.34,"JOD":122.66,"SAR":1012,"EGP":8442.19,"KWD":53.6,"USD":173},"f":"Semi-annual","t":"Main"},{"name":"wi-Q - Online Ordering - [Annual]","code":"MP-FDA-SUB-WIQ-ON01","desc":"","p":{"KWD":446,"EGP":72000,"AED":5285,"USD":1440,"SAR":5400,"JOD":1022},"f":"Annual","t":"Main"},{"name":"wi-Q - Online Ordering - [Monthly]","code":"MP-FDA-SUB-WIQ-ON02","desc":"","p":{"AED":477,"KWD":40,"EGP":6500,"USD":130,"JOD":92,"SAR":488},"f":"Monthly","t":"Main"},{"name":"wi-Q - Table Ordering - [Monthly]","code":"MP-FDA-SUB-WIQ-TO02","desc":"","p":{"JOD":129,"AED":668,"SAR":683,"EGP":9100,"KWD":56,"USD":182},"f":"Monthly","t":"Main"},{"name":"wi-Q - Table Ordering- [Annual]","code":"MP-FDA-SUB-WIQ-TO01","desc":"","p":{"JOD":1431,"EGP":100800,"SAR":7560,"KWD":625,"AED":7399,"USD":2016},"f":"Annual","t":"Main"}]};
+const CATS = [
+ {id:"opm", name:"Ordering platform management", partners:["Grubtech","Deliverect","UrbanPiper","FeedUs"],
+  pick:"Pick on which aggregators the merchant uses, single vs multi-brand, and country."},
+ {id:"loyalty", name:"Loyalty & CRM", partners:["BrandWallet","Koinz","OptCulture","Prepit"],
+  pick:"Pick on how deep the merchant goes: quick wallet cards, loyalty plus feedback and ordering, or a full CRM with campaigns."},
+ {id:"ordering", name:"Online ordering & web store", partners:["Ordable","Zyda","Mnasati","wi-Q"],
+  pick:"Pick on country first. Prices exist only in some currencies, so check that before anything else."},
+ {id:"inventory", name:"Inventory", partners:["ShopBrain","Supy"],
+  pick:"Pick on budget and depth: ShopBrain is tiered per branch, Supy is premium per outlet with a 3-license minimum."},
+ {id:"accounting", name:"Accounting", partners:["Wafeq","Xero","Alpha (Xero)","QuickBooks"],
+  pick:"Pick on branch count and whether the merchant needs setup help."},
+ {id:"erp", name:"ERP", partners:["FlowERP","SAP","MS Dynamics"],
+  pick:"Pick on size: FlowERP for KSA small and mid-size, SAP or Dynamics for enterprise groups."},
+ {id:"einv", name:"E-invoicing & digital receipts", partners:["InvoiceQ","Iisal"],
+  pick:"Both are licensed per account, not per branch. Pick on terminals and SMS vs invoice volume."},
+ {id:"hr", name:"HR & payroll", partners:["VOLT","Malachite"],
+  pick:"Both sit on top of SAP. Malachite cannot be sold without SAP."},
+ {id:"table", name:"Table management", partners:["Servme"], pick:"Only partner in this category."},
+ {id:"other", name:"Other", partners:["Ishbek","Roboost","Nitx"], pick:"Niche or inactive. Confirm with Partnerships before quoting."}
+];
+
+const PARTNERS = {
+ "Grubtech": {
+  "cat": "opm",
+  "countries": "KSA, UAE, Kuwait, Jordan",
+  "form": "https://share.hsforms.com/1rOFHTm1gTpepWC29FiQGzQ5c1ve",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects online ordering channels to Foodics POS and adds kitchen management and delivery dispatch in one platform. 300+ integrations.",
+  "bestFor": "Multi-brand operators and cloud kitchens that want order flow, kitchen tracking and dispatch together.",
+  "unit": "gOnline License per branch (main line). Virtual Brand add-on for each extra brand on the same branch.",
+  "edge": "Live order tracking from prep to dispatch; multi-brand, multi-location from one setup; widest integration list.",
+  "watch": "Menu sync is the most common support issue. Confirm menu setup ownership before go-live.",
+  "rules": [
+   "1 gOnline License per physical branch.",
+   "Each additional brand on a branch = 1 Virtual Brand line.",
+   "Sold Monthly or Annual."
+  ]
+ },
+ "Deliverect": {
+  "cat": "opm",
+  "countries": "KSA, UAE, Kuwait, Jordan",
+  "form": "https://welcome.deliverect.com/foodics-bundle",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects online ordering channels to Foodics POS so orders and menus are managed in one place, with sales and third-party delivery analytics.",
+  "bestFor": "Brands that care most about central menu control and channel analytics.",
+  "unit": "Physical License per physical branch; Virtual License per virtual branch.",
+  "edge": "Strongest menu management with location-specific variations; real-time sales analytics across channels.",
+  "watch": "Highest price in the category. Annual only in Salesforce.",
+  "rules": [
+   "1 Physical License per physical branch (includes 1 physical branch).",
+   "1 Virtual License per virtual branch (includes 1 virtual branch).",
+   "Annual billing in Salesforce."
+  ]
+ },
+ "UrbanPiper": {
+  "cat": "opm",
+  "countries": "KSA, UAE, Egypt",
+  "form": "https://tally.so/r/Xx11k4",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects online ordering channels to Foodics POS; control menus, stock availability and business data across platforms and outlets.",
+  "bestFor": "Price-sensitive merchants, and the only aggregator-management option for Egypt.",
+  "unit": "Subscription License per outlet. '1 Channel' license for merchants on a single aggregator.",
+  "edge": "Lowest entry price in KSA; real-time stock availability across outlets.",
+  "watch": "The 1 Channel line has no SAR price. It can't be quoted in KSA.",
+  "rules": [
+   "1 Subscription License per outlet.",
+   "1 Channel variant is limited to one channel and has no KSA price.",
+   "Monthly or Annual."
+  ]
+ },
+ "FeedUs": {
+  "cat": "opm",
+  "countries": "KSA only",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSeHp1QSysXGWgxilSlD3mSiEgDexgPFQFAG4yUVDpGPZNI-tQ/viewform",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Connects HungerStation, Jahez, Mrsool and other online channels to Foodics POS; unified menu control and branch-specific provider mapping.",
+  "bestFor": "KSA merchants whose orders come from local Saudi aggregators.",
+  "unit": "Subscription License per branch.",
+  "edge": "Local-aggregator focus and branch-level provider assignments.",
+  "watch": "SAR only. Not sellable outside KSA.",
+  "rules": [
+   "1 Subscription License per branch.",
+   "Annual, SAR only."
+  ]
+ },
+ "BrandWallet": {
+  "cat": "loyalty",
+  "countries": "Global",
+  "form": "https://foodics-sales.brand-wallet.com/PZQ5AqGEWaO7LyY9",
+  "ksaForm": "Yes",
+  "overview": "Digital loyalty cards (stamp, multi-stamp, point, tiered) with automated rewards, coupons, location push alerts and QR table tents.",
+  "bestFor": "Cafés and QSRs that want wallet loyalty cards live fast, in any country.",
+  "unit": "One plan for the main branch plus one Additional Branch line per extra branch.",
+  "edge": "Plans are tiered by number of cards: Basic 1, Standard 2, Growth 5.",
+  "watch": "License count must equal branch count. 6 branches = 1 plan + 5 Additional Branch.",
+  "rules": [
+   "1 Main plan (Basic / Standard / Growth) + (branches − 1) Additional Branch.",
+   "Additional Branch works with all plans.",
+   "Monthly or Annual."
+  ]
+ },
+ "Koinz": {
+  "cat": "loyalty",
+  "countries": "KSA, Egypt, UAE (no AED price)",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLScSNaZ0Ih5peHu2NBRMS0U1MYnLS7CcxereCUEqdzL-xI260g/viewform",
+  "ksaForm": "Yes",
+  "overview": "Loyalty plus customer feedback, growth analytics, retargeting, and online ordering for pickup and delivery.",
+  "bestFor": "KSA or Egypt merchants who want loyalty, feedback and their own ordering in one package.",
+  "unit": "Single Loyalty Package.",
+  "edge": "WhatsApp messaging in KSA, SMS in Egypt; Apple Wallet; built-in ordering.",
+  "watch": "Priced in SAR and EGP only.",
+  "rules": [
+   "One Loyalty Package line.",
+   "WhatsApp is KSA only; SMS is Egypt only.",
+   "Monthly or Annual."
+  ]
+ },
+ "OptCulture": {
+  "cat": "loyalty",
+  "countries": "KSA, UAE (also US, India)",
+  "form": "Not provided",
+  "ksaForm": "Yes",
+  "overview": "AI-powered loyalty and CRM: interactive digital receipts, personalized loyalty, automated campaigns, Apple and Google Wallet cards, Customer 360.",
+  "bestFor": "Mid-to-large brands that want a CRM with segmentation and automated campaigns, not just a stamp card.",
+  "unit": "Loyalty or Growth license, plus messaging billed per usage.",
+  "edge": "Growth adds pre-built WhatsApp, SMS and email promotional campaigns on top of Loyalty.",
+  "watch": "SMS and WhatsApp are charged per message on top of the license. Tell the merchant up front.",
+  "rules": [
+   "Choose Loyalty or Growth (Growth includes all Loyalty features).",
+   "Add SMS Usage and/or WhatsApp Usage lines (per message, GCC).",
+   "Monthly or Annual."
+  ]
+ },
+ "Prepit": {
+  "cat": "loyalty",
+  "countries": "Egypt (also KSA, Canada)",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSf8GJb_U_N2UMV6EYvssgza4JfQRB_kCd4wiPhkjaTnc6V7vA/viewform",
+  "ksaForm": "Yes",
+  "overview": "Behavior-based loyalty rewards, automated promotions and SMS, plus online ordering, payments and a waiter app.",
+  "bestFor": "Egyptian merchants who want loyalty and ordering together.",
+  "unit": "Basic or Advanced license for the main branch + Additional Branch lines; Delivery Module and Mobile App add-ons.",
+  "edge": "Advanced adds loyalty points, commercial account management and instant rewards.",
+  "watch": "EGP only in Salesforce. Advanced and Mobile App are high-value lines.",
+  "rules": [
+   "1 Main license (Basic or Advanced) + (branches − 1) matching Additional Branch.",
+   "Additional Branch must match the main tier.",
+   "Annual, EGP only."
+  ]
+ },
+ "Ordable": {
+  "cat": "ordering",
+  "countries": "Kuwait, Bahrain, Qatar (Jordan priced)",
+  "form": "Not provided",
+  "ksaForm": "Yes",
+  "overview": "0% commission online store connected to Foodics POS, with 60+ features, delivery, payment gateways and social marketing tools.",
+  "bestFor": "Kuwait merchants who want their own branded ordering store.",
+  "unit": "Basic or Advance license + Additional Branch; Mobile Application add-on.",
+  "edge": "0% commission; deep feature set; strong in Kuwait.",
+  "watch": "Priced in KWD and JOD only. No KSA or UAE price.",
+  "rules": [
+   "1 Main license (Basic / Advance) + (branches − 1) Additional Branch.",
+   "Mobile Application is an optional add-on.",
+   "Annual."
+  ]
+ },
+ "Zyda": {
+  "cat": "ordering",
+  "countries": "Global (priced KWD, AED, EGP)",
+  "form": "https://mex87gdp4z7.typeform.com/to/S5JhEa0v",
+  "ksaForm": "Yes",
+  "overview": "Direct ordering website set up in 24 hours at 0% commission, with one dashboard for orders, stock, delivery and marketing.",
+  "bestFor": "Merchants in UAE, Kuwait or Egypt who want a fast, low-effort web store.",
+  "unit": "Basic includes 1 branch; Advanced includes 3 branches; Additional Branch for each extra; Mobile Application add-on.",
+  "edge": "Advanced already covers 3 branches, which is cheaper than stacking branches on Basic.",
+  "watch": "No SAR or JOD price. Can't be quoted in KSA or Jordan.",
+  "rules": [
+   "Basic = 1 branch; Advanced = 3 branches included.",
+   "Extra branches beyond what's included = Additional Branch lines.",
+   "Annual."
+  ]
+ },
+ "Mnasati": {
+  "cat": "ordering",
+  "countries": "Kuwait, Qatar, KSA (priced KWD, AED)",
+  "form": "https://docs.google.com/forms/d/13UZOcC_pX0Ic14QMSvILejgq0gMpPFsrCE7l9VDmj5U/edit?ts=696e1e47",
+  "ksaForm": "Yes",
+  "overview": "Own online store live in about 24 hours; syncs menu, branches, customers and orders with Foodics.",
+  "bestFor": "Kuwait merchants who need a store fast and know their catalog size.",
+  "unit": "Basic or Premium package.",
+  "edge": "Tiered by catalog size: Premium allows 50 main and 150 sub categories, 1,500 products and bulk upload.",
+  "watch": "No SAR price in Salesforce, even though KSA is listed as a working country.",
+  "rules": [
+   "One package line (Basic or Premium) chosen by catalog size.",
+   "Annual."
+  ]
+ },
+ "wi-Q": {
+  "cat": "ordering",
+  "countries": "Priced in all six currencies",
+  "form": "Not provided",
+  "ksaForm": "No (Partnerships handles KSA)",
+  "overview": "Modular ordering: Connect, Online Ordering and Table (QR) Ordering.",
+  "bestFor": "Dine-in venues that want QR table ordering, or a modular online ordering setup.",
+  "unit": "Module licenses: Connect, Online Ordering, Table Ordering.",
+  "edge": "The only partner here with QR table ordering, and the only one with Monthly, Quarterly, Semi-annual and Annual options.",
+  "watch": "Table Ordering is the highest-priced module. Quote modules separately.",
+  "rules": [
+   "Quote each module as its own line.",
+   "Connect is available Monthly, Quarterly, Semi-annual and Annual."
+  ]
+ },
+ "ShopBrain": {
+  "cat": "inventory",
+  "countries": "KSA, UAE, Egypt, Qatar",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSeSgfMm0SOBlcvU56fhSTOWEJK4YQSQE6WsNnHaRUwmx5ceTg/viewform",
+  "ksaForm": "Yes",
+  "overview": "Real-time inventory with AI demand planning, a restaurant accounting module and F&B expert insights.",
+  "bestFor": "Single and multi-branch restaurants that want solid inventory at a mid price, with optional accounting.",
+  "unit": "Tier per branch: Essential, Operation or Enterprise. Main license + Additional Branch. Accounting add-on (main + additional). Cost Center per warehouse or central kitchen.",
+  "edge": "Operation adds the full PR/PO cycle; Enterprise adds advanced adjustments and COGS. The accounting add-on runs on the same POS data.",
+  "watch": "Essential has only Additional Branch lines in Salesforce, so the Essential main license is missing. Confirm before quoting Essential.",
+  "rules": [
+   "1 Main (tier) + (branches − 1) Additional Branch of the same tier.",
+   "Accounting: 1 Accounting Main + (branches − 1) Accounting Additional Branch.",
+   "Each warehouse or central kitchen = 1 Cost Center.",
+   "Annual, Quarterly, or Monthly for additional lines."
+  ]
+ },
+ "Supy": {
+  "cat": "inventory",
+  "countries": "KSA, UAE (also UK, Australia)",
+  "form": "https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw",
+  "ksaForm": "Yes",
+  "overview": "Inventory, smart procurement, invoices and supplier settlements, recipe and menu engineering, and BI on Foodics sales data.",
+  "bestFor": "Groups with central kitchens that want procurement, recipe costing and supplier control.",
+  "unit": "Regular Outlet License per outlet; Central Kitchen License per central kitchen; Extra Cost Center; one-time Onboarding Fee.",
+  "edge": "Deepest procurement and recipe-costing features in the category.",
+  "watch": "Minimum 3 licenses. About 2× ShopBrain Operation per outlet.",
+  "rules": [
+   "Minimum 3 licenses in total.",
+   "1 Regular Outlet per outlet; 1 Central Kitchen per central kitchen.",
+   "Add the one-time Onboarding Fee on new business.",
+   "Annual."
+  ]
+ },
+ "Wafeq": {
+  "cat": "accounting",
+  "countries": "KSA, UAE",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLScDy932sEjgQ4M3BgGzsHnZ7A_O7tQDXoaS6L0e4Kd8DzDCCA/viewform",
+  "ksaForm": "Yes",
+  "overview": "Cloud accounting that syncs Foodics sales; VAT returns, invoicing and payroll.",
+  "bestFor": "Saudi and UAE merchants who want local, VAT-ready accounting.",
+  "unit": "Premium (1 branch only) or Enterprise (includes 3 branches) + Additional Branch on Enterprise only.",
+  "edge": "Local Arabic-first product; Enterprise covers 3 branches in one license.",
+  "watch": "Premium can't take extra branches. With 2+ branches, quote Enterprise.",
+  "rules": [
+   "1 branch → Premium.",
+   "2–3 branches → Enterprise.",
+   "4+ branches → Enterprise + (branches − 3) Additional Branch.",
+   "Annual."
+  ]
+ },
+ "Xero": {
+  "cat": "accounting",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Xero subscription sold directly, with an optional Hesab Arabic interface and separate training and support packages.",
+  "bestFor": "Merchants who already know Xero or need international accounting.",
+  "unit": "Main Subscription + Additional Branch; Hesab Arabic Interface add-on; Training and Support packages (one-time).",
+  "edge": "Global brand; Arabic interface available as an add-on.",
+  "watch": "Training and support are NOT included. Quote them separately if the merchant needs help.",
+  "rules": [
+   "1 Main Subscription + (branches − 1) Additional Branch.",
+   "Training and Support are separate one-time lines."
+  ]
+ },
+ "Alpha (Xero)": {
+  "cat": "accounting",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Xero delivered by implementation partner Alpha: subscription plus implementation, migration and training.",
+  "bestFor": "Merchants who want Xero fully set up for them: chart of accounts, templates, integrations.",
+  "unit": "Basic or Premium Subscription + Additional Branch; Implementation (one-time), Migration Package, Training Sessions.",
+  "edge": "Done-for-you setup and up to 1 year of historical data migration.",
+  "watch": "Don't quote Xero direct and Alpha (Xero) to the same merchant. Pick one route.",
+  "rules": [
+   "1 Subscription (Basic / Premium) + (branches − 1) Additional Branch.",
+   "Implementation is a one-time line.",
+   "Migration and Training are optional."
+  ]
+ },
+ "QuickBooks": {
+  "cat": "accounting",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "QuickBooks Online Plus with separate training and support packages.",
+  "bestFor": "Merchants already on QuickBooks.",
+  "unit": "Online Plus Subscription + Additional Branch; Training and Support (one-time).",
+  "edge": "Familiar to many accountants.",
+  "watch": "Training and support are not included.",
+  "rules": [
+   "1 Subscription + (branches − 1) Additional Branch.",
+   "Training and Support are separate one-time lines."
+  ]
+ },
+ "FlowERP": {
+  "cat": "erp",
+  "countries": "KSA",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLScrAhuEzLPgQIjk01wYfdl5U4MaplE6P-5aTGBzLx4ce3_8Bw/viewform",
+  "ksaForm": "Yes",
+  "overview": "Finance and ERP that syncs Foodics sales into accounting: automated journals, inventory lifecycle, COGS, ZATCA e-invoicing.",
+  "bestFor": "KSA small and mid-size groups that need a real ERP without SAP-level cost.",
+  "unit": "Basic or Advanced Package + matching Additional Branch; Implementation per branch (one-time); add-ons (HR, Cost Center, Central Kitchen, B2B Invoicing and more).",
+  "edge": "Advanced adds assets, production (assembly), waste and payroll. Modular add-ons.",
+  "watch": "Additional Branch must match the package. Implementation is per branch.",
+  "rules": [
+   "1 Package (Basic / Advanced) + (branches − 1) Additional Branch of the SAME package.",
+   "Implementation: 1 line per branch (one-time).",
+   "Add-ons only on request."
+  ]
+ },
+ "SAP": {
+  "cat": "erp",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "SAP Business One for F&B groups: Pro and Limited users, hosting, Foodics integration, maintenance (AMC), implementation.",
+  "bestFor": "Enterprise and multi-entity groups.",
+  "unit": "Users (Pro / Limited: annual, monthly or perpetual one-time) + Hosting + Foodics Integration + AMC + Implementation per engineer-day. B1 Bundle = 1 brand, up to 5 users + 1 indirect user.",
+  "edge": "Most complete ERP; the B1 Bundle simplifies quoting for a single brand.",
+  "watch": "Many components. Use the B1 Bundle for a single brand with 5 users or fewer.",
+  "rules": [
+   "Count Pro and Limited users separately.",
+   "Always add Hosting + Foodics Integration unless the merchant self-hosts.",
+   "Implementation is quoted per engineer/day (one-time)."
+  ]
+ },
+ "MS Dynamics": {
+  "cat": "erp",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Microsoft Dynamics 365 Finance with Foodics integration.",
+  "bestFor": "Groups standardized on Microsoft.",
+  "unit": "Finance or Premium license + Attach licenses + Team Members + Foodics Integration + Implementation (one-time).",
+  "edge": "Microsoft ecosystem fit.",
+  "watch": "The Foodics Integration line is required for the POS sync.",
+  "rules": [
+   "Base license (Finance or Premium) + optional Attach and Team Member.",
+   "Add Foodics Integration and Implementation."
+  ]
+ },
+ "VOLT": {
+  "cat": "hr",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "HR, payroll, attendance and self-service suite with SAP finance integration.",
+  "bestFor": "SAP customers who need HR and payroll.",
+  "unit": "Per-module licenses (HR, Payroll, Attendance, ESS, Company Admin, Superuser, Dashboard, Mobile per user) in Annual, Monthly or One-time; Hosting with SAP; Implementation.",
+  "edge": "Native SAP finance link.",
+  "watch": "Several Monthly lines have inconsistent prices across currencies (flagged ⚠). Verify in Salesforce before quoting.",
+  "rules": [
+   "Quote per module and per user where the line says per user.",
+   "Pick one billing model (Annual, Monthly or One-time) for all modules."
+  ]
+ },
+ "Malachite": {
+  "cat": "hr",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "HR, payroll, attendance and employee self-service licenses.",
+  "bestFor": "SAP customers only.",
+  "unit": "Per-module annual licenses.",
+  "edge": "Alternative HR suite for SAP.",
+  "watch": "Not a stand-alone solution. It must be activated with SAP.",
+  "rules": [
+   "Only quote together with SAP."
+  ]
+ },
+ "InvoiceQ": {
+  "cat": "einv",
+  "countries": "KSA, Jordan",
+  "form": "https://invoiceq.com/?ff_landing=26",
+  "ksaForm": "Yes",
+  "overview": "Compliant B2B and B2C e-invoicing from Foodics POS with tax-authority integration, credit and debit notes, and approval workflows.",
+  "bestFor": "KSA and Jordan merchants who need ZATCA-compliant invoicing per terminal.",
+  "unit": "Licensed per account (not per branch). Basic = email only, up to 2 terminals. Advanced = unlimited invoicing + 2,000 SMS/year, per issuing terminal. Customization one-time.",
+  "edge": "Terminal-based model fits merchants with few issuing points.",
+  "watch": "Advanced is per issuing terminal. Count terminals, not branches.",
+  "rules": [
+   "Basic: one account line covers up to 2 terminals.",
+   "Advanced: 1 line per issuing terminal.",
+   "Customization is a one-time line."
+  ]
+ },
+ "Iisal": {
+  "cat": "einv",
+  "countries": "Global",
+  "form": "https://docs.google.com/forms/d/e/1FAIpQLSdmC6bQAoGYvjo-7GKIaGFhQsbp4k-VcH2tPv1xO8sScq4_Fg/viewform",
+  "ksaForm": "Yes",
+  "overview": "Digital receipts: POS transactions become compliant e-invoices sent by SMS, with sales dashboards, consumer insights and a loyalty program.",
+  "bestFor": "Merchants who want paperless SMS receipts plus customer insights.",
+  "unit": "Licensed per account (not per branch). Tier by yearly invoice volume: up to 100, up to 500, 500+.",
+  "edge": "Receipts double as a customer-data and loyalty channel. ZATCA Phase 1 and 2.",
+  "watch": "Pick the tier by invoice volume, not by branch count.",
+  "rules": [
+   "One account line, tier chosen by invoice volume."
+  ]
+ },
+ "Servme": {
+  "cat": "table",
+  "countries": "All markets",
+  "form": "Servme Submission Form",
+  "ksaForm": "—",
+  "overview": "Reservations and seat management, waitlist, CRM guest profiles and booking widget.",
+  "bestFor": "Dine-in and fine-dining venues that take reservations.",
+  "unit": "Black Plan (Monthly, Quarterly, Semi-annual, Annual) or Advanced Plan (Annual) + one-time Onboarding Fee.",
+  "edge": "Only table-management partner; flexible billing frequency.",
+  "watch": "",
+  "rules": [
+   "One plan line + Onboarding Fee on new business."
+  ]
+ },
+ "Ishbek": {
+  "cat": "other",
+  "countries": "Kuwait, Jordan (priced)",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "License includes 1 branch.",
+  "bestFor": "Kuwait or Jordan only.",
+  "unit": "1 license per branch.",
+  "edge": "—",
+  "watch": "Priced in KWD and JOD only.",
+  "rules": [
+   "1 license per branch."
+  ]
+ },
+ "Roboost": {
+  "cat": "other",
+  "countries": "All markets",
+  "form": "—",
+  "ksaForm": "—",
+  "overview": "Delivery management system (DMS).",
+  "bestFor": "Merchants running their own delivery fleet.",
+  "unit": "Usage-priced line (very small unit price).",
+  "edge": "—",
+  "watch": "Confirm the billing unit with Partnerships before quoting.",
+  "rules": [
+   "Confirm the unit (per order or per driver) first."
+  ]
+ },
+ "Nitx": {
+  "cat": "other",
+  "countries": "—",
+  "form": "—",
+  "ksaForm": "—",
+  "inactive": true,
+  "overview": "Screen management software.",
+  "bestFor": "—",
+  "unit": "Annual license.",
+  "edge": "—",
+  "watch": "Partner is DEACTIVATED. Do not quote.",
+  "rules": [
+   "Do not quote: partner deactivated."
+  ]
+ }
+};
+
+
+
+const CUR_LABEL={SAR:"SAR",AED:"AED",KWD:"KWD",JOD:"JOD",EGP:"EGP",USD:"USD"};
+const fmt=(v,c)=>v==null?"—":Number(v).toLocaleString("en-US",{minimumFractionDigits:c==="KWD"||c==="JOD"?2:2,maximumFractionDigits:c==="KWD"||c==="JOD"?3:2});
+const esc=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+const link=u=>/^https?:\/\//.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">Open form</a>`:esc(u);
+const catName=id=>(CATS.find(c=>c.id===id)||{}).name||"";
+
+/* ---------- catalogue tab ---------- */
+const selP=document.getElementById("selPartner"), selC=document.getElementById("selCur");
+CATS.forEach(c=>{const g=document.createElement("optgroup");g.label=c.name;c.partners.forEach(p=>{if(!CATALOG[p])return;const o=document.createElement("option");o.value=p;o.textContent=p+(PARTNERS[p]&&PARTNERS[p].inactive?" (inactive)":"");g.append(o)});selP.append(g)});
+function renderProfile(){
+  const p=selP.value, c=selC.value, m=PARTNERS[p]||{}, lines=CATALOG[p]||[];
+  const order={Main:0,Additional:1,"Add-on":2,"One-time":3,Usage:4};
+  const rows=[...lines].sort((a,b)=>(order[a.t]-order[b.t])||a.name.localeCompare(b.name)).map(l=>{
+    const v=l.p[c];
+    return `<tr><td>${esc(l.name)}${l.flag?` <span class="flag" title="${esc(l.flag)}">⚠</span>`:""}<div class="src">${esc(l.desc||"")}</div></td><td><span class="pill ${l.t}">${l.t}</span></td><td>${l.f}</td>${v==null?`<td class="na">not priced</td>`:`<td class="n">${fmt(v,c)}</td>`}</tr>`}).join("");
+  const priced=lines.filter(l=>l.p[c]!=null).length;
+  document.getElementById("profile").innerHTML=`
+   ${m.inactive?`<div class="callout bad"><b>Inactive partner.</b> Do not quote.</div>`:""}
+   <h3>${esc(p)} <span class="src" style="font-family:var(--f-body);font-weight:400">· ${esc(catName(m.cat))}</span></h3>
+   <dl class="facts">
+    <dt>What it is</dt><dd>${esc(m.overview||"—")}</dd>
+    <dt>Best for</dt><dd>${esc(m.bestFor||"—")}</dd>
+    <dt>Licensing unit</dt><dd>${esc(m.unit||"—")}</dd>
+    <dt>Countries</dt><dd>${esc(m.countries||"—")}</dd>
+    <dt>Submission form</dt><dd>${link(m.form||"—")}</dd>
+    <dt>Form for KSA approvals</dt><dd>${esc(m.ksaForm||"—")}</dd>
+   </dl>
+   <h3>Quote structure</h3>
+   <ul class="list">${(m.rules||[]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul>
+   ${m.watch?`<div class="callout" style="margin-top:10px"><b>Watch out:</b> ${esc(m.watch)}</div>`:""}
+   <h3>Line items · list price in ${CUR_LABEL[c]}${priced?"":" (none priced in this currency)"}</h3>
+   <div class="tbl"><table><tr><th>Line item</th><th>Type</th><th>Billing</th><th style="text-align:right">List ${c}</th></tr>${rows}</table></div>`;
+}
+selP.onchange=renderProfile; selC.onchange=()=>{document.getElementById("selCur2").value=selC.value;renderProfile();renderCompare()};
+
+/* ---------- compare tab ---------- */
+const selCat=document.getElementById("selCat"), selC2=document.getElementById("selCur2");
+CATS.forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=c.name;selCat.append(o)});
+function entry(p,c){
+  const mains=(CATALOG[p]||[]).filter(l=>l.t==="Main"&&l.p[c]!=null);
+  const annual=mains.filter(l=>l.f==="Annual"); const pool=annual.length?annual:mains;
+  if(!pool.length) return "not priced";
+  const best=pool.reduce((a,b)=>a.p[c]<=b.p[c]?a:b);
+  return `${fmt(best.p[c],c)} ${c}<div class="src">${esc(best.name)}</div>`;
+}
+function renderCompare(){
+  const cat=CATS.find(c=>c.id===selCat.value), c=selC2.value, ps=cat.partners.filter(p=>CATALOG[p]);
+  const row=(label,fn)=>`<tr><td><b>${label}</b></td>${ps.map(p=>`<td>${fn(p)}</td>`).join("")}</tr>`;
+  document.getElementById("compare").innerHTML=`
+   <div class="callout">${esc(cat.pick)}</div>
+   <div class="tbl"><table class="cmp">
+    <tr><th></th>${ps.map(p=>`<th>${esc(p)}${PARTNERS[p]&&PARTNERS[p].inactive?" (inactive)":""}</th>`).join("")}</tr>
+    ${row("Best for",p=>esc(PARTNERS[p].bestFor))}
+    ${row("Edge",p=>esc(PARTNERS[p].edge))}
+    ${row("Licensing unit",p=>esc(PARTNERS[p].unit))}
+    ${row("Countries",p=>esc(PARTNERS[p].countries))}
+    ${row("Entry price, annual main line",p=>entry(p,c))}
+    ${row("Watch out",p=>esc(PARTNERS[p].watch))}
+   </table></div>`;
+}
+selCat.onchange=renderCompare; selC2.onchange=()=>{selC.value=selC2.value;renderProfile();renderCompare()};
+
+/* ---------- rules tab ---------- */
+document.getElementById("pane-rules").innerHTML=`
+ <div class="callout"><b>Discounts have their own flow.</b> This page shows list prices and quote structure only. To ask for a discount, fill the "i need discount" form in #reseller-hub and the Partnerships team will reply with the result.</div>`;
+
+/* ---------- tabs ---------- */
+const TABIDS=["cat","cmp","rules"];
+function selectTab(id){TABIDS.forEach(t=>{document.getElementById("tab-"+t).setAttribute("aria-selected",t===id?"true":"false");document.getElementById("pane-"+t).hidden=t!==id});try{localStorage.setItem("rc2-tab",id)}catch(e){}}
+TABIDS.forEach(t=>document.getElementById("tab-"+t).onclick=()=>selectTab(t));
+try{const s=localStorage.getItem("rc2-tab");if(TABIDS.includes(s))selectTab(s)}catch(e){}
+selP.value="Grubtech"; selCat.value="opm"; renderProfile(); renderCompare();
+
+/* ---------- knowledge for the bot (selling data only) ---------- */
+/* Only send the partners the conversation is about, so answers come back fast. */
+const ALIAS={"grub":"Grubtech","deliverect":"Deliverect","urban":"UrbanPiper","feedus":"FeedUs","feed us":"FeedUs","brand wallet":"BrandWallet","brandwallet":"BrandWallet","koinz":"Koinz","optculture":"OptCulture","opt culture":"OptCulture","prepit":"Prepit","ordable":"Ordable","zyda":"Zyda","mnasati":"Mnasati","wi-q":"wi-Q","wiq":"wi-Q","shopbrain":"ShopBrain","shop brain":"ShopBrain","supy":"Supy","wafeq":"Wafeq","xero":"Xero","alpha":"Alpha (Xero)","quickbooks":"QuickBooks","quick books":"QuickBooks","flow":"FlowERP","sap":"SAP","dynamics":"MS Dynamics","volt":"VOLT","malachite":"Malachite","invoiceq":"InvoiceQ","invoice q":"InvoiceQ","iisal":"Iisal","servme":"Servme","ishbek":"Ishbek","roboost":"Roboost","nitx":"Nitx"};
+const CATWORDS={opm:["aggregator","delivery","ordering platform","menu sync","virtual brand","cloud kitchen","hungerstation","jahez","talabat","مطبخ","توصيل"],loyalty:["loyalty","reward","stamp","crm","wallet","ولاء"],ordering:["web store","webstore","online store","online ordering","website","qr","table ordering","متجر"],inventory:["inventory","stock","procurement","recipe","central kitchen","مخزون"],accounting:["accounting","vat","bookkeeping","محاسب"],erp:["erp"],einv:["e-invoic","einvoic","zatca","receipt","فاتورة","فواتير"],hr:[" hr ","hr app","payroll","attendance","رواتب"],table:["reservation","booking","waitlist","حجز"]};
+function relevantPartners(texts){
+  const t=texts.join(" \n ").toLowerCase(), set=new Set();
+  Object.entries(ALIAS).forEach(([k,v])=>{if(t.includes(k)) set.add(v)});
+  Object.entries(CATWORDS).forEach(([id,ws])=>{if(ws.some(w=>t.includes(w))) (CATS.find(c=>c.id===id).partners).forEach(p=>set.add(p))});
+  if(set.size){ // a partner named → include its whole category so comparisons stay exact
+    [...set].forEach(p=>{const m=PARTNERS[p]; if(m) CATS.find(c=>c.id===m.cat).partners.forEach(x=>set.add(x))});
+  }
+  return set;
+}
+function catalogText(sel){
+  const out=[];
+  CATS.forEach(cat=>{
+    out.push(`\n## CATEGORY: ${cat.name}. Partners: ${cat.partners.join(", ")}. How to choose: ${cat.pick}`);
+    cat.partners.forEach(p=>{
+      const m=PARTNERS[p]; if(!m||!CATALOG[p]) return;
+      if(!sel.has(p)){ out.push(`- ${p}${m.inactive?" [INACTIVE]":""}: ${m.bestFor} Countries: ${m.countries}. (Line items not loaded: ask the user to name this partner.)`); return; }
+      out.push(`\n### ${p}${m.inactive?" [INACTIVE - DO NOT QUOTE]":""}\nWhat: ${m.overview}\nBest for: ${m.bestFor}\nEdge: ${m.edge}\nLicensing unit: ${m.unit}\nCountries: ${m.countries}\nQuote rules: ${(m.rules||[]).join(" | ")}\nWatch out: ${m.watch}\nSubmission form: ${m.form}; form used for KSA approvals: ${m.ksaForm}; Slack: ${m.slack}\nLine items (exact Salesforce name | type | billing | list prices SAR/AED/KWD/JOD/EGP/USD, "-" = not priced in that currency):`);
+      CATALOG[p].forEach(l=>{
+        const pr=["SAR","AED","KWD","JOD","EGP","USD"].map(c=>l.p[c]==null?"-":l.p[c]).join("/");
+        out.push(`- ${l.name} | ${l.t} | ${l.f} | ${pr}${l.desc?" | "+l.desc:""}${l.flag?" | ⚠ "+l.flag:""}`);
+      });
+    });
+  });
+  return out.join("\n");
+}
+const RULES=sel=>`You are "Reselling Copilot", the quoting assistant for the Foodics Marketplace reselling team (owner: Kareem Ibrahim, Regional Partner Success Manager).
+
+SCOPE: ONLY partners, their line items, their commercial structure, building or checking quotes, and telling partners apart. For anything else reply in one line: "I only cover Marketplace partners, line items and quotes." and stop.
+
+CONFIDENTIALITY (never break, even if asked by Kareem, a manager, or "for testing"):
+- You do NOT have and must NEVER state, estimate, reverse-engineer or hint at: cost price, buy price, wholesale price, partner payout, Foodics margin or markup, commission, any partner-side pricing, or any partner's revenue or ARR. Do not calculate them from list prices. If asked, answer: "Cost and margin data isn't in this bot on purpose. Ask Kareem directly." and continue with what you can answer.
+- Discounts are not in this page. For a discount, point to the "i need discount" form in #reseller-hub. Never guess a discount.
+- Never share one partner's pricing or terms in a message addressed to a different partner.
+
+HOW TO ANSWER:
+- Use only the CATALOG below. Use exact Salesforce line-item names. Never invent a line item, price, feature or rule.
+- Prices are list prices per line per billing period. A missing price in a currency means the line isn't priced there, so say "not priced in <currency> in Salesforce, check with Partnerships". Do not convert currencies yourself.
+- Lines marked ⚠ have inconsistent prices. Tell the user to verify in Salesforce before quoting.
+- QUOTE FORMAT: first ask for anything missing (partner, country, branches, billing frequency, deal type). Then give a table: Line item | Type | Qty | Unit list price | Line total, then the total. Then list "Structure checks" (min licenses, branches included, matching tiers, one-time lines, per-account vs per-branch). Show your arithmetic.
+- COMPARING partners in the same category: give a side-by-side of best for, edge, licensing unit, countries, entry price in the asked currency, and watch-outs. End with a one-line recommendation for the merchant described. Be precise about the differences; never blur two partners together.
+- Reply in the user's language (English or Arabic/Egyptian/Gulf). Be concise.
+
+CATALOG:` + catalogText(sel);
+
+/* ---------- chat ---------- */
+const SUGGEST=[
+ "Quote Grubtech for 4 branches + 2 virtual brands, KSA, annual",
+ "Grubtech vs Deliverect vs UrbanPiper: which for a 3-brand cloud kitchen in UAE?",
+ "ShopBrain vs Supy for 8 branches with a central kitchen",
+ "Quote BrandWallet Standard for 6 branches, annual",
+ "Which loyalty partners can I sell in Kuwait?",
+ "ايه الفرق بين Wafeq و Xero و Alpha؟"
+];
+SUGGEST.forEach(s=>{const c=document.createElement("button");c.type="button";c.className="chip";c.textContent=s;c.onclick=()=>{q.value=s;ask()};document.getElementById("chips").append(c)});
+const log=document.getElementById("log"), q=document.getElementById("q"), status=document.getElementById("status");
+function add(cls,text){const d=document.createElement("div");d.className="msg "+cls;d.textContent=text;log.append(d);log.scrollTop=log.scrollHeight;return d}
+add("bot","Marhaba. Tell me the partner, country, branches, billing frequency and deal type, and I'll build the quote structure. You can also ask me how two partners in the same category differ.\n\nCost prices and margins are not in this bot.");
+
+let sample=null, turns=[], ctl=null, busy=false;
+(async()=>{try{sample=window.claude?await window.claude.use("sample"):null}catch(e){sample=null}
+  if(sample){status.textContent="Claude connected";status.className="status on"}else{status.textContent="Offline: catalogue search only"}})();
+
+const BLOCK=/\b(cost|wholesale|margin|markup|mark-up|buy price|purchase price|payout|commission|profit)\b|تكلفة|هامش|سعر الشراء|الجملة|ربح/i;
+function localAnswer(text){
+  const t=text.toLowerCase(); const hits=[];
+  Object.keys(CATALOG).forEach(p=>{if(t.includes(p.toLowerCase().split(" ")[0])) hits.push(p)});
+  if(!hits.length) return "Claude isn't available in this view. Name a partner (e.g. Grubtech, ShopBrain) and I'll show its structure, or use the Partner catalogue tab.";
+  return "Claude isn't available in this view. Here's the structure from the catalogue:\n\n"+hits.map(p=>`${p}\n• ${(PARTNERS[p].rules||[]).join("\n• ")}\nUnit: ${PARTNERS[p].unit}`).join("\n\n");
+}
+const ERR={not_granted:"Claude access was declined for this page. Only catalogue search works now.",rate_limited:"Too many questions at once. Wait a minute, then ask again.",session_expired:"Your session expired. Sign in to claude.ai again.",refused:"Claude declined that. Try rephrasing.",upstream_error:"The connection dropped. Ask again."};
+
+async function ask(){
+  const text=q.value.trim(); if(!text||busy) return;
+  q.value=""; add("me",text);
+  if(BLOCK.test(text)&&!/list price|سعر البيع/i.test(text)){
+    add("bot","Cost and margin data isn't in this bot on purpose. Ask Kareem directly.\n\nI can give you list prices and line-item structure.");
+    return;
+  }
+  if(!sample){add("bot",localAnswer(text));return}
+  busy=true;document.getElementById("send").disabled=true;document.getElementById("stop").hidden=false;
+  const bubble=add("bot","Thinking…");
+  turns.push({role:"user",content:text}); while(turns.length>12) turns.splice(0,2);
+  ctl=new AbortController();
+  try{
+    const sel=relevantPartners(turns.filter(x=>x.role==="user").map(x=>x.content));
+    const {text:ans,truncated}=await sample([{role:"user",content:RULES(sel)},{role:"assistant",content:"Understood. Ready."},...turns],{cache:false,modelTier:"quick",signal:ctl.signal,onText:({text})=>{bubble.textContent=text;log.scrollTop=log.scrollHeight}});
+    turns.push({role:"assistant",content:ans});
+    if(truncated) add("note","The answer was cut short. Ask for one partner at a time.");
+  }catch(e){
+    turns.pop(); bubble.textContent=e&&e.text?e.text:"";
+    if(e&&(e.code==="not_granted"||e.code==="sampling_disabled")){sample=null;status.textContent="Offline: catalogue search only";status.className="status";bubble.textContent=localAnswer(text)}
+    else if(e&&e.code!=="cancelled") add("note",ERR[e&&e.code]||ERR.upstream_error);
+    if(!bubble.textContent) bubble.remove();
+  }finally{busy=false;document.getElementById("send").disabled=false;document.getElementById("stop").hidden=true}
+}
+document.getElementById("form").addEventListener("submit",e=>{e.preventDefault();ask()});
+q.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask()}});
+document.getElementById("stop").onclick=()=>ctl&&ctl.abort();
+</script>

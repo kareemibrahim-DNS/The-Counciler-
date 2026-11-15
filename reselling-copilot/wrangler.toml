@@ -1,0 +1,13 @@
+name = "reselling-copilot"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+CLAUDE_MODEL = "claude-opus-5-5"
+CLAUDE_EFFORT = "low"
+
+# Secrets (never commit these): set with
+#   npx wrangler secret put SLACK_BOT_TOKEN
+#   npx wrangler secret put SLACK_SIGNING_SECRET
+#   npx wrangler secret put ANTHROPIC_API_KEY

@@ -1,0 +1,8 @@
+.env
+learn_queue.json
+__pycache__/
+*.pyc
+.venv/
+learned_owner.md
+learned_team.md
+state.json

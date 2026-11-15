@@ -1,0 +1,675 @@
+Partner,Line item,Currency,Internal sheet,Salesforce,Issue
+BrandWallet,BrandWallet - Additional Branch [Annual],AED,881.37,882,price differs
+BrandWallet,BrandWallet - Additional Branch [Annual],KWD,74.16,73.573,price differs
+BrandWallet,BrandWallet - Additional Branch [Annual],JOD,170.01,171,price differs
+BrandWallet,BrandWallet - Additional Branch [Annual],EGP,12132.00,11280.15,price differs
+BrandWallet,BrandWallet - Additional Branch [Annual],USD,,240,missing in sheet
+BrandWallet,BrandWallet - Additional Branch [Monthly],SAR,81.25,75,price differs
+BrandWallet,BrandWallet - Additional Branch [Monthly],AED,79.57,73.45,price differs
+BrandWallet,BrandWallet - Additional Branch [Monthly],KWD,6.69,6.131,price differs
+BrandWallet,BrandWallet - Additional Branch [Monthly],JOD,15.35,14.2,price differs
+BrandWallet,BrandWallet - Additional Branch [Monthly],EGP,1095.25,940,price differs
+BrandWallet,BrandWallet - Additional Branch [Monthly],USD,,20,missing in sheet
+BrandWallet,BrandWallet - Basic Plan [Annual],SAR,2065.50,2154.9,price differs
+BrandWallet,BrandWallet - Basic Plan [Annual],AED,2022.74,2107.9,price differs
+BrandWallet,BrandWallet - Basic Plan [Annual],KWD,170.20,175.9,price differs
+BrandWallet,BrandWallet - Basic Plan [Annual],JOD,390.17,406.9,price differs
+BrandWallet,BrandWallet - Basic Plan [Annual],EGP,27842.94,23400,price differs
+BrandWallet,BrandWallet - Basic Plan [Annual],USD,,573.8,missing in sheet
+BrandWallet,BrandWallet - Basic Plan [Monthly],SAR,186.47,219.9,price differs
+BrandWallet,BrandWallet - Basic Plan [Monthly],AED,182.61,214.9,price differs
+BrandWallet,BrandWallet - Basic Plan [Monthly],KWD,15.37,17.9,price differs
+BrandWallet,BrandWallet - Basic Plan [Monthly],JOD,35.22,41.49,price differs
+BrandWallet,BrandWallet - Basic Plan [Monthly],EGP,2513.60,2280,price differs
+BrandWallet,BrandWallet - Basic Plan [Monthly],USD,,58.5,missing in sheet
+BrandWallet,BrandWallet - Growth Plan [Annual],SAR,2808.00,2928.9,price differs
+BrandWallet,BrandWallet - Growth Plan [Annual],AED,2749.87,2864.9,price differs
+BrandWallet,BrandWallet - Growth Plan [Annual],KWD,231.38,240,price differs
+BrandWallet,BrandWallet - Growth Plan [Annual],JOD,530.43,553,price differs
+BrandWallet,BrandWallet - Growth Plan [Annual],EGP,37851.84,31800,price differs
+BrandWallet,BrandWallet - Growth Plan [Annual],USD,,780,missing in sheet
+BrandWallet,BrandWallet - Growth Plan [Monthly],SAR,253.50,317,price differs
+BrandWallet,BrandWallet - Growth Plan [Monthly],AED,248.25,310,price differs
+BrandWallet,BrandWallet - Growth Plan [Monthly],KWD,20.89,26,price differs
+BrandWallet,BrandWallet - Growth Plan [Monthly],JOD,47.89,59.9,price differs
+BrandWallet,BrandWallet - Growth Plan [Monthly],EGP,3417.18,3300,price differs
+BrandWallet,BrandWallet - Growth Plan [Monthly],USD,,84.5,missing in sheet
+BrandWallet,BrandWallet - Standard Plan [Annual],SAR,2754.00,2872,price differs
+BrandWallet,BrandWallet - Standard Plan [Annual],AED,2696.99,2809.9,price differs
+BrandWallet,BrandWallet - Standard Plan [Annual],KWD,226.93,235,price differs
+BrandWallet,BrandWallet - Standard Plan [Annual],JOD,520.23,542.5,price differs
+BrandWallet,BrandWallet - Standard Plan [Annual],EGP,37123.92,29400,price differs
+BrandWallet,BrandWallet - Standard Plan [Annual],USD,,765,missing in sheet
+BrandWallet,BrandWallet - Standard Plan [Monthly],SAR,248.62,292.9,price differs
+BrandWallet,BrandWallet - Standard Plan [Monthly],AED,243.48,286.49,price differs
+BrandWallet,BrandWallet - Standard Plan [Monthly],KWD,20.49,24,price differs
+BrandWallet,BrandWallet - Standard Plan [Monthly],JOD,46.97,54.9,price differs
+BrandWallet,BrandWallet - Standard Plan [Monthly],EGP,3351.46,2880,price differs
+BrandWallet,BrandWallet - Standard Plan [Monthly],USD,,78,missing in sheet
+Deliverect,Deliverect - Physical License - [Annual],SAR,2646.00,3150,price differs
+Deliverect,Deliverect - Physical License - [Annual],AED,3437.34,3438.79,price differs
+Deliverect,Deliverect - Physical License - [Annual],KWD,289.22,290.47,price differs
+Deliverect,Deliverect - Physical License - [Annual],JOD,663.04,665.27,price differs
+Deliverect,Deliverect - Physical License - [Annual],EGP,47314.80,46850,price differs
+Deliverect,Deliverect - Physical License - [Annual],USD,,937,missing in sheet
+Deliverect,Deliverect - Virtual License - [Annual],SAR,1350.00,1688,price differs
+Deliverect,Deliverect - Virtual License - [Annual],AED,2115.29,2113.92,price differs
+Deliverect,Deliverect - Virtual License - [Annual],KWD,177.98,178.56,price differs
+Deliverect,Deliverect - Virtual License - [Annual],JOD,408.02,408.96,price differs
+Deliverect,Deliverect - Virtual License - [Annual],EGP,29116.80,28800,price differs
+Deliverect,Deliverect - Virtual License - [Annual],USD,,576,missing in sheet
+FeedUs,FeedUs - Subscription License [Annual],SAR,2186.40,2300,price differs
+FeedUs,FeedUs - Subscription License [Annual],AED,2141.14,,not sold in this country (sheet has a price)
+FeedUs,FeedUs - Subscription License [Annual],KWD,180.16,,not sold in this country (sheet has a price)
+FeedUs,FeedUs - Subscription License [Annual],JOD,413.01,,not sold in this country (sheet has a price)
+FeedUs,FeedUs - Subscription License [Annual],EGP,29472.67,,not sold in this country (sheet has a price)
+FlowERP,FlowCRM - Lead App - [Annual],SAR,,3598.8,missing in sheet
+FlowERP,FlowCRM - Lead App - [Annual],AED,,3524.3,missing in sheet
+FlowERP,FlowCRM - Lead App - [Annual],KWD,,296.54,missing in sheet
+FlowERP,FlowCRM - Lead App - [Annual],JOD,,679.81,missing in sheet
+FlowERP,FlowCRM - Lead App - [Annual],EGP,,48511.82,missing in sheet
+FlowERP,FlowCRM - Lead App - [Annual],USD,,959.68,missing in sheet
+FlowERP,FlowChat - Employee Chat App - [Annual],SAR,,4918.8,missing in sheet
+FlowERP,FlowChat - Employee Chat App - [Annual],AED,,4816.98,missing in sheet
+FlowERP,FlowChat - Employee Chat App - [Annual],KWD,,405.31,missing in sheet
+FlowERP,FlowChat - Employee Chat App - [Annual],JOD,,929.16,missing in sheet
+FlowERP,FlowChat - Employee Chat App - [Annual],EGP,,66305.42,missing in sheet
+FlowERP,FlowChat - Employee Chat App - [Annual],USD,,1311.68,missing in sheet
+FlowERP,FlowERP - Additional Employees - [Annual],SAR,,600,missing in sheet
+FlowERP,FlowERP - Additional Employees - [Annual],AED,,587.58,missing in sheet
+FlowERP,FlowERP - Additional Employees - [Annual],KWD,,49.44,missing in sheet
+FlowERP,FlowERP - Additional Employees - [Annual],JOD,,113.34,missing in sheet
+FlowERP,FlowERP - Additional Employees - [Annual],EGP,,8088,missing in sheet
+FlowERP,FlowERP - Additional Employees - [Annual],USD,,160,missing in sheet
+FlowERP,FlowERP - Advanced Inventory - [Annual],SAR,,1200,missing in sheet
+FlowERP,FlowERP - Advanced Inventory - [Annual],AED,,1175.16,missing in sheet
+FlowERP,FlowERP - Advanced Inventory - [Annual],KWD,,98.88,missing in sheet
+FlowERP,FlowERP - Advanced Inventory - [Annual],JOD,,226.68,missing in sheet
+FlowERP,FlowERP - Advanced Inventory - [Annual],EGP,,16176,missing in sheet
+FlowERP,FlowERP - Advanced Inventory - [Annual],USD,,320,missing in sheet
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Annual],SAR,2250.00,2500,price differs
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Annual],AED,2205.00,2450,price differs
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Annual],KWD,184.56,205,price differs
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Annual],JOD,427.56,475,price differs
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Annual],EGP,29250.00,32500,price differs
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Annual],USD,,666.67,missing in sheet
+FlowERP,FlowERP - Advanced Package - [Annual],SAR,3825.00,4250,price differs
+FlowERP,FlowERP - Advanced Package - [Annual],AED,3748.56,4165,price differs
+FlowERP,FlowERP - Advanced Package - [Annual],KWD,313.68,348.5,price differs
+FlowERP,FlowERP - Advanced Package - [Annual],JOD,726.72,807.5,price differs
+FlowERP,FlowERP - Advanced Package - [Annual],EGP,49725.00,55250,price differs
+FlowERP,FlowERP - Advanced Package - [Annual],USD,,1133.33,missing in sheet
+FlowERP,FlowERP - B2B Invoicing - [Annual],SAR,,1200,missing in sheet
+FlowERP,FlowERP - B2B Invoicing - [Annual],AED,,1175.16,missing in sheet
+FlowERP,FlowERP - B2B Invoicing - [Annual],KWD,,98.88,missing in sheet
+FlowERP,FlowERP - B2B Invoicing - [Annual],JOD,,226.68,missing in sheet
+FlowERP,FlowERP - B2B Invoicing - [Annual],EGP,,16176,missing in sheet
+FlowERP,FlowERP - B2B Invoicing - [Annual],USD,,320,missing in sheet
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Annual],SAR,1125.00,1171.88,price differs
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Annual],AED,1102.56,1148.5,price differs
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Annual],KWD,92.28,96.125,price differs
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Annual],JOD,213.72,222.625,price differs
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Annual],EGP,14625.00,15234.38,price differs
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Annual],USD,,312.5,missing in sheet
+FlowERP,FlowERP - Basic Package - [Annual],SAR,2205.00,2450,price differs
+FlowERP,FlowERP - Basic Package - [Annual],AED,2160.96,2401,price differs
+FlowERP,FlowERP - Basic Package - [Annual],KWD,180.84,200.9,price differs
+FlowERP,FlowERP - Basic Package - [Annual],JOD,418.92,465.5,price differs
+FlowERP,FlowERP - Basic Package - [Annual],EGP,28665.00,31850,price differs
+FlowERP,FlowERP - Basic Package - [Annual],USD,,653.33,missing in sheet
+FlowERP,FlowERP - Central Kitchen - [Annual],SAR,,1200,missing in sheet
+FlowERP,FlowERP - Central Kitchen - [Annual],AED,,1175.16,missing in sheet
+FlowERP,FlowERP - Central Kitchen - [Annual],KWD,,98.88,missing in sheet
+FlowERP,FlowERP - Central Kitchen - [Annual],JOD,,226.68,missing in sheet
+FlowERP,FlowERP - Central Kitchen - [Annual],EGP,,16176,missing in sheet
+FlowERP,FlowERP - Central Kitchen - [Annual],USD,,320,missing in sheet
+FlowERP,FlowERP - Cheques and Withdrawal - [Annual],SAR,,6000,missing in sheet
+FlowERP,FlowERP - Cheques and Withdrawal - [Annual],AED,,5875.8,missing in sheet
+FlowERP,FlowERP - Cheques and Withdrawal - [Annual],KWD,,494.4,missing in sheet
+FlowERP,FlowERP - Cheques and Withdrawal - [Annual],JOD,,1133.4,missing in sheet
+FlowERP,FlowERP - Cheques and Withdrawal - [Annual],EGP,,80880,missing in sheet
+FlowERP,FlowERP - Cheques and Withdrawal - [Annual],USD,,1600,missing in sheet
+FlowERP,FlowERP - Cost Center - [Annual],SAR,,1560,missing in sheet
+FlowERP,FlowERP - Cost Center - [Annual],AED,,1528.8,missing in sheet
+FlowERP,FlowERP - Cost Center - [Annual],KWD,,120,missing in sheet
+FlowERP,FlowERP - Cost Center - [Annual],JOD,,283.64,missing in sheet
+FlowERP,FlowERP - Cost Center - [Annual],EGP,,20280,missing in sheet
+FlowERP,FlowERP - Cost Center - [Annual],USD,,416,missing in sheet
+FlowERP,FlowERP - HR App - [Annual],SAR,,4918.8,missing in sheet
+FlowERP,FlowERP - HR App - [Annual],AED,,4816.98,missing in sheet
+FlowERP,FlowERP - HR App - [Annual],KWD,,405.31,missing in sheet
+FlowERP,FlowERP - HR App - [Annual],JOD,,929.16,missing in sheet
+FlowERP,FlowERP - HR App - [Annual],EGP,,66305.42,missing in sheet
+FlowERP,FlowERP - HR App - [Annual],USD,,1311.68,missing in sheet
+FlowERP,FlowERP - Implementation Per Branch - [One Time],AED,,918.8,missing in sheet
+FlowERP,FlowERP - Implementation Per Branch - [One Time],KWD,,76.9,missing in sheet
+FlowERP,FlowERP - Implementation Per Branch - [One Time],JOD,,178.1,missing in sheet
+FlowERP,FlowERP - Implementation Per Branch - [One Time],EGP,,12187.5,missing in sheet
+FlowERP,FlowERP - Implementation Per Branch - [One Time],USD,,250,missing in sheet
+FlowERP,FlowERP - Pre and Scheduled Orders - [Annual],SAR,,1200,missing in sheet
+FlowERP,FlowERP - Pre and Scheduled Orders - [Annual],AED,,1175.16,missing in sheet
+FlowERP,FlowERP - Pre and Scheduled Orders - [Annual],KWD,,98.88,missing in sheet
+FlowERP,FlowERP - Pre and Scheduled Orders - [Annual],JOD,,226.68,missing in sheet
+FlowERP,FlowERP - Pre and Scheduled Orders - [Annual],EGP,,16176,missing in sheet
+FlowERP,FlowERP - Pre and Scheduled Orders - [Annual],USD,,320,missing in sheet
+Grubtech,Grubtech - Virtual Brand [Annual],SAR,658.35,710.5,price differs
+Grubtech,Grubtech - Virtual Brand [Annual],AED,896.79,970.9,price differs
+Grubtech,Grubtech - Virtual Brand [Annual],KWD,75.46,82,price differs
+Grubtech,Grubtech - Virtual Brand [Annual],JOD,93.51,101.5,price differs
+Grubtech,Grubtech - Virtual Brand [Annual],EGP,6672.60,7150,price differs
+Grubtech,Grubtech - Virtual Brand [Annual],USD,,268.2,missing in sheet
+Grubtech,Grubtech - Virtual Brand [Monthly],SAR,59.43,64.6,price differs
+Grubtech,Grubtech - Virtual Brand [Monthly],AED,80.96,88.3,price differs
+Grubtech,Grubtech - Virtual Brand [Monthly],KWD,6.81,7.5,price differs
+Grubtech,Grubtech - Virtual Brand [Monthly],JOD,8.44,9.2,price differs
+Grubtech,Grubtech - Virtual Brand [Monthly],EGP,602.39,650,price differs
+Grubtech,Grubtech - Virtual Brand [Monthly],USD,,24.5,missing in sheet
+Grubtech,Grubtech - gOnline License [Annual],SAR,1311.75,1421.1,price differs
+Grubtech,Grubtech - gOnline License [Annual],AED,1793.59,1942,price differs
+Grubtech,Grubtech - gOnline License [Annual],KWD,150.92,164,price differs
+Grubtech,Grubtech - gOnline License [Annual],JOD,187.01,203,price differs
+Grubtech,Grubtech - gOnline License [Annual],EGP,13345.20,14300,price differs
+Grubtech,Grubtech - gOnline License [Annual],USD,,536.3,missing in sheet
+Grubtech,Grubtech - gOnline License [Monthly],SAR,118.42,129.2,price differs
+Grubtech,Grubtech - gOnline License [Monthly],AED,161.92,176.5,price differs
+Grubtech,Grubtech - gOnline License [Monthly],KWD,13.62,14.911,price differs
+Grubtech,Grubtech - gOnline License [Monthly],JOD,16.88,18.46,price differs
+Grubtech,Grubtech - gOnline License [Monthly],EGP,1204.78,1300,price differs
+Grubtech,Grubtech - gOnline License [Monthly],USD,,48.8,missing in sheet
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Annual],SAR,1320.00,6800,price differs
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Annual],AED,1292.68,6649,price differs
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Annual],KWD,108.77,557,price differs
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Annual],JOD,249.35,1284,price differs
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Annual],EGP,17793.60,,not sold in this country (sheet has a price)
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Annual],USD,,1810,missing in sheet
+Iisal,Iisal - B2B E-Invoicing (Up to 100 Invoice) [Annual],AED,,1399,missing in sheet
+Iisal,Iisal - B2B E-Invoicing (Up to 100 Invoice) [Annual],KWD,,117.2,missing in sheet
+Iisal,Iisal - B2B E-Invoicing (Up to 100 Invoice) [Annual],JOD,,270,missing in sheet
+Iisal,Iisal - B2B E-Invoicing (Up to 100 Invoice) [Annual],USD,,380,missing in sheet
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual],SAR,6282.00,2725,price differs
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual],AED,6151.96,2664,price differs
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual],KWD,517.64,144.7,price differs
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual],JOD,1186.67,514.4,price differs
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual],EGP,84681.36,,not sold in this country (sheet has a price)
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Annual],USD,,725,missing in sheet
+InvoiceQ,InvoiceQ - Advanced Package - [Annual],SAR,2700.00,3150,price differs
+InvoiceQ,InvoiceQ - Advanced Package - [Annual],AED,2644.11,2867,price differs
+InvoiceQ,InvoiceQ - Advanced Package - [Annual],KWD,222.48,240,price differs
+InvoiceQ,InvoiceQ - Advanced Package - [Annual],JOD,510.03,545,price differs
+InvoiceQ,InvoiceQ - Advanced Package - [Annual],EGP,4200.00,24999,price differs
+InvoiceQ,InvoiceQ - Advanced Package - [Annual],USD,,780,missing in sheet
+InvoiceQ,InvoiceQ - Basic Package - [Annual],SAR,1350.00,1470,price differs
+InvoiceQ,InvoiceQ - Basic Package - [Annual],AED,1322.06,1440,price differs
+InvoiceQ,InvoiceQ - Basic Package - [Annual],KWD,111.24,119.9,price differs
+InvoiceQ,InvoiceQ - Basic Package - [Annual],JOD,255.01,275,price differs
+InvoiceQ,InvoiceQ - Basic Package - [Annual],EGP,12132.00,14999,price differs
+InvoiceQ,InvoiceQ - Basic Package - [Annual],USD,,390,missing in sheet
+InvoiceQ,InvoiceQ - Customization - [One Time],AED,,9800,missing in sheet
+InvoiceQ,InvoiceQ - Customization - [One Time],KWD,,820,missing in sheet
+InvoiceQ,InvoiceQ - Customization - [One Time],JOD,,1862,missing in sheet
+InvoiceQ,InvoiceQ - Customization - [One Time],EGP,,124194,missing in sheet
+InvoiceQ,InvoiceQ - Customization - [One Time],USD,,2667,missing in sheet
+Koinz,Koinz - Loyalty Package - [Annual],SAR,1620.00,1800,price differs
+Koinz,Koinz - Loyalty Package - [Annual],EGP,12960.00,14400,price differs
+Koinz,Koinz - Loyalty Package - [Monthly],SAR,146.25,300,price differs
+Koinz,Koinz - Loyalty Package - [Monthly],EGP,1170.00,1200,price differs
+Mnasati,Mnasati - Basic Package [Annual],SAR,250.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Mnasati,Mnasati - Basic Package [Annual],AED,4050.00,3500,price differs
+Mnasati,Mnasati - Basic Package [Annual],KWD,315.00,250,price differs
+Mnasati,Mnasati - Premium Package - [Annual],SAR,350.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Mnasati,Mnasati - Premium Package - [Annual],AED,3150.00,4500,price differs
+Mnasati,Mnasati - Premium Package - [Annual],KWD,225.00,350,price differs
+OptCulture,OptCulture - Growth - [Annual],AED,,4756,missing in sheet
+OptCulture,OptCulture - Growth - [Annual],KWD,,402,missing in sheet
+OptCulture,OptCulture - Growth - [Annual],JOD,,920,missing in sheet
+OptCulture,OptCulture - Growth - [Annual],EGP,,64800,missing in sheet
+OptCulture,OptCulture - Growth - [Annual],USD,,1296,missing in sheet
+OptCulture,OptCulture - Growth - [Monthly],AED,,396,missing in sheet
+OptCulture,OptCulture - Growth - [Monthly],KWD,,33,missing in sheet
+OptCulture,OptCulture - Growth - [Monthly],JOD,,77,missing in sheet
+OptCulture,OptCulture - Growth - [Monthly],EGP,,5400,missing in sheet
+OptCulture,OptCulture - Growth - [Monthly],USD,,108,missing in sheet
+OptCulture,OptCulture - Loyalty - [Annual],AED,,2863,missing in sheet
+OptCulture,OptCulture - Loyalty - [Annual],KWD,,242,missing in sheet
+OptCulture,OptCulture - Loyalty - [Annual],JOD,,553.8,missing in sheet
+OptCulture,OptCulture - Loyalty - [Annual],EGP,,39000,missing in sheet
+OptCulture,OptCulture - Loyalty - [Annual],USD,,780,missing in sheet
+OptCulture,OptCulture - Loyalty - [Monthly],AED,,239,missing in sheet
+OptCulture,OptCulture - Loyalty - [Monthly],KWD,,20,missing in sheet
+OptCulture,OptCulture - Loyalty - [Monthly],JOD,,46.15,missing in sheet
+OptCulture,OptCulture - Loyalty - [Monthly],EGP,,3250,missing in sheet
+OptCulture,OptCulture - Loyalty - [Monthly],USD,,65,missing in sheet
+OptCulture,OptCulture - SMS Usage - GCC,SAR,,0.1,missing in sheet
+OptCulture,OptCulture - SMS Usage - GCC,AED,,0.1,missing in sheet
+OptCulture,OptCulture - SMS Usage - GCC,KWD,,0.01,missing in sheet
+OptCulture,OptCulture - SMS Usage - GCC,JOD,,0.02,missing in sheet
+OptCulture,OptCulture - SMS Usage - GCC,EGP,,1.36,missing in sheet
+OptCulture,OptCulture - SMS Usage - GCC,USD,,0.03,missing in sheet
+OptCulture,OptCulture - WhatsApp usage - GCC,SAR,,0.25,missing in sheet
+OptCulture,OptCulture - WhatsApp usage - GCC,AED,,0.25,missing in sheet
+OptCulture,OptCulture - WhatsApp usage - GCC,KWD,,0.02,missing in sheet
+OptCulture,OptCulture - WhatsApp usage - GCC,JOD,,0.05,missing in sheet
+OptCulture,OptCulture - WhatsApp usage - GCC,EGP,,3.4,missing in sheet
+OptCulture,OptCulture - WhatsApp usage - GCC,USD,,0.07,missing in sheet
+Ordable,Ordable - Additional Branch [Annual],SAR,20.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Ordable,Ordable - Additional Branch [Annual],KWD,18.00,20,price differs
+Ordable,Ordable - Additional Branch [Annual],JOD,41.26,44,price differs
+Ordable,Ordable - Additional Branch [Annual],EGP,2944.66,,not sold in this country (sheet has a price)
+Ordable,Ordable - Advance License [Annual],SAR,410.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Ordable,Ordable - Advance License [Annual],KWD,408.00,410,price differs
+Ordable,Ordable - Advance License [Annual],JOD,825.29,947,price differs
+Ordable,Ordable - Basic License [Annual],SAR,275.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Ordable,Ordable - Basic License [Annual],KWD,240.00,275,price differs
+Ordable,Ordable - Basic License [Annual],JOD,495.17,635,price differs
+Ordable,Ordable - Mobile Application [Annual],SAR,250.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Ordable,Ordable - Mobile Application [Annual],KWD,240.00,250,price differs
+Ordable,Ordable - Mobile Application [Annual],JOD,453.91,473,price differs
+Ordable,Ordable - Mobile Application [Annual],EGP,29446.60,,not sold in this country (sheet has a price)
+Prepit,Prepit - Advanced License (Additional Branch) [Annual],SAR,2456.00,,not sold in this country (sheet has a price)
+Prepit,Prepit - Advanced License (Additional Branch) [Annual],EGP,2377.20,2456,price differs
+Prepit,Prepit - Advanced license [Annual],SAR,50088.00,,not sold in this country (sheet has a price)
+Prepit,Prepit - Advanced license [Annual],EGP,48472.80,50088,price differs
+Prepit,Prepit - Basic License (Additional Branch) [Annual],SAR,1255.00,,not sold in this country (sheet has a price)
+Prepit,Prepit - Basic License (Additional Branch) [Annual],EGP,1158.00,1255,price differs
+Prepit,Prepit - Basic License [Annual],SAR,6539.00,,not sold in this country (sheet has a price)
+Prepit,Prepit - Basic License [Annual],EGP,6036.00,6539,price differs
+Prepit,Prepit - Delivery Management Module [Annual],SAR,6097.00,,not sold in this country (sheet has a price)
+Prepit,Prepit - Delivery Management Module [Annual],EGP,6097.20,6097,price differs
+Prepit,Prepit - Mobile Application [Annual],SAR,66053.00,,not sold in this country (sheet has a price)
+Prepit,Prepit - Mobile Application [Annual],EGP,60972.00,66053,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Annual],SAR,300.00,226,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Annual],AED,293.79,221,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Annual],KWD,24.72,19,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Annual],JOD,36.27,43,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Annual],EGP,598.51,2400,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Annual],USD,,60,missing in sheet
+ShopBrain,ShopBrain - Accounting Additional Branch [Quarterly],SAR,79.38,59,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Quarterly],AED,77.73,58,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Quarterly],KWD,6.54,5,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Quarterly],JOD,9.60,11,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Quarterly],EGP,158.36,630,price differs
+ShopBrain,ShopBrain - Accounting Additional Branch [Quarterly],USD,,16,missing in sheet
+ShopBrain,ShopBrain - Accounting Main [Annual],SAR,1296.00,1576,price differs
+ShopBrain,ShopBrain - Accounting Main [Annual],AED,1269.17,1542,price differs
+ShopBrain,ShopBrain - Accounting Main [Annual],KWD,106.79,131,price differs
+ShopBrain,ShopBrain - Accounting Main [Annual],JOD,270.43,299,price differs
+ShopBrain,ShopBrain - Accounting Main [Annual],EGP,10773.22,10800,price differs
+ShopBrain,ShopBrain - Accounting Main [Annual],USD,,420,missing in sheet
+ShopBrain,ShopBrain - Accounting Main [Quarterly],SAR,342.90,414,price differs
+ShopBrain,ShopBrain - Accounting Main [Quarterly],AED,335.80,405,price differs
+ShopBrain,ShopBrain - Accounting Main [Quarterly],KWD,28.25,34,price differs
+ShopBrain,ShopBrain - Accounting Main [Quarterly],JOD,71.55,78,price differs
+ShopBrain,ShopBrain - Accounting Main [Quarterly],EGP,2850.41,2835,price differs
+ShopBrain,ShopBrain - Accounting Main [Quarterly],USD,,110,missing in sheet
+ShopBrain,ShopBrain - Cost Center [Annual],SAR,1071.00,1126,price differs
+ShopBrain,ShopBrain - Cost Center [Annual],AED,1048.83,1102,price differs
+ShopBrain,ShopBrain - Cost Center [Annual],KWD,88.25,94,price differs
+ShopBrain,ShopBrain - Cost Center [Annual],JOD,202.31,214,price differs
+ShopBrain,ShopBrain - Cost Center [Annual],EGP,10190.88,9600,price differs
+ShopBrain,ShopBrain - Cost Center [Annual],USD,,300,missing in sheet
+ShopBrain,ShopBrain - Cost Center [Quarterly],SAR,283.37,295,price differs
+ShopBrain,ShopBrain - Cost Center [Quarterly],AED,277.50,289,price differs
+ShopBrain,ShopBrain - Cost Center [Quarterly],KWD,23.35,25,price differs
+ShopBrain,ShopBrain - Cost Center [Quarterly],JOD,53.53,56,price differs
+ShopBrain,ShopBrain - Cost Center [Quarterly],EGP,2696.34,2520,price differs
+ShopBrain,ShopBrain - Cost Center [Quarterly],USD,,79,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan - Additional Branch - [Annual],SAR,,1800,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan - Additional Branch - [Annual],AED,,1762.74,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan - Additional Branch - [Annual],KWD,,148.32,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan - Additional Branch - [Annual],JOD,,340.02,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan - Additional Branch - [Annual],EGP,,24264,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan - Additional Branch - [Annual],USD,,480,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan - [Annual],SAR,2880.00,4500,price differs
+ShopBrain,ShopBrain - Enterprise Plan - [Annual],AED,1692.23,4404,price differs
+ShopBrain,ShopBrain - Enterprise Plan - [Annual],KWD,142.39,372,price differs
+ShopBrain,ShopBrain - Enterprise Plan - [Annual],JOD,288.34,852,price differs
+ShopBrain,ShopBrain - Enterprise Plan - [Annual],EGP,9818.83,21000,price differs
+ShopBrain,ShopBrain - Enterprise Plan - [Annual],USD,,1200,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan- Additional Branch - [Monthly],SAR,,178.75,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan- Additional Branch - [Monthly],AED,,175.05,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan- Additional Branch - [Monthly],KWD,,14.73,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan- Additional Branch - [Monthly],JOD,,33.77,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan- Additional Branch - [Monthly],EGP,,2409.55,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan- Additional Branch - [Monthly],USD,,47.67,missing in sheet
+ShopBrain,ShopBrain - Enterprise Plan- [Quarterly],SAR,762.00,1181,price differs
+ShopBrain,ShopBrain - Enterprise Plan- [Quarterly],AED,447.74,1156,price differs
+ShopBrain,ShopBrain - Enterprise Plan- [Quarterly],KWD,37.67,98,price differs
+ShopBrain,ShopBrain - Enterprise Plan- [Quarterly],JOD,76.29,224,price differs
+ShopBrain,ShopBrain - Enterprise Plan- [Quarterly],EGP,2597.90,5513,price differs
+ShopBrain,ShopBrain - Enterprise Plan- [Quarterly],USD,,315,missing in sheet
+ShopBrain,ShopBrain - Essential Plan - Additional Branch - [Monthly],SAR,,97.5,missing in sheet
+ShopBrain,ShopBrain - Essential Plan - Additional Branch - [Monthly],AED,,95.48,missing in sheet
+ShopBrain,ShopBrain - Essential Plan - Additional Branch - [Monthly],KWD,,8.03,missing in sheet
+ShopBrain,ShopBrain - Essential Plan - Additional Branch - [Monthly],JOD,,18.42,missing in sheet
+ShopBrain,ShopBrain - Essential Plan - Additional Branch - [Monthly],EGP,,1314.3,missing in sheet
+ShopBrain,ShopBrain - Essential Plan - Additional Branch - [Monthly],USD,,26,missing in sheet
+ShopBrain,ShopBrain - Essential Plan- Additional Branch - [Annual],SAR,,900,missing in sheet
+ShopBrain,ShopBrain - Essential Plan- Additional Branch - [Annual],AED,,881.37,missing in sheet
+ShopBrain,ShopBrain - Essential Plan- Additional Branch - [Annual],KWD,,74.16,missing in sheet
+ShopBrain,ShopBrain - Essential Plan- Additional Branch - [Annual],JOD,,170.01,missing in sheet
+ShopBrain,ShopBrain - Essential Plan- Additional Branch - [Annual],EGP,,12132,missing in sheet
+ShopBrain,ShopBrain - Essential Plan- Additional Branch - [Annual],USD,,240,missing in sheet
+ShopBrain,ShopBrain - Operation Plan - Additional Branch - [Annual],SAR,,1260,missing in sheet
+ShopBrain,ShopBrain - Operation Plan - Additional Branch - [Annual],AED,,1233.92,missing in sheet
+ShopBrain,ShopBrain - Operation Plan - Additional Branch - [Annual],KWD,,103.82,missing in sheet
+ShopBrain,ShopBrain - Operation Plan - Additional Branch - [Annual],JOD,,238.01,missing in sheet
+ShopBrain,ShopBrain - Operation Plan - Additional Branch - [Annual],EGP,,16984.8,missing in sheet
+ShopBrain,ShopBrain - Operation Plan - Additional Branch - [Annual],USD,,336,missing in sheet
+ShopBrain,ShopBrain - Operation Plan - [Quarterly],SAR,674.69,827,price differs
+ShopBrain,ShopBrain - Operation Plan - [Quarterly],AED,396.43,809,price differs
+ShopBrain,ShopBrain - Operation Plan - [Quarterly],KWD,33.36,68,price differs
+ShopBrain,ShopBrain - Operation Plan - [Quarterly],JOD,67.53,157,price differs
+ShopBrain,ShopBrain - Operation Plan - [Quarterly],EGP,2375.34,5040,price differs
+ShopBrain,ShopBrain - Operation Plan - [Quarterly],USD,,221,missing in sheet
+ShopBrain,ShopBrain - Operation Plan- Additional Branch - [Monthly],SAR,,130,missing in sheet
+ShopBrain,ShopBrain - Operation Plan- Additional Branch - [Monthly],AED,,127.31,missing in sheet
+ShopBrain,ShopBrain - Operation Plan- Additional Branch - [Monthly],KWD,,10.71,missing in sheet
+ShopBrain,ShopBrain - Operation Plan- Additional Branch - [Monthly],JOD,,24.56,missing in sheet
+ShopBrain,ShopBrain - Operation Plan- Additional Branch - [Monthly],EGP,,1752.4,missing in sheet
+ShopBrain,ShopBrain - Operation Plan- Additional Branch - [Monthly],USD,,34.67,missing in sheet
+ShopBrain,ShopBrain - Operation Plan- [Annual],SAR,2550.00,3150,price differs
+ShopBrain,ShopBrain - Operation Plan- [Annual],AED,1498.33,3083,price differs
+ShopBrain,ShopBrain - Operation Plan- [Annual],KWD,126.07,260,price differs
+ShopBrain,ShopBrain - Operation Plan- [Annual],JOD,255.24,596,price differs
+ShopBrain,ShopBrain - Operation Plan- [Annual],EGP,8977.68,19200,price differs
+ShopBrain,ShopBrain - Operation Plan- [Annual],USD,,840,missing in sheet
+Supy,Supy - Central Kitchen License [Annual],AED,6874.69,6870,price differs
+Supy,Supy - Central Kitchen License [Annual],KWD,578.45,580,price differs
+Supy,Supy - Central Kitchen License [Annual],JOD,1326.08,1329,price differs
+Supy,Supy - Central Kitchen License [Annual],EGP,94629.60,93600,price differs
+Supy,Supy - Central Kitchen License [Annual],USD,,1872,missing in sheet
+Supy,Supy - Extra Cost Center [Annual],AED,528.82,528,price differs
+Supy,Supy - Extra Cost Center [Annual],KWD,44.50,45,price differs
+Supy,Supy - Extra Cost Center [Annual],EGP,7279.20,7200,price differs
+Supy,Supy - Extra Cost Center [Annual],USD,,144,missing in sheet
+Supy,Supy - Onboarding Fee [One-Time],AED,,1835,missing in sheet
+Supy,Supy - Onboarding Fee [One-Time],KWD,,155,missing in sheet
+Supy,Supy - Onboarding Fee [One-Time],JOD,,355,missing in sheet
+Supy,Supy - Onboarding Fee [One-Time],EGP,,25000,missing in sheet
+Supy,Supy - Onboarding Fee [One-Time],USD,,500,missing in sheet
+Supy,Supy - Regular Outlet License [Annual],AED,5817.04,5813,price differs
+Supy,Supy - Regular Outlet License [Annual],KWD,489.46,491,price differs
+Supy,Supy - Regular Outlet License [Annual],JOD,1122.07,1125,price differs
+Supy,Supy - Regular Outlet License [Annual],EGP,80071.20,79200,price differs
+Supy,Supy - Regular Outlet License [Annual],USD,,1584,missing in sheet
+UrbanPiper,Urban Piper - Subscription License [Annual],SAR,1080.00,1170,price differs
+UrbanPiper,Urban Piper - Subscription License [Annual],AED,1850.88,1822.28,price differs
+UrbanPiper,Urban Piper - Subscription License [Annual],KWD,155.74,167.895,price differs
+UrbanPiper,Urban Piper - Subscription License [Annual],JOD,204.01,222.3,price differs
+UrbanPiper,Urban Piper - Subscription License [Annual],EGP,14558.40,15022.8,price differs
+UrbanPiper,Urban Piper - Subscription License [Annual],USD,,588,missing in sheet
+UrbanPiper,Urban Piper - Subscription License [Monthly],SAR,97.50,128.34,price differs
+UrbanPiper,Urban Piper - Subscription License [Monthly],AED,167.09,184.23,price differs
+UrbanPiper,Urban Piper - Subscription License [Monthly],KWD,14.06,16.974,price differs
+UrbanPiper,Urban Piper - Subscription License [Monthly],JOD,18.42,24.385,price differs
+UrbanPiper,Urban Piper - Subscription License [Monthly],EGP,1314.30,1647.89,price differs
+UrbanPiper,Urban Piper - Subscription License [Monthly],USD,,55.89,missing in sheet
+UrbanPiper,UrbanPiper - 1 Channel [Annual],SAR,130.20,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+UrbanPiper,UrbanPiper - 1 Channel [Annual],AED,1480.70,1541.4,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Annual],KWD,124.59,130.2,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Annual],JOD,204.01,204.48,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Annual],EGP,14558.40,14650.56,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Annual],USD,,420,missing in sheet
+UrbanPiper,UrbanPiper - 1 Channel [Monthly],SAR,12.09,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+UrbanPiper,UrbanPiper - 1 Channel [Monthly],AED,133.67,143.13,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Monthly],KWD,11.25,12.09,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Monthly],JOD,18.42,19.53,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Monthly],EGP,1314.30,1398.93,price differs
+UrbanPiper,UrbanPiper - 1 Channel [Monthly],USD,,39,missing in sheet
+Wafeq,Wafeq - Additional Branch -  Enterprise [Annual],AED,528.82,540,price differs
+Wafeq,Wafeq - Additional Branch -  Enterprise [Annual],KWD,44.50,45.45,price differs
+Wafeq,Wafeq - Additional Branch -  Enterprise [Annual],JOD,102.01,104.25,price differs
+Wafeq,Wafeq - Additional Branch -  Enterprise [Annual],EGP,4044.00,3981,price differs
+Wafeq,Wafeq - Additional Branch -  Enterprise [Annual],USD,,147.14,missing in sheet
+Wafeq,Wafeq - Enterprise Plan [Annual],AED,3290.45,3360,price differs
+Wafeq,Wafeq - Enterprise Plan [Annual],KWD,276.86,282.83,price differs
+Wafeq,Wafeq - Enterprise Plan [Annual],JOD,634.70,648.65,price differs
+Wafeq,Wafeq - Enterprise Plan [Annual],EGP,38822.40,38217.6,price differs
+Wafeq,Wafeq - Enterprise Plan [Annual],USD,,915.53,missing in sheet
+Wafeq,Wafeq - Premium Plan [Annual],SAR,2160.00,2340,price differs
+Wafeq,Wafeq - Premium Plan [Annual],AED,2115.29,2340,price differs
+Wafeq,Wafeq - Premium Plan [Annual],KWD,177.98,196.97,price differs
+Wafeq,Wafeq - Premium Plan [Annual],JOD,408.02,451.74,price differs
+Wafeq,Wafeq - Premium Plan [Annual],EGP,22646.40,24151.4,price differs
+Wafeq,Wafeq - Premium Plan [Annual],USD,,637.6,missing in sheet
+Zyda,Zyda - Additional Branch [Annual],SAR,144.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Zyda,Zyda - Additional Branch [Annual],AED,1583.04,1728,price differs
+Zyda,Zyda - Additional Branch [Annual],EGP,13938.06,15000,price differs
+Zyda,Zyda - Advanced Package [Annual],SAR,420.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Zyda,Zyda - Advanced Package [Annual],AED,4606.51,5040,price differs
+Zyda,Zyda - Advanced Package [Annual],EGP,48881.36,52500,price differs
+Zyda,Zyda - Basic Package [Annual],SAR,218.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Zyda,Zyda - Basic Package [Annual],AED,2681.19,2940,price differs
+Zyda,Zyda - Basic Package [Annual],KWD,218.40,218,price differs
+Zyda,Zyda - Basic Package [Annual],EGP,16293.79,17500,price differs
+Zyda,Zyda - Mobile Application [Annual],SAR,600.00,,not sold in this country (sheet has a price) — sheet SAR holds the KWD price
+Zyda,Zyda - Mobile Application [Annual],AED,6588.88,7200,price differs
+Zyda,Zyda - Mobile Application [Annual],EGP,69690.29,75000,price differs
+BrandWallet,BrandWallet - Additional Branch [Semi Annual],-,,,line not in Salesforce
+BrandWallet,BrandWallet - Additional Branch [Quarterly],-,,,line not in Salesforce
+BrandWallet,BrandWallet - Basic Plan [Semi Annual],-,,,line not in Salesforce
+BrandWallet,BrandWallet - Basic Plan [Quarterly],-,,,line not in Salesforce
+BrandWallet,BrandWallet - Growth Plan [Semi Annual],-,,,line not in Salesforce
+BrandWallet,BrandWallet - Growth Plan [Quarterly],-,,,line not in Salesforce
+BrandWallet,BrandWallet - Standard Plan [Semi Annual],-,,,line not in Salesforce
+BrandWallet,BrandWallet - Standard Plan [Quarterly],-,,,line not in Salesforce
+Deliverect,Deliverect - Physical License - [Semi Annual],-,,,line not in Salesforce
+Deliverect,Deliverect - Physical License - [Quarterly],-,,,line not in Salesforce
+Deliverect,Deliverect - Physical License - [Monthly],-,,,line not in Salesforce
+Deliverect,Deliverect - Virtual License - [Semi Annual],-,,,line not in Salesforce
+Deliverect,Deliverect - Virtual License - [Quarterly],-,,,line not in Salesforce
+Deliverect,Deliverect - Virtual License - [Monthly],-,,,line not in Salesforce
+FeedUs,FeedUs - Subscription License [Semi Annual],-,,,line not in Salesforce
+FeedUs,FeedUs - Subscription License [Quarterly],-,,,line not in Salesforce
+FeedUs,FeedUs - Subscription License [Monthly],-,,,line not in Salesforce
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Semi Annual],-,,,line not in Salesforce
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Quarterly],-,,,line not in Salesforce
+FlowERP,FlowERP - Advanced Package (Additional Branch) - [Monthly],-,,,line not in Salesforce
+FlowERP,FlowERP - Advanced Package - [Semi Annual],-,,,line not in Salesforce
+FlowERP,FlowERP - Advanced Package - [Quarterly],-,,,line not in Salesforce
+FlowERP,FlowERP - Advanced Package - [Monthly],-,,,line not in Salesforce
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Semi Annual],-,,,line not in Salesforce
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Quarterly],-,,,line not in Salesforce
+FlowERP,FlowERP - Basic Package (Additional Branch) - [Monthly],-,,,line not in Salesforce
+FlowERP,FlowERP - Basic Package - [Semi Annual],-,,,line not in Salesforce
+FlowERP,FlowERP - Basic Package - [Quarterly],-,,,line not in Salesforce
+FlowERP,FlowERP - Basic Package - [Monthly],-,,,line not in Salesforce
+Grubtech,Grubtech - Virtual Brand [Semi Annual],-,,,line not in Salesforce
+Grubtech,Grubtech - Virtual Brand [Quarterly],-,,,line not in Salesforce
+Grubtech,Grubtech - gOnline License [Semi Annual],-,,,line not in Salesforce
+Grubtech,Grubtech - gOnline License [Quarterly],-,,,line not in Salesforce
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Semi Annual],-,,,line not in Salesforce
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Quarterly],-,,,line not in Salesforce
+Iisal,Iisal - B2B E-Invoicing (500+ Invoice) [Monthly],-,,,line not in Salesforce
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Semi Annual],-,,,line not in Salesforce
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Quarterly],-,,,line not in Salesforce
+Iisal,Iisal - B2B E-Invoicing (Up to 500 Invoice) [Monthly],-,,,line not in Salesforce
+InvoiceQ,InvoiceQ - Advanced Package - [Semi Annual],-,,,line not in Salesforce
+InvoiceQ,InvoiceQ - Advanced Package - [Quarterly],-,,,line not in Salesforce
+InvoiceQ,InvoiceQ - Advanced Package - [Monthly],-,,,line not in Salesforce
+InvoiceQ,InvoiceQ - Basic Package - [Semi Annual],-,,,line not in Salesforce
+InvoiceQ,InvoiceQ - Basic Package - [Quarterly],-,,,line not in Salesforce
+InvoiceQ,InvoiceQ - Basic Package - [Monthly],-,,,line not in Salesforce
+Koinz,Koinz - Loyalty Package - [Semi Annual],-,,,line not in Salesforce
+Koinz,Koinz - Loyalty Package - [Quarterly],-,,,line not in Salesforce
+Mnasati,Mnasati - Basic Package [Semi Annual],-,,,line not in Salesforce
+Mnasati,Mnasati - Basic Package [Quarterly],-,,,line not in Salesforce
+Mnasati,Mnasati - Basic Package [Monthly],-,,,line not in Salesforce
+Mnasati,Mnasati - Premium Package - [Semi Annual],-,,,line not in Salesforce
+Mnasati,Mnasati - Premium Package - [Quarterly],-,,,line not in Salesforce
+Mnasati,Mnasati - Premium Package - [Monthly],-,,,line not in Salesforce
+Ordable,Ordable - Additional Branch [Semi Annual],-,,,line not in Salesforce
+Ordable,Ordable - Additional Branch [Quarterly],-,,,line not in Salesforce
+Ordable,Ordable - Additional Branch [Monthly],-,,,line not in Salesforce
+Ordable,Ordable - Advance License [Semi Annual],-,,,line not in Salesforce
+Ordable,Ordable - Advance License [Quarterly],-,,,line not in Salesforce
+Ordable,Ordable - Advance License [Monthly],-,,,line not in Salesforce
+Ordable,Ordable - Basic License [Semi Annual],-,,,line not in Salesforce
+Ordable,Ordable - Basic License [Quarterly],-,,,line not in Salesforce
+Ordable,Ordable - Basic License [Monthly],-,,,line not in Salesforce
+Ordable,Ordable - Mobile Application [Semi Annual],-,,,line not in Salesforce
+Ordable,Ordable - Mobile Application [Quarterly],-,,,line not in Salesforce
+Ordable,Ordable - Mobile Application [Monthly],-,,,line not in Salesforce
+Prepit,Prepit - Advanced License (Additional Branch) [Semi Annual],-,,,line not in Salesforce
+Prepit,Prepit - Advanced License (Additional Branch) [Quarterly],-,,,line not in Salesforce
+Prepit,Prepit - Advanced License (Additional Branch) [Monthly],-,,,line not in Salesforce
+Prepit,Prepit - Advanced license [Semi Annual],-,,,line not in Salesforce
+Prepit,Prepit - Advanced license [Quarterly],-,,,line not in Salesforce
+Prepit,Prepit - Advanced license [Monthly],-,,,line not in Salesforce
+Prepit,Prepit - Basic License (Additional Branch) [Semi Annual],-,,,line not in Salesforce
+Prepit,Prepit - Basic License (Additional Branch) [Quarterly],-,,,line not in Salesforce
+Prepit,Prepit - Basic License (Additional Branch) [Monthly],-,,,line not in Salesforce
+Prepit,Prepit - Basic License [Semi Annual],-,,,line not in Salesforce
+Prepit,Prepit - Basic License [Quarterly],-,,,line not in Salesforce
+Prepit,Prepit - Basic License [Monthly],-,,,line not in Salesforce
+Prepit,Prepit - Delivery Management Module [Semi Annual],-,,,line not in Salesforce
+Prepit,Prepit - Delivery Management Module [Quarterly],-,,,line not in Salesforce
+Prepit,Prepit - Delivery Management Module [Monthly],-,,,line not in Salesforce
+Prepit,Prepit - Mobile Application [Semi Annual],-,,,line not in Salesforce
+Prepit,Prepit - Mobile Application [Quarterly],-,,,line not in Salesforce
+Prepit,Prepit - Mobile Application [Monthly],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Accounting Additional Branch [Semi Annual],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Accounting Additional Branch [Monthly],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Accounting Main [Semi Annual],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Accounting Main [Monthly],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Cost Center [Semi Annual],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Cost Center [Monthly],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Enterprise Plan - [Semi Annual],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Enterprise Plan - [Monthly],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Operation Plan- [Semi Annual],-,,,line not in Salesforce
+ShopBrain,ShopBrain - Operation Plan- [Monthly],-,,,line not in Salesforce
+Supy,Supy - Central Kitchen License [Semi Annual],-,,,line not in Salesforce
+Supy,Supy - Central Kitchen License [Quarterly],-,,,line not in Salesforce
+Supy,Supy - Central Kitchen License [Monthly],-,,,line not in Salesforce
+Supy,Supy - Extra Cost Center [Semi Annual],-,,,line not in Salesforce
+Supy,Supy - Extra Cost Center [Quarterly],-,,,line not in Salesforce
+Supy,Supy - Extra Cost Center [Monthly],-,,,line not in Salesforce
+Supy,Supy - Regular Outlet License [Semi Annual],-,,,line not in Salesforce
+Supy,Supy - Regular Outlet License [Quarterly],-,,,line not in Salesforce
+Supy,Supy - Regular Outlet License [Monthly],-,,,line not in Salesforce
+UrbanPiper,Urban Piper - Subscription License [Semi Annual],-,,,line not in Salesforce
+UrbanPiper,Urban Piper - Subscription License [Quarterly],-,,,line not in Salesforce
+UrbanPiper,UrbanPiper - 1 Channel [Semi Annual],-,,,line not in Salesforce
+UrbanPiper,UrbanPiper - 1 Channel [Quarterly],-,,,line not in Salesforce
+Wafeq,Wafeq - Additional Branch -  Enterprise [Semi Annual],-,,,line not in Salesforce
+Wafeq,Wafeq - Additional Branch -  Enterprise [Quarterly],-,,,line not in Salesforce
+Wafeq,Wafeq - Additional Branch -  Enterprise [Monthly],-,,,line not in Salesforce
+Wafeq,Wafeq - Enterprise Plan [Semi Annual],-,,,line not in Salesforce
+Wafeq,Wafeq - Enterprise Plan [Quarterly],-,,,line not in Salesforce
+Wafeq,Wafeq - Enterprise Plan [Monthly],-,,,line not in Salesforce
+Wafeq,Wafeq - Premium Plan [Semi Annual],-,,,line not in Salesforce
+Wafeq,Wafeq - Premium Plan [Quarterly],-,,,line not in Salesforce
+Wafeq,Wafeq - Premium Plan [Monthly],-,,,line not in Salesforce
+Zyda,Zyda - Additional Branch [Semi Annual],-,,,line not in Salesforce
+Zyda,Zyda - Additional Branch [Quarterly],-,,,line not in Salesforce
+Zyda,Zyda - Additional Branch [Monthly],-,,,line not in Salesforce
+Zyda,Zyda - Advanced Package [Semi Annual],-,,,line not in Salesforce
+Zyda,Zyda - Advanced Package [Quarterly],-,,,line not in Salesforce
+Zyda,Zyda - Advanced Package [Monthly],-,,,line not in Salesforce
+Zyda,Zyda - Basic Package [Semi Annual],-,,,line not in Salesforce
+Zyda,Zyda - Basic Package [Quarterly],-,,,line not in Salesforce
+Zyda,Zyda - Basic Package [Monthly],-,,,line not in Salesforce
+Zyda,Zyda - Mobile Application [Semi Annual],-,,,line not in Salesforce
+Zyda,Zyda - Mobile Application [Quarterly],-,,,line not in Salesforce
+Zyda,Zyda - Mobile Application [Monthly],-,,,line not in Salesforce
+Alpha (Xero),Alpha - Xero Basic Subscription - [Annual],-,,,line missing from sheet
+Alpha (Xero),Alpha - Xero Migration Package - [Annual],-,,,line missing from sheet
+Alpha (Xero),Alpha - Xero Premium Subscription - [Annual],-,,,line missing from sheet
+Alpha (Xero),Alpha - Xero Training Session - [One-time],-,,,line missing from sheet
+Alpha (Xero),Alpha - Xero additional Branch [Annual],-,,,line missing from sheet
+Alpha (Xero),Alpha- Xero Implementation - [One-time],-,,,line missing from sheet
+Ishbek,Ishbek - [Annual],-,,,line missing from sheet
+Ishbek,Ishbek - [Monthly],-,,,line missing from sheet
+MS Dynamics,MS Dynamics - Adding Team Member - [Annual],-,,,line missing from sheet
+MS Dynamics,MS Dynamics - Attach License - [Annual],-,,,line missing from sheet
+MS Dynamics,MS Dynamics - Finance License - [Annual],-,,,line missing from sheet
+MS Dynamics,MS Dynamics - Foodics Integration [Annual],-,,,line missing from sheet
+MS Dynamics,MS Dynamics - Implementation - [One-time],-,,,line missing from sheet
+MS Dynamics,MS Dynamics - Premium License - [Annual],-,,,line missing from sheet
+Malachite,Malachite - Attendance License  [Annual],-,,,line missing from sheet
+Malachite,Malachite - Company Admin License  [Annual],-,,,line missing from sheet
+Malachite,Malachite - Employee Self-Service License  [Annual],-,,,line missing from sheet
+Malachite,Malachite - HR Employees [Annual],-,,,line missing from sheet
+Malachite,Malachite - HR License  [Annual],-,,,line missing from sheet
+Malachite,Malachite - Payroll License  [Annual],-,,,line missing from sheet
+Nitx,Nitx- SW Only Screen Management [Annual],-,,,line missing from sheet
+QuickBooks,QuickBooks - Online Plus Additional Branch [Annual],-,,,line missing from sheet
+QuickBooks,QuickBooks - Online Plus Subscription [Annual],-,,,line missing from sheet
+QuickBooks,QuickBooks - Support Package [One-Time],-,,,line missing from sheet
+QuickBooks,QuickBooks - Training Package [One-Time],-,,,line missing from sheet
+Roboost,Roboost - DMS Solution,-,,,line missing from sheet
+SAP,SAP - Annual Maintenance Contract (AMC) [Annual],-,,,line missing from sheet
+SAP,SAP - Customer Check Out Retail [Annual],-,,,line missing from sheet
+SAP,SAP - Customer Check Out Retail [Monthly],-,,,line missing from sheet
+SAP,SAP - Foodics Integration [Annual],-,,,line missing from sheet
+SAP,SAP - Foodics Integration [Monthly],-,,,line missing from sheet
+SAP,SAP - HANA Engine [One-Time Fee],-,,,line missing from sheet
+SAP,SAP - Hosting [Annual],-,,,line missing from sheet
+SAP,SAP - Hosting [Monthly],-,,,line missing from sheet
+SAP,SAP - Implementation (Per Engineer/day) [One-Time Fee],-,,,line missing from sheet
+SAP,SAP - Limited User [Annual],-,,,line missing from sheet
+SAP,SAP - Limited User [Monthly],-,,,line missing from sheet
+SAP,SAP - Limited User [One-Time Fee],-,,,line missing from sheet
+SAP,SAP - Pro User [Annual],-,,,line missing from sheet
+SAP,SAP - Pro User [Monthly],-,,,line missing from sheet
+SAP,SAP - Pro User [One-Time Fee],-,,,line missing from sheet
+SAP,SAP B1 Bundle - Annual,-,,,line missing from sheet
+SAP,SAP Indirect License - Annual,-,,,line missing from sheet
+SAP,SAP Indirect License - Monthly,-,,,line missing from sheet
+SAP,SAP Indirect License - One Time,-,,,line missing from sheet
+Servme,Servme - Advanced Plan - [Annual],-,,,line missing from sheet
+Servme,Servme - Black Plan - [Annual],-,,,line missing from sheet
+Servme,Servme - Black Plan - [Monthly],-,,,line missing from sheet
+Servme,Servme - Black Plan - [Quarterly],-,,,line missing from sheet
+Servme,Servme - Black Plan - [Semi Annual],-,,,line missing from sheet
+Servme,Servme - Onboarding Fee - [One-Time],-,,,line missing from sheet
+VOLT,VOLT - Additional Company License with SAP Finance Integration Included [Annual],-,,,line missing from sheet
+VOLT,VOLT - Additional Company License with SAP Finance Integration Included [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Additional Company License with SAP Finance Integration Included [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - Attendance License [Annual],-,,,line missing from sheet
+VOLT,VOLT - Attendance License [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Attendance License [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - Company Admin License [Annual],-,,,line missing from sheet
+VOLT,VOLT - Company Admin License [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Company Admin License [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - Employee Self Services License [Annual],-,,,line missing from sheet
+VOLT,VOLT - Employee Self Services License [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Employee Self Services License [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - HR License [Annual],-,,,line missing from sheet
+VOLT,VOLT - HR License [Monthly],-,,,line missing from sheet
+VOLT,VOLT - HR License [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - Hosting with SAP Included [Annual],-,,,line missing from sheet
+VOLT,VOLT - Hosting with SAP Included [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Implementation for One-Time Payment Based Deals [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - Implementation for Subscription Based Deals [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - Mobile App - per User [Annual],-,,,line missing from sheet
+VOLT,VOLT - Mobile App - per User [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Payroll License [Annual],-,,,line missing from sheet
+VOLT,VOLT - Payroll License [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Payroll License [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT - Upgrade from admin to Superuser Admin License [Annual],-,,,line missing from sheet
+VOLT,VOLT - Upgrade from admin to Superuser Admin License [Monthly],-,,,line missing from sheet
+VOLT,VOLT - Upgrade from admin to Superuser Admin License [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT -Superuser Admin License [Annual],-,,,line missing from sheet
+VOLT,VOLT -Superuser Admin License [Monthly],-,,,line missing from sheet
+VOLT,VOLT -Superuser Admin License [One-Time Fee],-,,,line missing from sheet
+VOLT,VOLT – Dashboard [Annual],-,,,line missing from sheet
+VOLT,VOLT – Dashboard [Monthly],-,,,line missing from sheet
+VOLT,VOLT – Dashboard [One-Time Fee],-,,,line missing from sheet
+VOLT,Volt Performance (Annual),-,,,line missing from sheet
+VOLT,Volt Performance (Monthly),-,,,line missing from sheet
+VOLT,Volt Training (Annual),-,,,line missing from sheet
+VOLT,Volt Training (Monthly),-,,,line missing from sheet
+Xero,"Xero - ""Hesab"" Arabic Interface [Annual]",-,,,line missing from sheet
+Xero,Xero - Additional Branch [Annual],-,,,line missing from sheet
+Xero,Xero - Support Package [One-Time],-,,,line missing from sheet
+Xero,Xero - Training Package [One-Time],-,,,line missing from sheet
+Xero,Xero - Xero Main Subscription [Annual],-,,,line missing from sheet
+wi-Q,wi-Q - Connect - [Annual],-,,,line missing from sheet
+wi-Q,wi-Q - Connect - [Monthly],-,,,line missing from sheet
+wi-Q,wi-Q - Connect - [Quarterly],-,,,line missing from sheet
+wi-Q,wi-Q - Connect - [Semi-Annual],-,,,line missing from sheet
+wi-Q,wi-Q - Online Ordering - [Annual],-,,,line missing from sheet
+wi-Q,wi-Q - Online Ordering - [Monthly],-,,,line missing from sheet
+wi-Q,wi-Q - Table Ordering - [Monthly],-,,,line missing from sheet
+wi-Q,wi-Q - Table Ordering- [Annual],-,,,line missing from sheet

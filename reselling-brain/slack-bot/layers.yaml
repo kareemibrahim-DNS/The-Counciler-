@@ -1,0 +1,79 @@
+# Audience layers — decided by Kareem on 14 Nov 2026.
+#   everyone (base): live resellers, list prices by country, how to build the quote, partner comparison
+#                    (best for, edge, why), merchant fit, how to work with resellers (flows), unified billing,
+#                    and how a partner's solution operates. Discount rules are never shown at this level.
+#   sales   : Sales, AMs and ANYONE not listed below. Sees the base layer only.
+#   team    : Partnerships team (Althurayyaa). + policy, discount eligibility, SLAs, processes, partner operations.
+#   manager : managers (Hatem). + program cycles in depth (why we built it, how it runs now), targets, strategy,
+#             internal trackers and partner contacts (Kareem and Hatem only). Everyone else gets the generic
+#             cycle picture (13-cycles-at-a-glance) and deep cycle questions go to Kareem or Hatem.
+#   cost    : cost prices and contracts. Locked for everyone except the Slack IDs in the BRAIN_COST_SLACK_IDS
+#             secret (Hatem) and Kareem. Only ever answered in a private DM.
+#   owner   : Kareem (the BRAIN_OWNER_SLACK_ID secret). Everything.
+# Deny by default: a person not listed in `people` gets the sales layer.
+# The owner is whoever BRAIN_OWNER_SLACK_ID names; an `owner` entry here alone gives sales.
+# Who READS the reply also counts (slack-bot/access.py):
+#   - partners, guests and other workspaces get nothing;
+#   - manager, cost and owner answers only happen in a private DM;
+#   - a private channel gets its least-privileged member's level (never above team); a public channel gets sales.
+default_level: sales
+
+levels:
+  owner:
+    sees: [owner, cost, manager, team, base]
+    tools: [brain_catalog, escalate, salesforce_query, sheets_read, drive_search, drive_read, slack_read_channel, read_slack_file, learn]
+    instructions: "This is Kareem. Full detail, including cost, contracts, targets and strategy."
+  manager:
+    sees: [manager, team, base]
+    tools: [brain_catalog, escalate, sheets_read, read_slack_file]
+    instructions: "Manager. Everything the team sees, plus program cycles, targets, strategy, trackers and partner contacts. Cost and contracts only if this person has the cost grant."
+  team:
+    sees: [team, base]
+    # read_slack_file opens only files attached to the asker's own message.
+    tools: [brain_catalog, escalate, sheets_read, read_slack_file]
+    instructions: "Partnerships team member. Policy, discount eligibility, SLAs, processes, partner operations and the catalogue. No cost, contracts, contacts, trackers, targets or strategy."
+  sales:
+    sees: [sales, base]
+    tools: [brain_catalog, escalate]
+    instructions: "Sales, Account Manager or any other colleague. The common layer: resellers, list prices, quotes, comparisons, merchant fit, flows and operations. Nothing locked."
+
+# Channels partners can read. The bot never answers there (it tells only the asker, privately).
+# Slack Connect channels, channels with a guest or an outside member, and users from another
+# workspace are always blocked, whatever the channel name.
+blocked_channels:
+  - "^(ksa|uae|egypt|kw-jo|kw|jo|eg)-"   # per-partner country channels, e.g. ksa-<partner>
+  - "^foodics-"                         # shared channels, e.g. foodics-<partner>
+# Internal channels that match a pattern above can be allowed here (the member check still applies).
+allowed_channels: []
+
+# Prices are quoted for the asker's own country, taken from their Slack time zone. Add `country: SA|AE|KW|JO|EG|INT`
+# to a person below to override it.
+# Map Slack user IDs to a level. Add Kareem's Slack ID (owner) and each Partnerships team member (team).
+# Everyone else is sales.
+people:
+  U08DW8E5WKW: { level: owner, name: Kareem Ibrahim }   # owner level needs the BRAIN_OWNER_SLACK_ID secret too
+  U0BQKNQNF89: { level: team, name: Althurayyaa Alsaad }
+  U02VD9VGNA0: { level: manager, name: Hatem Ashour }    # cost + contracts via the BRAIN_COST_SLACK_IDS secret
+
+# Who the bot pulls in under a reply (code adds the @-mentions; the model never writes them):
+#   decision   (confidential data or calculations, exceptions, approvals) -> owner; manager when the owner is away
+#   operations (detailed and day-to-day operations)                     -> operations, cc owner (cc manager when away)
+#   cycles     (deep questions about how a cycle works or why)          -> owner and manager; manager when away
+# "Away" = Kareem's `away` DM command (until `back`), or a Slack status with one of these emojis or words
+# (whole words; "back from vacation" doesn't count; business travel doesn't count).
+routing:
+  owner: U08DW8E5WKW
+  manager: U02VD9VGNA0
+  operations: U0BQKNQNF89
+  away_emojis: [":palm_tree:", ":desert_island:", ":beach_with_umbrella:", ":face_with_thermometer:"]
+  away_words: [vacation, vacationing, holiday, on leave, annual leave, sick leave, sick, ooo, out of office, agaza, إجازة, اجازة, عطلة]
+
+# Sources the tools may read. Only sheets listed here can be opened.
+sources:
+  sheets:
+    # audience: team → the team (and managers) may read it; audience: manager → managers only; none → Kareem only.
+    # Trackers are manager-level (Kareem, 14 Nov 2026): give them audience: manager, never team.
+    # example: { id: "<spreadsheet id>", title: "<sheet title>", range: "A1:Z1000", audience: manager }
+    # (real sheet names are added on the server, not in this shared repo)
+  # Drive folders (owner only) come from the BRAIN_DRIVE_FOLDERS secret (comma-separated ids), not from this shared repo.
+  drive_folders: []

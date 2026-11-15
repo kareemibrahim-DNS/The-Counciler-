@@ -1,0 +1,5 @@
+.brain-log{display:flex;flex-direction:column;gap:.75rem;margin:1rem 0;max-height:60vh;overflow-y:auto}
+.brain-msg{padding:.75rem 1rem;border-radius:12px;white-space:pre-wrap;line-height:1.5;max-width:85%}
+.brain-user{align-self:flex-end;background:rgba(99,102,241,.15)}
+.brain-answer{align-self:flex-start;background:rgba(127,127,127,.12)}
+#question{width:100%;box-sizing:border-box}
