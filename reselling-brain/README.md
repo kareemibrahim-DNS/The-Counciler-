@@ -10,7 +10,7 @@ This folder, in The-Counciler-, is the home of the reseller bot. Everything live
 | Owner skill | Kareem | uploaded in Kareem's own Claude account |
 | Web page (built in Orbit, kept as reference) | — | `orbit-web/`: the Ask page, `/api/brain` and Orbit data tools; doesn't run on its own here |
 
-Reports from the build (data issues to fix in Salesforce, the old internal price list vs Salesforce, the security reviews) are in `reports/`.
+Reports from the build (data issues to fix in Salesforce, the security reviews) are in `reports/`.
 
 All of them read the same files in `knowledge/` (rules, policy, partners, flows, cycles) and `catalog/` (line items and Salesforce list prices). To update the brain, edit a file there, then:
 - Slack: push to the deploy branch (Railway redeploys) or send `reload` to the bot (Kareem only).
