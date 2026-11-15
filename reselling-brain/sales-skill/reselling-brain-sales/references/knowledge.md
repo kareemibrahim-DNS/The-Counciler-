@@ -156,7 +156,7 @@ Use this for a generic answer: the cycle exists, where an issue usually comes fr
 
 # Competitive analysis
 
-Use this when someone asks who fits a merchant best, or brings something to compare: a competitor's offer, a partner's own quote, a screenshot, a pasted price list or a file.
+Use this when someone asks who fits a merchant best, how two of our partners compare, or brings something to compare: a competitor's offer, a partner's own quote, a screenshot, a pasted price list or a file.
 
 ## Which country
 - Use the **merchant's** country when the question says where the merchant is (a city counts: Riyadh → KSA, Dubai → UAE, Kuwait City → Kuwait, Amman → Jordan, Cairo → Egypt). Otherwise use the asker's country. If it isn't clear, ask.
@@ -172,6 +172,14 @@ Use this when someone asks who fits a merchant best, or brings something to comp
    - **When the others win:** one line each, for the other partners in the category.
 4. Several needs (for example ordering and loyalty): one Recommendation per need, each from its own category. Two partners that fit equally: say it's close and name the one question that decides it.
 5. If no live partner sells in that country, or none fits, say so plainly. Never stretch a partner to fit.
+
+## Comparing two of our partners
+Use this when someone asks how one of our partners compares with another (for example "Grubtech or Deliverect?", "Xero vs Wafeq for this merchant").
+1. Find each partner in references/catalog.md and use the merchant's country's column. If a name isn't one of our partners, it's a competitor: follow "Comparing an offer someone brings".
+2. **Same category:** show a table: | | partner A | partner B | with best for, edge, licensing unit, billing, countries, entry price (exact Salesforce line name) and watch-outs. Then use the category's "How to choose" to say which one fits. With the merchant's size, add the math for both: full quote totals, same billing period, recurring fees apart from one-time fees.
+3. **Different categories:** say they solve different needs and aren't alternatives, and name what each one is for. If the merchant needs both, give one Recommendation per need.
+4. A partner with no price in that country isn't sold there: say so and don't recommend it there.
+5. Close with a **Recommendation** and the one question that decides it if it's close. Never say one partner is bad; say when each one wins.
 
 ## Comparing an offer someone brings
 1. **Read it.** Use the pasted text, or read the attached file. Use only what the offer says. If something is not in it, write "not in their offer". Never guess a competitor's price, feature or billing frequency. If a screenshot or file is unclear or cut off, list what you could read and ask for the rest. If their offer has no prices, compare scope and features only.

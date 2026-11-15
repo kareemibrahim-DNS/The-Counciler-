@@ -342,6 +342,55 @@ class Catalog:
         best = min(pool, key=lambda l: l["p"][cur])
         return {"line_item": best["name"], "price": best["p"][cur], "currency": cur}
 
+    def _billing(self, name: str, cur: str | None) -> list[str]:
+        lines = [l for l in self.items.get(name, []) if l["t"] == "Main" and (not cur or l["p"].get(cur) is not None)]
+        return sorted({l["f"] for l in lines})
+
+    def compare(self, partners: list[str] | str, country: str | None = None, level: str = "sales") -> str:
+        """Two or more of our partners side by side: the same fields Sales sees for one partner, in one table.
+        List prices only, and the same level rules as lookup (watch-outs without discount wording below team)."""
+        full = level in ("owner", "manager", "team")
+        if isinstance(partners, str):
+            partners = [x for x in re.split(r"\s*(?:,|;|\bvs\.?\b|\bversus\b|\band\b)\s*", partners, flags=re.I) if x.strip()]
+        cur = CURRENCY.get(str(country).upper()) if country else None
+        if country and not cur:
+            return _clip({"error": f"unknown country '{country}'. Use SA, AE, KW, JO, EG or INT."})
+        names, unknown = [], []
+        for raw in partners or []:
+            n = self._partner(raw)
+            if not n:
+                unknown.append(raw)
+            elif n not in names:
+                names.append(n)
+        if unknown:
+            return _clip({"error": f"not in the reseller catalogue: {', '.join(unknown)}. The Reselling Brain holds no "
+                                   "competitor data: compare an offer only from what the asker brings.",
+                          "partners": sorted(self.partners)})
+        if len(names) < 2:
+            return _clip({"error": "name at least two different partners to compare"})
+        if len(names) > 4:
+            return _clip({"error": "compare up to 4 partners at a time; for a whole category use `category`"})
+        cats = {c["id"]: c for c in self.categories}
+        rows = []
+        for n in names:
+            m = self.partners[n]
+            row = {"partner": n, "category": cats.get(m["cat"], {}).get("name", ""), "inactive": bool(m.get("inactive")),
+                   "overview": m["overview"], "licensing_unit": m["unit"], "countries": m["countries"],
+                   "best_for": m["bestFor"], "edge": m["edge"], "watch_out": self._watch(n, full),
+                   "billing": self._billing(n, cur), "submission_form": m["form"]}
+            if cur:
+                entry = self._entry(n, cur)
+                row.update(entry_price=entry, sold_in_country=entry is not None)
+            rows.append(row)
+        out = {"compare": rows}
+        cat_ids = {self.partners[n]["cat"] for n in names}
+        if len(cat_ids) == 1:
+            out["how_to_choose"] = cats.get(next(iter(cat_ids)), {}).get("pick", "")
+        else:
+            out["note"] = ("These partners are in different categories, so they solve different needs and are not "
+                           "alternatives to each other. Say so, and compare each with the partners in its own category.")
+        return _clip(out)
+
     def lookup(self, partner: str | None = None, category: str | None = None, country: str | None = None,
                level: str = "sales") -> str:
         """Everyone gets resellers, list prices, quote structure, comparisons (best for, edge, how to choose),
@@ -421,9 +470,12 @@ def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: 
     if catalog:
         add("brain_catalog", "Reseller catalogue: a partner's profile, quote rules and line items with LIST prices (Salesforce price book), "
             "or a side-by-side of all partners in a category. Give a country (SA, AE, KW, JO, EG or INT) to get prices in its currency. "
+            "Give `compare` (two or more partner names) to put our own partners side by side. "
             "With no input, lists categories and partners. Never contains cost or margin.",
-            {"partner": {"type": "string"}, "category": {"type": "string"}, "country": {"type": "string"}}, [],
-            lambda partner=None, category=None, country=None, _level="sales": catalog.lookup(partner, category, country, _level),
+            {"partner": {"type": "string"}, "category": {"type": "string"}, "country": {"type": "string"},
+             "compare": {"type": "array", "items": {"type": "string"}, "description": "Two or more of our partners to compare"}}, [],
+            lambda partner=None, category=None, country=None, compare=None, _level="sales":
+                catalog.compare(compare, country, _level) if compare else catalog.lookup(partner, category, country, _level),
             level_aware=True)
     if os.environ.get("SF_ACCESS_TOKEN") or os.environ.get("SF_USERNAME"):
         add("salesforce_query", "Run one read-only SOQL SELECT on Salesforce (accounts, opportunities, ARR, churn, F5). Max 200 rows.",

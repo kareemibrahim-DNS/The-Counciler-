@@ -86,7 +86,7 @@ Replies never carry link or media previews. A reply may only link to Foodics sys
 ### Tools (all read-only)
 | Tool | Owner (Kareem) | Manager (Hatem) | Team (Althurayyaa) | Sales and everyone else | Setup |
 | --- | --- | --- | --- | --- | --- |
-| `brain_catalog` | ✅ | ✅ | ✅ | ✅ (discount wording removed) | Nothing extra — reads `catalog/` (list prices only, never cost) |
+| `brain_catalog` | ✅ | ✅ | ✅ | ✅ (discount wording removed) | Nothing extra — reads `catalog/` (list prices only, never cost). `compare` puts 2–4 of our partners side by side |
 | `escalate` | ✅ | ✅ | ✅ | ✅ | Nothing extra — the app adds the @-mentions from `routing` in `layers.yaml` |
 | `read_slack_file` | ✅ | ✅ | ✅ | ✅ | Opens only files attached to the message being answered (or to the message just above a bare mention), e.g. an offer to compare |
 | `sheets_read` | ✅ all listed sheets | ✅ sheets marked `audience: team` or `audience: manager` (trackers) | ✅ only sheets marked `audience: team` | — | Google service-account key in the `GOOGLE_SERVICE_ACCOUNT_JSON` secret (never commit the key file) + list the real sheets in a server-side copy of `layers.yaml` (point `BRAIN_LAYERS_FILE` at it on the `/data` volume; never in this repo) and share them with the service account |

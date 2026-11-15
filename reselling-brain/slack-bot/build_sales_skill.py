@@ -74,6 +74,8 @@ SKILL_WORDING = [
      "then it's the \"i need discount\" form in #reseller-hub, say so, and name Kareem Ibrahim (Hatem Ashour when Kareem is away) for the decision."),
     ("that's new partner outreach: call `escalate` with kind decision.", "that's new partner outreach: name Kareem Ibrahim (Hatem Ashour when Kareem is away)."),
     ("open the attached file with `read_slack_file`", "read the attached file"),
+    ("Call `brain_catalog` with `compare` (the partner names) and the merchant's country.",
+     "Find each partner in references/catalog.md and use the merchant's country's column."),
     ("**Find our match** with `brain_catalog`:", "**Find our match** in references/catalog.md:"),
     ("Our prices are list prices from `brain_catalog` only.", "Our prices are list prices from references/catalog.md only."),
     ("say so and call `escalate` with kind decision.", "say so, and name Kareem Ibrahim (Hatem Ashour when Kareem is away) for the decision."),
