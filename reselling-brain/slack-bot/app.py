@@ -30,7 +30,7 @@ from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from access import OWNER_DM_ONLY_REPLY, Directory, decide, handoff_lines, is_away, is_owner_command
+from access import OWNER_DM_ONLY_REPLY, Directory, country_of, decide, handoff_lines, is_away, is_owner_command
 from brain import KNOWLEDGE_DIR, OWNER_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply
 from tools import Learner, SlackReader, build_tools
 
@@ -241,6 +241,12 @@ def answer(event, client, say, context):
         question = "Answer the last question in this thread."
     queued_before = set(learner.queued()) if d.level == "owner" else set()
     ctx = {"file_ids": [f.get("id") for f in files if f.get("id")]}
+    try:  # quote the asker's own country by default
+        found = country_of(directory.user(event["user"]), (brain.layers.get("people") or {}).get(event["user"]))
+        if found:
+            ctx["country"] = found
+    except Exception:
+        pass
     try:
         reply = brain.ask(question, event["user"], history, level=d.level, where=d.where, ctx=ctx)
     except Exception:

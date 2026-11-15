@@ -127,6 +127,18 @@ class Directory:
         return self.client.conversations_info(channel=channel)["channel"]
 
 
+# Slack time zone -> the country whose prices a person quotes. A `country` in layers.yaml people wins.
+TZ_COUNTRY = {"Asia/Riyadh": "SA", "Asia/Dubai": "AE", "Asia/Muscat": "AE", "Asia/Kuwait": "KW", "Asia/Amman": "JO",
+              "Africa/Cairo": "EG"}
+
+
+def country_of(user: dict | None, person: dict | None = None) -> str | None:
+    override = str((person or {}).get("country") or "").upper()
+    if override in ("SA", "AE", "KW", "JO", "EG", "INT"):
+        return override
+    return TZ_COUNTRY.get((user or {}).get("tz") or "")
+
+
 def is_dm(event: dict) -> bool:
     return event.get("channel_type") == "im" and str(event.get("channel", "")).startswith("D")
 

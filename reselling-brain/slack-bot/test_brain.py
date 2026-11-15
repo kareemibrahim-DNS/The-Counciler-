@@ -715,6 +715,23 @@ class EscalationTest(unittest.TestCase):
             self.assertIn("escalate", cfg["tools"], level)
 
 
+class CountryTest(unittest.TestCase):
+    def test_country_from_slack_time_zone_with_a_layers_override(self):
+        self.assertEqual(access.country_of({"tz": "Asia/Riyadh"}), "SA")
+        self.assertEqual(access.country_of({"tz": "Asia/Kuwait"}), "KW")
+        self.assertEqual(access.country_of({"tz": "Africa/Cairo"}), "EG")
+        self.assertIsNone(access.country_of({"tz": "Europe/London"}))
+        self.assertEqual(access.country_of({"tz": "Asia/Riyadh"}, {"country": "ae"}), "AE")
+
+    def test_prompt_quotes_one_country(self):
+        docs = [brain.Doc("how", "base", "BASE")]
+        layers = {"levels": {"sales": {"sees": ["sales", "base"]}}}
+        self.assertIn("works in Kuwait (KWD)", brain.system_prompt("sales", layers, docs, country="KW"))
+        self.assertIn("ask which one before quoting", brain.system_prompt("sales", layers, docs))
+        p = brain.system_prompt("sales", brain.load_layers(), brain.load_docs(private=False))
+        self.assertIn("One country per answer", p)
+
+
 class HardLimitsTest(unittest.TestCase):
     def test_private_source_tools_never_go_below_their_floor(self):
         layers = {"levels": {"sales": {"tools": ["brain_catalog", "escalate", "slack_read_channel", "drive_read",

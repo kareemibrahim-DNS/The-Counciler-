@@ -158,8 +158,12 @@ WHERE_NOTES = {
 }
 
 
+COUNTRY_NAMES = {"SA": "KSA (SAR)", "AE": "UAE (AED)", "KW": "Kuwait (KWD)", "JO": "Jordan (JOD)", "EG": "Egypt (EGP)",
+                 "INT": "International (USD)"}
+
+
 def system_prompt(level: str, layers: dict, docs: list[Doc], where: str = "dm", capped: bool = False,
-                  cost: bool = False) -> str:
+                  cost: bool = False, country: str | None = None) -> str:
     parts = [f"<knowledge id=\"{d.id}\">\n{d.body}\n</knowledge>" for d in visible_docs(level, layers, docs, cost)]
     level_note = (layers.get("levels") or {}).get(level, {}).get("instructions", "")
     footer = f"\n\nThe answer is at level: {level}.\n{level_note}".rstrip()
@@ -170,6 +174,12 @@ def system_prompt(level: str, layers: dict, docs: list[Doc], where: str = "dm", 
     if level != "owner" and not cost:
         footer += ("\nCost prices, markups, margins and contracts are locked at this level. Never hint at or estimate them; "
                    "point to the right flow and call `escalate` with kind decision.")
+    if country in COUNTRY_NAMES:
+        footer += (f"\nThe asker works in {COUNTRY_NAMES[country]}. Quote prices for that country only, unless they name "
+                   "another country or ask for all countries.")
+    else:
+        footer += ("\nThe asker's country is unknown. If the question doesn't name a country, ask which one before quoting; "
+                   "don't list every country's price.")
     return "\n\n".join(parts) + footer
 
 
@@ -307,7 +317,8 @@ class Brain:
                 and LEVEL_RANK.get(level, -1) >= LEVEL_RANK["manager"])
         tools = tools_for(level, self.layers, self.all_tools)
         guide = (SALES_TOOL_GUIDE if level == "sales" else TOOL_GUIDE) if tools else ""
-        system = system_prompt(level, self.layers, self.docs, where=where, capped=capped, cost=cost) + guide
+        system = system_prompt(level, self.layers, self.docs, where=where, capped=capped, cost=cost,
+                               country=(ctx or {}).get("country")) + guide
         messages = list(history or []) + [{"role": "user", "content": question}]
         kwargs = dict(model=MODEL, max_tokens=MAX_TOKENS,
                       # The knowledge block is cached so repeat questions are cheap and fast.

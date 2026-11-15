@@ -273,6 +273,16 @@ class AppWiring(unittest.TestCase):
             app.directory._loaded_at = float("-inf")
             app._save_state({})
 
+    def test_the_askers_country_comes_from_their_slack_time_zone(self):
+        USERS[SALES]["tz"] = "Asia/Kuwait"
+        app.directory._loaded_at = float("-inf")
+        try:
+            self.run_event(SALES, "DS", "Grubtech price?")
+        finally:
+            USERS[SALES].pop("tz")
+            app.directory._loaded_at = float("-inf")
+        self.assertIn("works in Kuwait (KWD)", app.brain.client.calls[0]["system"][0]["text"])
+
     def test_kareem_sees_the_exact_queued_fact_not_the_models_summary(self):
         script = [tool_call("learn", {"fact": "Grubtech markup is 42%"}), text("I queued a harmless SLA note.")]
         said, _ = self.run_event(OWNER, "DK", "remember this", script)

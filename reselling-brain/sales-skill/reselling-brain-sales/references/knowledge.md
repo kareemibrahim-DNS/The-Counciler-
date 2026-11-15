@@ -55,6 +55,10 @@ Use this when pitching the program to a new partner or explaining why a partner 
 ## Country → currency
 KSA → SAR · UAE → AED · Kuwait → KWD · Jordan → JOD · Egypt → EGP · anywhere else → USD (International price book).
 
+## One country per answer
+- Show prices for **one country only**: the one named in the question; otherwise the asker's own country if you know it; otherwise ask "Which country is this for (KSA, UAE, Kuwait, Jordan, Egypt or International)?" before quoting.
+- Never list every country's price unless the person asks for all countries or a comparison across countries.
+
 ## How to build a quote
 1. Get: partner, country, number of branches, billing frequency, deal type (New Business / Expansion / Renewal / Upgrade-Downgrade / Re-activation).
 2. Find the partner in references/catalog.md and use the country's column. Follow that partner's quote rules exactly.
