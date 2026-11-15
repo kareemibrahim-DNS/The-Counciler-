@@ -33,12 +33,10 @@ export interface Category {
   pick: string;
 }
 
+/** Team-only discount policy, as rendered text from the POLICY_JSON secret. Its content never lives in this repo. */
 export interface Policy {
-  tiers: [string, string][];
-  ranges: [string, string][];
-  deal: [string, string][];
-  notes: string[];
-  terms: string[];
+  text: string;
+  terms?: string[];
 }
 
 /** Where the bot is talking decides what it may say. */

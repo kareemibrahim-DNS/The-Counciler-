@@ -4,8 +4,7 @@ import { asksForCost, audienceFor } from "../src/policy";
 import { buildSystem, relevantPartners } from "../src/prompt";
 import type { Policy } from "../src/types";
 
-const POLICY: Policy = { tiers: [["TIER-MARKER", "x"]], ranges: [["RANGE-MARKER", "y"]], deal: [["DEAL-MARKER", "z"]],
-  notes: ["NOTE-MARKER"], terms: ["TERMS-MARKER"] };
+const POLICY: Policy = { text: "POLICY-TEXT-MARKER", terms: ["TERMS-MARKER"] };
 
 describe("audience", () => {
   it("treats channels mapped in the secret as partner-only", () => {
@@ -47,19 +46,20 @@ describe("prompt scoping", () => {
     const { stable, audience } = buildSystem({ mode: "partner", partner: "Grubtech" }, new Set(["Grubtech", "Deliverect"]), POLICY);
     expect(audience).toContain("Grubtech - gOnline License");
     expect(audience).not.toContain("Deliverect - Physical License");
-    expect(stable + audience).not.toContain("Branch tiers");
+    expect(stable + audience).not.toContain("POLICY-TEXT-MARKER");
     expect(stable + audience).not.toContain("TERMS-MARKER");
   });
   it("internal prompt includes the discount policy only when the secret provides it", () => {
-    expect(buildSystem({ mode: "internal" }, new Set(), POLICY).audience).toContain("Branch tiers: TIER-MARKER");
+    expect(buildSystem({ mode: "internal" }, new Set(), POLICY).audience).toContain("POLICY (internal):\nPOLICY-TEXT-MARKER");
     expect(buildSystem({ mode: "internal" }, new Set(), POLICY).audience).toContain("TERMS-MARKER");
     const bare = buildSystem({ mode: "internal" }, new Set());
-    expect(bare.stable + bare.audience).not.toContain("Branch tiers");
+    expect(bare.stable + bare.audience).not.toContain("POLICY (internal)");
     expect(bare.audience).toContain("i need discount");
   });
   it("reads the policy and channel map from the secret, and survives a bad one", () => {
     const t = teamData(JSON.stringify({ policy: POLICY, channels: { _note: "x", "partner-x": "Supy" } }));
-    expect(t.policy?.tiers[0][0]).toBe("TIER-MARKER");
+    expect(t.policy?.text).toBe("POLICY-TEXT-MARKER");
+    expect(teamData(JSON.stringify({ policy: { text: " " } })).policy).toBeNull();
     expect(t.channels).toEqual({ "partner-x": "Supy" });
     expect(teamData("not json")).toEqual({ policy: null, channels: {} });
     expect(teamData(undefined)).toEqual({ policy: null, channels: {} });

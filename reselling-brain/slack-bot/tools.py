@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import os
 import re
 import time
@@ -122,10 +123,18 @@ def sheets_read(sheet: str, range: str | None, allowlist: dict, level: str = "te
     return _clip({"sheet": sheet, "range": rng, "rows": vals[:1000]})
 
 
+def drive_folders(sources: dict, env: str | None = None) -> list[str]:
+    """Folder ids from layers.yaml (empty in this repo) plus the BRAIN_DRIVE_FOLDERS secret (commas, spaces or lines)."""
+    raw = os.environ.get("BRAIN_DRIVE_FOLDERS", "") if env is None else env
+    ids = [str(f).strip() for f in (sources.get("drive_folders") or [])] + re.split(r"[\s,;]+", raw)
+    return list(dict.fromkeys(f for f in ids if re.fullmatch(r"[A-Za-z0-9_-]{10,}", f)))
+
+
 def drive_search(query: str, folder_ids: list[str]) -> str:
+    if not folder_ids:
+        raise ValueError("Drive search is limited to the folders in BRAIN_DRIVE_FOLDERS, and none are set.")
     q = "trashed=false and fullText contains '" + query.replace("\\", "\\\\").replace("'", "\\'") + "'"
-    if folder_ids:
-        q += " and (" + " or ".join(f"'{f}' in parents" for f in folder_ids) + ")"
+    q += " and (" + " or ".join(f"'{f}' in parents" for f in folder_ids) + ")"
     res = _google("drive", "v3").files().list(q=q, pageSize=15, fields="files(id,name,mimeType,modifiedTime,webViewLink)",
                                                supportsAllDrives=True, includeItemsFromAllDrives=True, corpora="allDrives").execute()
     return _clip(res.get("files", []))
@@ -397,8 +406,7 @@ def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: 
     """name -> {schema, fn}. Which level may use which tool is decided in layers.yaml."""
     sheets = sources.get("sheets") or {}
     # Drive folder ids are owner-only pointers, so they come from a secret, not from the shared layers.yaml.
-    folders = list(sources.get("drive_folders") or []) + [
-        f.strip() for f in os.environ.get("BRAIN_DRIVE_FOLDERS", "").split(",") if f.strip()]
+    folders = drive_folders(sources)
     t: dict[str, dict] = {}
 
     def add(name: str, desc: str, props: dict, required: list[str], fn: Callable[..., str], level_aware: bool = False):
@@ -424,8 +432,11 @@ def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: 
                 "; ".join(f"{k} = {v.get('title', k)}" for k, v in sheets.items()),
                 {"sheet": {"type": "string", "enum": sorted(sheets)}, "range": {"type": "string", "description": "A1 range, optional"}},
                 ["sheet"], lambda sheet, range=None, _level="team": sheets_read(sheet, range, sheets, _level), level_aware=True)
-        add("drive_search", "Search Google Drive files (contracts, SOPs, policies, partner docs) by text.",
-            {"query": {"type": "string"}}, ["query"], lambda query: drive_search(query, folders))
+        if folders:  # fail closed: without folders the search would cover everything the account can see
+            add("drive_search", "Search Google Drive files (contracts, SOPs, policies, partner docs) by text.",
+                {"query": {"type": "string"}}, ["query"], lambda query: drive_search(query, folders))
+        else:
+            logging.warning("BRAIN_DRIVE_FOLDERS is not set: drive_search is off.")
         add("drive_read", "Read a Google Drive file by id (Docs, Sheets, Slides, PDF, Word, Excel).",
             {"file_id": {"type": "string"}}, ["file_id"], lambda file_id: drive_read(file_id))
     if slack:

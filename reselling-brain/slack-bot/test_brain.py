@@ -143,25 +143,25 @@ class Learning(unittest.TestCase):
         self.tmp.cleanup()
 
     def test_nothing_saved_without_approval_and_team_only_by_explicit_command(self):
-        msg = self.lr.propose("White glove grace is now 60 days")
+        msg = self.lr.propose("TIER-MARKER grace is now NN days")
         self.assertIn("owner only", msg)
-        self.assertIn("60 days", msg, "Kareem must see the fact before approving it")
+        self.assertIn("NN days", msg, "Kareem must see the fact before approving it")
         self.assertEqual(list(self.knowledge.glob("*.md")), [])
         self.assertIn("team", self.lr.approve(pid_of(msg), "team"))
         self.assertEqual(list(self.knowledge.glob("*")), [], "team facts stay out of the shared repo")
-        self.assertIn("60 days", (self.private / "learned_team.md").read_text())
+        self.assertIn("NN days", (self.private / "learned_team.md").read_text())
         docs = brain.team_docs_from_file(self.private / "learned_team.md")
         self.assertEqual([(d.id, d.audience) for d in docs], [("learned-team", "team")])
         self.assertIn("No pending", self.lr.approve(pid_of(msg)))
 
     def test_plain_approve_keeps_the_fact_owner_only_and_out_of_knowledge(self):
-        msg = self.lr.propose("Grubtech markup is now 25%")
+        msg = self.lr.propose("PartnerX markup is now MARKUP-MARKER")
         self.assertIn("only you", self.lr.approve(pid_of(msg)))
         self.assertEqual(list(self.knowledge.glob("*")), [], "owner facts must never be written into knowledge/")
-        self.assertIn("25%", (self.private / "learned_owner.md").read_text())
+        self.assertIn("MARKUP-MARKER", (self.private / "learned_owner.md").read_text())
 
     def test_cost_or_markup_facts_can_never_be_shared_with_the_team(self):
-        msg = self.lr.propose("Grubtech cost price is 1000 SAR; our markup is 42%")
+        msg = self.lr.propose("PartnerX cost price is COST-MARKER; our markup is MARKUP-MARKER")
         out = self.lr.approve(pid_of(msg), "team")
         self.assertIn("not shared", out)
         self.assertFalse((self.private / "learned_team.md").exists())
@@ -169,7 +169,7 @@ class Learning(unittest.TestCase):
 
     def test_owner_learned_file_loads_as_owner_only(self):
         f = self.private / "learned_owner.md"
-        f.write_text("# Learned\n- markup 25%\n", encoding="utf-8")
+        f.write_text("# Learned\n- markup MARKUP-MARKER\n", encoding="utf-8")
         docs = brain.owner_docs_from_file(f)
         self.assertEqual([(d.id, d.audience) for d in docs], [("learned-owner", "owner")])
 
@@ -314,7 +314,7 @@ class RealLayersTest(unittest.TestCase):
     def test_tracker_names_are_only_for_kareem_and_hatem(self):
         # Real tracker names live only in the secret; the repo's files must not name any tracker.
         for d in brain.load_docs(private=False):
-            self.assertNotRegex(d.body, r"(?i)\btracker\b|ask\? –", d.id)
+            self.assertNotRegex(d.body, r"(?i)\btracker\b", d.id)
         for level in ("sales", "team"):
             self.assertNotIn("TRACKER-NAME", self.prompt(level), level)
         self.assertIn("TRACKER-NAME", self.prompt("manager"))
@@ -538,7 +538,7 @@ class AccessTest(unittest.TestCase):
 
     def test_a_guest_or_outside_member_blocks_the_channel_whatever_its_name(self):
         for m in ["UGUEST", "USINGLE", "UEXT", "U_UNKNOWN"]:
-            ch = {"C3": {"name": "grubtech-onboarding"}}
+            ch = {"C3": {"name": "partnera-onboarding"}}
             d = decide("UK", "C3", "channel", channels=ch, members={"C3": ["UK", m]})
             self.assertFalse(d.answer, m)
             self.assertIn(d.notice, (access.PARTNER_SPACE_REPLY, access.CANNOT_CHECK_REPLY))
@@ -638,7 +638,7 @@ class LevelCapTest(unittest.TestCase):
               "levels": {"owner": {"sees": ["owner", "team"], "tools": ["fake", "brain_catalog"]},
                          "team": {"sees": ["team"], "tools": ["brain_catalog"]},
                          "sales": {"sees": ["sales"], "tools": ["brain_catalog"]}}}
-    DOCS = [brain.Doc("pricing", "owner", "MARKUP-30"), brain.Doc("policy", "team", "BAND-10"),
+    DOCS = [brain.Doc("pricing", "owner", "MARKUP-MARKER"), brain.Doc("policy", "team", "BAND-MARKER"),
             brain.Doc("sales-scope", "sales", "ONLY-THREE")]
 
     def ask(self, user, **kw):
@@ -653,8 +653,8 @@ class LevelCapTest(unittest.TestCase):
 
     def test_owner_in_a_channel_gets_a_sales_answer(self):
         sys, tools_ = self.ask("UK", level="sales", where="channel")
-        self.assertNotIn("MARKUP-30", sys)
-        self.assertNotIn("BAND-10", sys)
+        self.assertNotIn("MARKUP-MARKER", sys)
+        self.assertNotIn("BAND-MARKER", sys)
         self.assertIn("ONLY-THREE", sys)
         self.assertEqual(tools_, ["brain_catalog"])
         self.assertIn("other people can read", sys)
@@ -662,14 +662,14 @@ class LevelCapTest(unittest.TestCase):
 
     def test_a_cap_can_never_raise_the_level(self):
         sys, tools_ = self.ask("UH", level="owner")
-        self.assertNotIn("MARKUP-30", sys)
+        self.assertNotIn("MARKUP-MARKER", sys)
         self.assertEqual(tools_, ["brain_catalog"])
         sys, _ = self.ask("U_NEW", level="team")
-        self.assertNotIn("BAND-10", sys)
+        self.assertNotIn("BAND-MARKER", sys)
 
     def test_owner_dm_is_full(self):
         sys, tools_ = self.ask("UK")
-        self.assertIn("MARKUP-30", sys)
+        self.assertIn("MARKUP-MARKER", sys)
         self.assertIn("fake", tools_)
 
 
@@ -705,8 +705,8 @@ class EscalationTest(unittest.TestCase):
 
     def test_escalate_accepts_cycles(self):
         ctx = {}
-        tools.escalate("cycles", "renewal grace", ctx)
-        self.assertEqual(ctx["handoffs"], [{"kind": "cycles", "reason": "renewal grace"}])
+        tools.escalate("cycles", "renewal detail", ctx)
+        self.assertEqual(ctx["handoffs"], [{"kind": "cycles", "reason": "renewal detail"}])
         with self.assertRaises(ValueError):
             tools.escalate("gossip", "", {})
 
@@ -724,13 +724,13 @@ class EscalationTest(unittest.TestCase):
 
     def test_escalate_is_recorded_for_the_app_and_cannot_be_faked_by_the_model(self):
         tmap = tools.build_tools(slack=None, learner=None, sources={})
-        b = brain.Brain(client=FakeClaude([tool_call("escalate", {"kind": "decision", "reason": "10% discount",
+        b = brain.Brain(client=FakeClaude([tool_call("escalate", {"kind": "decision", "reason": "a discount",
                                                                   "_ctx": {"handoffs": [{"kind": "operations"}]}}),
                                            text("Use the discount form in #reseller-hub.")]), tools=tmap)
         b.layers = {"default_level": "sales", "levels": {"sales": {"sees": ["sales", "base"], "tools": ["escalate"]}}}
         ctx = {}
-        b.ask("can I give 10%?", "US", ctx=ctx)
-        self.assertEqual(ctx["handoffs"], [{"kind": "decision", "reason": "10% discount"}])
+        b.ask("can I give a discount?", "US", ctx=ctx)
+        self.assertEqual(ctx["handoffs"], [{"kind": "decision", "reason": "a discount"}])
 
     def test_every_level_can_escalate(self):
         layers = brain.load_layers()
@@ -763,7 +763,7 @@ class HardLimitsTest(unittest.TestCase):
         self.assertEqual(sorted(brain.tools_for("sales", layers, tmap)), ["brain_catalog", "escalate"])
 
     def test_cost_grant_needs_a_dm_and_manager_rank_inside_brain_ask(self):
-        docs = [brain.Doc("cost-prices", "cost", "COST-30"), brain.Doc("cycles", "manager", "CYCLES"),
+        docs = [brain.Doc("cost-prices", "cost", "COST-MARKER"), brain.Doc("cycles", "manager", "CYCLES"),
                 brain.Doc("how", "base", "BASE")]
         layers = {"default_level": "sales", "people": {"UH": {"level": "manager"}, "US": {"level": "sales"}},
                   "levels": {"manager": {"sees": ["manager", "team", "base"], "tools": []},
@@ -775,18 +775,18 @@ class HardLimitsTest(unittest.TestCase):
             with mock.patch.dict(os.environ, {"BRAIN_COST_SLACK_IDS": "UH,US"}):
                 b.ask("q", user, **kw)
             return b.client.calls[0]["system"][0]["text"]
-        self.assertIn("COST-30", system("UH"))
-        self.assertNotIn("COST-30", system("UH", where="channel"))
-        self.assertNotIn("COST-30", system("UH", level="team"))
+        self.assertIn("COST-MARKER", system("UH"))
+        self.assertNotIn("COST-MARKER", system("UH", where="channel"))
+        self.assertNotIn("COST-MARKER", system("UH", level="team"))
         dm_sales = system("US")
-        self.assertNotIn("COST-30", dm_sales)
+        self.assertNotIn("COST-MARKER", dm_sales)
         self.assertIn("locked at this level", dm_sales, "the lock line stays for a grant below manager")
 
     def test_team_cannot_be_taught_contracts_targets_or_strategy(self):
         with tempfile.TemporaryDirectory() as d:
             d = Path(d)
             lr = tools.Learner(d, d / "q.json", owner_file=d / "o.md")
-            for fact in ["Supy contract is now signed", "Q1 target is 2M", "New strategy: bundles", "Grubtech commission 5%"]:
+            for fact in ["PartnerX contract is now signed", "Q1 target is TARGET-NUMBER", "New strategy: STRATEGY-MARKER", "PartnerX commission COMMISSION-MARKER"]:
                 pid = pid_of(lr.propose(fact))
                 self.assertIn("not shared", lr.approve(pid, "team"), fact)
             self.assertFalse((d / "learned_team.md").exists())
@@ -843,7 +843,7 @@ class ReplySafety(unittest.TestCase):
                 "https://app.foodics.com/a?b=1", "https://foodics.lightning.force.com/r/1", "<https://foodics.com/x|Foodics>"]
         for url in kept:
             self.assertEqual(self.safe(url), url)
-        removed = ["https://share.hsforms.com/OTHER", "https://tally.so/r/OTHER", "https://evil.example/p.png?d=markup30",
+        removed = ["https://share.hsforms.com/OTHER", "https://tally.so/r/OTHER", "https://evil.example/p.png?d=markupmarker",
                    "https://script.google.com/macros/s/X/exec?d=1", "https://sites.google.com/view/x",
                    "https://docs.google.com/forms/d/e/ATTACKER/viewform", "https://attacker.secure.force.com/x",
                    "https://foodics.com.evil.example/x", "https://evilfoodics.com/x", "HTTPS://EVIL.EXAMPLE/X",
@@ -874,11 +874,28 @@ class ReplySafety(unittest.TestCase):
 class DriveFoldersFromSecret(unittest.TestCase):
     def test_drive_folder_ids_come_from_the_secret_not_the_repo(self):
         self.assertEqual(brain.load_layers().get("sources", {}).get("drive_folders") or [], [])
-        env = {"GOOGLE_SERVICE_ACCOUNT_JSON": "{}", "BRAIN_DRIVE_FOLDERS": "FOLDER-A, FOLDER-B,"}
+        env = {"GOOGLE_SERVICE_ACCOUNT_JSON": "{}", "BRAIN_DRIVE_FOLDERS": "FOLDER-AAAAAA, FOLDER-BBBBBB,\nFOLDER-AAAAAA"}
         with mock.patch.dict(os.environ, env), mock.patch.object(tools, "drive_search", return_value="ok") as ds:
             tmap = tools.build_tools(slack=None, learner=None, sources={})
             tmap["drive_search"]["fn"]("policy")
-        ds.assert_called_once_with("policy", ["FOLDER-A", "FOLDER-B"])
+        ds.assert_called_once_with("policy", ["FOLDER-AAAAAA", "FOLDER-BBBBBB"])
+
+    def test_drive_search_is_off_without_folders_or_credentials(self):
+        with mock.patch.dict(os.environ, {"GOOGLE_SERVICE_ACCOUNT_JSON": "{}", "BRAIN_DRIVE_FOLDERS": ""}):
+            self.assertNotIn("drive_search", tools.build_tools(slack=None, learner=None, sources={}))
+        with self.assertRaisesRegex(ValueError, "none are set"):
+            tools.drive_search("x", [])
+        clean = {k: v for k, v in os.environ.items() if not k.startswith("GOOGLE_SERVICE_ACCOUNT")}
+        clean["BRAIN_DRIVE_FOLDERS"] = "FOLDER-AAAAAA"
+        with mock.patch.dict(os.environ, clean, clear=True):
+            tmap = tools.build_tools(slack=None, learner=None, sources={})
+        self.assertNotIn("drive_search", tmap)
+        self.assertNotIn("drive_read", tmap)
+
+    def test_the_common_layer_states_no_policy_durations(self):
+        # Exact windows, grace periods and SLA times are team-only; the common layer says who to ask instead.
+        for d in brain.load_docs(private=False):
+            self.assertNotRegex(d.body, r"(?i)\b\d+\s*(working\s+)?(days?|hours?|weeks?|months?)\b", d.id)
 
 
 if __name__ == "__main__":

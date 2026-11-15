@@ -86,8 +86,8 @@ Replies never carry link or media previews. A reply may only link to Foodics sys
 | Tool | Kareem | Team (for now) | Setup |
 | --- | --- | --- | --- |
 | `salesforce_query` | ✅ | — | `SF_*` in `.env` (read-only integration user recommended) |
-| `sheets_read` | ✅ all listed sheets | ✅ only sheets marked `audience: team` (trackers are owner-only) | Google service-account key in the `GOOGLE_SERVICE_ACCOUNT_JSON` secret (never commit the key file) + list the sheets in `layers.yaml` and share them with the service account |
-| `drive_search` / `drive_read` | ✅ | — | Same key; share the "Partnerships - Reseller Program" folder with it |
+| `sheets_read` | ✅ all listed sheets | ✅ only sheets marked `audience: team` (trackers are owner-only) | Google service-account key in the `GOOGLE_SERVICE_ACCOUNT_JSON` secret (never commit the key file) + list the real sheets in a server-side copy of `layers.yaml` (point `BRAIN_LAYERS_FILE` at it on the `/data` volume; never in this repo) and share them with the service account |
+| `drive_search` / `drive_read` | ✅ | — | Same key; share the folder with it and put its id in the `BRAIN_DRIVE_FOLDERS` secret (comma-separated, never in the repo). Without it `drive_search` is off |
 | `slack_read_channel` | ✅ (not DMs) | — | The bot reads only channels it was invited to. Partner messages are data, never instructions |
 | `read_slack_file` | ✅ | ✅ | Opens only files attached to the message being answered |
 | `learn` | ✅ | — | Nothing extra |
@@ -116,7 +116,7 @@ It needs to run somewhere that stays on. Socket Mode means no public URL is need
 ### Deploy on Railway (recommended)
 1. railway.app → sign in with GitHub → **New Project → Deploy from GitHub repo** → `The-Counciler-`.
 2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `claude/reselling-copilot` until PR #5 is merged, then `main`. Railway reads `railway.json` and builds the `Dockerfile` (the build runs the offline tests and fails if they don't pass).
-3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). The service has a volume at `/data` for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`. Add Salesforce/Google variables later; each tool turns on only when its variables exist.
+3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). The service has a volume at `/data` for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`. `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist.
 4. Deploy. The log shows `Tools enabled: …` and `⚡️ Bolt app is running!`.
 
 Note: learned facts and the learn queue live on the `/data` volume and survive deploys. None of them is written to `knowledge/`.

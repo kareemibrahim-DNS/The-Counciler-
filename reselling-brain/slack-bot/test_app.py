@@ -20,7 +20,7 @@ USERS = {OWNER: {"id": OWNER, "team_id": T}, TEAM: {"id": TEAM, "team_id": T}, S
 CHANNELS = {"CPRIV": ({"name": "partnerships-internal", "is_private": True}, [OWNER, TEAM, BOT]),
             "CPUB": ({"name": "reseller-hub", "is_private": False}, [OWNER, TEAM, BOT]),
             "CSHARED": ({"name": "launch", "is_private": True, "is_ext_shared": True}, [OWNER, BOT]),
-            "CGUEST": ({"name": "grubtech-onboarding", "is_private": True}, [OWNER, GUEST, BOT])}
+            "CGUEST": ({"name": "partnera-onboarding", "is_private": True}, [OWNER, GUEST, BOT])}
 CALLS = []
 ABOVE = {}  # channel -> messages above a mention, newest first
 REPLIES = {}  # thread ts -> thread messages
@@ -175,25 +175,25 @@ class AppWiring(unittest.TestCase):
     def test_hand_off_mentions_come_from_code_and_follow_kareems_status(self):
         script = lambda: [tool_call("escalate", {"kind": "decision", "reason": "discount"}),
                           text("Use the discount form in #reseller-hub. <@U0BQKNQNF89>")]
-        said, _ = self.run_event(TEAM, "DT", "can I give 10%?", script())
+        said, _ = self.run_event(TEAM, "DT", "can I give a discount?", script())
         self.assertIn("➡️ Decision needed: <@UK>", said[0]["text"])
         self.assertNotIn("<@U0BQKNQNF89>", said[0]["text"].split("➡️")[0], "the model's own mentions are neutralised")
         self.run_event(OWNER, "DK", "away")
         try:
-            said, _ = self.run_event(TEAM, "DT", "can I give 10%?", script())
+            said, _ = self.run_event(TEAM, "DT", "can I give a discount?", script())
             self.assertIn("➡️ Decision needed: <@U02VD9VGNA0> (Kareem is away)", said[0]["text"])
             said, _ = self.run_event(OWNER, "DK", "status")
             self.assertIn("away", said[0]["text"])
         finally:
             self.run_event(OWNER, "DK", "back")
-        said, _ = self.run_event(TEAM, "DT", "can I give 10%?", script())
+        said, _ = self.run_event(TEAM, "DT", "can I give a discount?", script())
         self.assertIn("<@UK>", said[0]["text"])
 
     def test_away_from_kareems_slack_status(self):
         USERS[OWNER]["profile"] = {"status_emoji": ":palm_tree:", "status_text": "Vacation"}
         app.directory._loaded_at = float("-inf")  # pick up the new status
         try:
-            said, _ = self.run_event(SALES, "DS", "can I give 10%?",
+            said, _ = self.run_event(SALES, "DS", "can I give a discount?",
                                      [tool_call("escalate", {"kind": "operations"}), text("Here is the flow.")])
             self.assertIn("➡️ Operational details: <@U0BQKNQNF89> · cc <@U02VD9VGNA0> (Kareem is away)", said[0]["text"])
         finally:
@@ -212,7 +212,7 @@ class AppWiring(unittest.TestCase):
         self.assertEqual(len(said), 1)
 
     def test_a_workflow_form_parent_is_a_question_not_the_bots_own_answer(self):
-        REPLIES["2.0"] = [{"ts": "2.0", "bot_id": "B_DAILYBOT", "text": "New response for the I need discount form: 12 branches"},
+        REPLIES["2.0"] = [{"ts": "2.0", "bot_id": "B_DAILYBOT", "text": "New response for the I need discount form: BRANCH-COUNT branches"},
                           {"ts": "2.1", "user": TEAM, "text": "<@UBOT> what's the flow?"}]
         try:
             self.run_event(TEAM, "CPRIV", "<@UBOT> what's the flow?", thread_ts="2.0", ts="2.1")
@@ -220,7 +220,7 @@ class AppWiring(unittest.TestCase):
             REPLIES.clear()
         msgs = app.brain.client.calls[0]["messages"]
         self.assertTrue(all(m["role"] == "user" for m in msgs))
-        self.assertIn("12 branches", msgs[-1]["content"])
+        self.assertIn("BRANCH-COUNT branches", msgs[-1]["content"])
 
     def test_the_message_above_skips_join_notices_and_brings_its_file(self):
         ABOVE["CPRIV"] = [{"subtype": "channel_join", "user": SALES, "text": "<@US> has joined the channel", "ts": "1.2"},
@@ -242,7 +242,7 @@ class AppWiring(unittest.TestCase):
         self.assertEqual((args.get("latest"), str(args.get("inclusive")).lower()), ("1.1", "false"))
 
     def test_hand_offs_from_a_dm_say_the_person_is_not_in_the_conversation(self):
-        said, _ = self.run_event(SALES, "DS", "can I give 10%?",
+        said, _ = self.run_event(SALES, "DS", "can I give a discount?",
                                  [tool_call("escalate", {"kind": "decision"}), text("Use the discount form.")])
         self.assertIn("aren't in this conversation", said[0]["text"])
 
@@ -284,9 +284,9 @@ class AppWiring(unittest.TestCase):
         self.assertIn("works in Kuwait (KWD)", app.brain.client.calls[0]["system"][0]["text"])
 
     def test_kareem_sees_the_exact_queued_fact_not_the_models_summary(self):
-        script = [tool_call("learn", {"fact": "Grubtech markup is 42%"}), text("I queued a harmless SLA note.")]
+        script = [tool_call("learn", {"fact": "PartnerX markup is MARKUP-MARKER"}), text("I queued a harmless SLA note.")]
         said, _ = self.run_event(OWNER, "DK", "remember this", script)
-        self.assertIn('(exact text, owner only): "Grubtech markup is 42%"', said[0]["text"])
+        self.assertIn('(exact text, owner only): "PartnerX markup is MARKUP-MARKER"', said[0]["text"])
 
 
 if __name__ == "__main__":

@@ -30,7 +30,7 @@ Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assis
 |---|---|
 | `data/catalog.json` | Salesforce Standard Price Book (SAR, AED, KWD, JOD, EGP) + "USD 1 – International", active Marketplace products |
 | `data/partners.json` | The internal partner guide + Salesforce product descriptions + Partnerships notes |
-| `POLICY_JSON` secret (not in the repo) | Team-only: discount policy, Reseller Policy terms and the partner channel map, as `{"policy": {...}, "channels": {...}}` |
+| `POLICY_JSON` secret (not in the repo) | Team-only: discount policy, Reseller Policy terms and the partner channel map, as `{"policy": {"text": "...", "terms": ["..."]}, "channels": {"<channel>": "<partner>"}}` |
 
 ## Refreshing prices from Salesforce
 `node scripts/refresh-prices.mjs <result.json>…` updates the list prices in `data/catalog.json` from saved PricebookEntry query results (the SOQL is at the top of the script). It never adds or removes lines; it reports new and missing products, and flags lines whose currencies differ by 2× or more. Then copy `data/catalog.json` to `reselling-brain/catalog/`, run `npm run feed:salesforce` in `reseller-programs/` and `python build_sales_skill.py` in `reselling-brain/slack-bot/`.
