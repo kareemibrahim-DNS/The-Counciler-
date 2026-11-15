@@ -37,6 +37,6 @@ Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assis
 
 ## Known data issues
 
-- The old internal price-list sheet doesn't match Salesforce (e.g. Grubtech gOnline Annual 1,311.75 vs 1,421.10 SAR). Its KSA column holds KWD values for Ordable, Zyda and Mnasati. This repo uses Salesforce.
+- Only Salesforce list prices are used here. Old internal price sheets are not, and are never copied into this repo.
 - Eight VOLT lines have inconsistent prices across currencies (flagged ⚠ in the data), e.g. VOLT Hosting with SAP [Monthly] is USD 5,000 but SAR 1,750.
 - ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.
