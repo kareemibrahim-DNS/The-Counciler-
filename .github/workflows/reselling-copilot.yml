@@ -1,0 +1,36 @@
+name: reselling-copilot
+on:
+  pull_request:
+    paths: ["reselling-copilot/**", "reseller-programs/feed/**", "reselling-brain/**", ".github/workflows/reselling-copilot.yml"]
+  push:
+    branches: [main]
+    paths: ["reselling-copilot/**", "reseller-programs/feed/**", "reselling-brain/**"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reselling-copilot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: reselling-copilot/package-lock.json
+      - run: npm ci
+      - run: npm run guard     # blocks any cost / margin data
+      - run: npm run typecheck
+      - run: npm test
+  brain-bot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reselling-brain/slack-bot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --quiet -r requirements.txt
+      - run: python -m unittest test_brain test_app
