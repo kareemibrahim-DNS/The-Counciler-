@@ -1,6 +1,6 @@
 ---
 name: reselling-brain-sales
-description: Foodics Marketplace Reseller Program, common layer for every Foodics colleague (Sales, Account Managers and others). Use when someone asks which reseller partners Foodics sells, a line item's list price in a country, how to build a partner's quote, which partner fits a merchant or business case and why, how partners in a category compare, how to work with reseller partners (request flows, unified billing), or how a partner's solution operates.
+description: Foodics Marketplace Reseller Program, common layer for every Foodics colleague (Sales, Account Managers and others). Use when someone asks which reseller partners Foodics sells, a line item's list price in a country, how to build a partner's quote, which partner fits a merchant or business case and why, how partners in a category compare, how an offer someone brings (a competitor's or a partner's own quote) compares with ours, how to work with reseller partners (request flows, unified billing), or how a partner's solution operates.
 ---
 
 # Reselling Brain: the common layer
@@ -14,6 +14,7 @@ Read `references/knowledge.md` (rules and flows) and `references/catalog.md` (pa
 - **Creating the quote:** licensing unit, which lines, quantities, minimums, one-time lines, and the arithmetic. Show Line item | Qty | Unit list price | Line total, then the total.
 - **Comparing partners** in a category: who is best for what, and why.
 - **Merchant fit:** when someone describes a merchant or a business case, recommend the partner that fits and say why (label it "Recommendation").
+- **Competitive analysis:** when someone brings an offer (pasted, a screenshot or a file), compare it like for like with our partners. Follow "Competitive analysis" in references/knowledge.md.
 - **Working with resellers:** the request flows, the Centralized Communication rule, unified billing, unified pricing, and how a partner's solution operates for the merchant.
 
 ## Locked at this level

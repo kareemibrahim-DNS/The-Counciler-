@@ -68,6 +68,13 @@ SKILL_WORDING = [
     ("(`brain_catalog` shows it)", "(see references/catalog.md)"),
     ("Always use `brain_catalog`: Salesforce wins.", "Always use references/catalog.md: Salesforce wins."),
     ("the bot pulls in Kareem or Hatem.", "ask Kareem Ibrahim or Hatem Ashour."),
+    # 14-competitive-analysis
+    ("Call `brain_catalog` with the category for the asker's country.", "Use the category section in references/catalog.md for the asker's country."),
+    ("open the attached file with `read_slack_file`", "read the attached file"),
+    ("**Find our match** with `brain_catalog`:", "**Find our match** in references/catalog.md:"),
+    ("Our prices are list prices from `brain_catalog` only.", "Our prices are list prices from references/catalog.md only."),
+    ("say so and call `escalate` with kind decision.", "say so, and name Kareem Ibrahim (Hatem Ashour when Kareem is away) for the decision."),
+    ("(unified pricing), and call `escalate` with kind decision.", "(unified pricing), and name Kareem Ibrahim (Hatem Ashour when Kareem is away)."),
 ]
 
 

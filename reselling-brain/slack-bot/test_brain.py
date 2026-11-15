@@ -299,13 +299,14 @@ class RealLayersTest(unittest.TestCase):
 
     def test_sales_sees_the_common_layer_and_nothing_locked(self):
         ids = [d.id for d in brain.visible_docs("sales", self.layers, self.docs)]
-        self.assertEqual(sorted(ids), ["cycles-at-a-glance", "how-to-answer", "line-items-and-quotes", "program-overview",
-                                       "sales-scope", "working-with-resellers"])
+        self.assertEqual(sorted(ids), ["competitive-analysis", "cycles-at-a-glance", "how-to-answer", "line-items-and-quotes",
+                                       "program-overview", "sales-scope", "working-with-resellers"])
         p = self.prompt("sales")
         for secret in ["TEAM-POLICY-MARKER", "DISCOUNT-BANDS-MARKER", "CONTACT-NAME", "COST-TABLE-ROW", "TRACKER-NAME",
                        "CONTRACT-STATUS", "TARGET-NUMBER", "GAP-LIST"]:
             self.assertNotIn(secret, p, secret)
         for common in ["Unified billing", "i need discount", "Centralized Communication", "who fits this merchant",
+                       "Comparing an offer someone brings", "never suggest a discount",
                        "Renewal cycle", "This part I can't answer here", "Unified pricing", "no price burning"]:
             self.assertIn(common, p, common)
         self.assertNotIn("CYCLE-DETAIL-MARKER", p, "cycle details stay at manager level")
@@ -760,7 +761,7 @@ class HardLimitsTest(unittest.TestCase):
         layers = {"levels": {"sales": {"tools": ["brain_catalog", "escalate", "slack_read_channel", "drive_read",
                                                    "salesforce_query", "learn", "sheets_read", "read_slack_file"]}}}
         tmap = {k: {} for k in layers["levels"]["sales"]["tools"]}
-        self.assertEqual(sorted(brain.tools_for("sales", layers, tmap)), ["brain_catalog", "escalate"])
+        self.assertEqual(sorted(brain.tools_for("sales", layers, tmap)), ["brain_catalog", "escalate", "read_slack_file"])
 
     def test_cost_grant_needs_a_dm_and_manager_rank_inside_brain_ask(self):
         docs = [brain.Doc("cost-prices", "cost", "COST-MARKER"), brain.Doc("cycles", "manager", "CYCLES"),
@@ -817,6 +818,15 @@ class SlackReadLimits(unittest.TestCase):
         b.layers = {"levels": {"team": {"sees": ["team"], "tools": ["read_slack_file"]}}, "default_level": "team"}
         b.ask("read it", "UH", ctx={"file_ids": ["F1"]})
         self.assertEqual(got["ctx"], {"file_ids": ["F1"]})
+
+    def test_sales_can_open_only_the_file_they_attached(self):
+        got = {}
+        tmap = {"read_slack_file": {"schema": {"name": "read_slack_file"}, "ctx_aware": True,
+                                    "fn": lambda file_id, _ctx=None: got.setdefault("ctx", _ctx) and "ok"}}
+        b = make_brain([tool_call("read_slack_file", {"file_id": "F9", "_ctx": {"file_ids": ["F9"]}}), text("done")], tmap)
+        b.layers = {"levels": {"sales": {"sees": ["base"], "tools": ["read_slack_file"]}}, "default_level": "sales"}
+        b.ask("compare this offer", "US", ctx={"file_ids": ["F1"]})
+        self.assertEqual(got["ctx"], {"file_ids": ["F1"]}, "the model cannot widen the file list at sales level either")
 
     def test_dms_cannot_be_read(self):
         class Client:

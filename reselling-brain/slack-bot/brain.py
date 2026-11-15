@@ -298,6 +298,7 @@ SALES_TOOL_GUIDE = """
 - Call `brain_catalog` for every partner, line item, price and comparison. Never quote a price from memory.
 - If the tool fails or returns nothing, say so plainly; do not invent the result.
 - When the question needs a decision or operational detail you can't give, explain the flow, then call `escalate` once.
+- When a file is attached (an offer to compare, a price list), open it with `read_slack_file` before you answer.
 """
 TOOL_GUIDE = """
 ## Tools
@@ -316,7 +317,9 @@ LEVEL_RANK = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
 
 # Hard floors, whatever layers.yaml (a shared file) lists: tools that read private sources stay owner-only.
 TOOL_MIN_LEVEL = {"salesforce_query": "owner", "drive_search": "owner", "drive_read": "owner",
-                  "slack_read_channel": "owner", "learn": "owner", "sheets_read": "team", "read_slack_file": "team"}
+                  "slack_read_channel": "owner", "learn": "owner", "sheets_read": "team",
+                  # Everyone may open a file attached to the message being answered, to compare an offer they bring.
+                  "read_slack_file": "sales"}
 
 
 def tools_for(level: str, layers: dict, tools: dict) -> dict:

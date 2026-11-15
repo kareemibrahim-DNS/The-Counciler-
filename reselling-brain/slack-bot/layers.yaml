@@ -34,7 +34,8 @@ levels:
     instructions: "Partnerships team member. Policy, discount eligibility, SLAs, processes, partner operations and the catalogue. No cost, contracts, contacts, trackers, targets or strategy."
   sales:
     sees: [sales, base]
-    tools: [brain_catalog, escalate]
+    # read_slack_file opens only files attached to the message being answered (an offer to compare).
+    tools: [brain_catalog, escalate, read_slack_file]
     instructions: "Sales, Account Manager or any other colleague. The common layer: resellers, list prices, quotes, comparisons, merchant fit, flows and operations. Nothing locked."
 
 # Channels partners can read. The bot never answers there (it tells only the asker, privately).
