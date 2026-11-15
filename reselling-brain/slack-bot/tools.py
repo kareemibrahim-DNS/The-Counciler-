@@ -369,7 +369,9 @@ class Catalog:
             return _clip(out)
         if category:
             n = _norm(category)
-            c = next((x for x in self.categories if _norm(x["id"]) == n or n in _norm(x["name"])), None)
+            # An exact id wins over a name match ("ordering" is not "Ordering platform management").
+            c = (next((x for x in self.categories if _norm(x["id"]) == n), None)
+                 or next((x for x in self.categories if n in _norm(x["name"])), None))
             if not c:
                 return _clip({"error": f"category '{category}' not found", "categories": [x["id"] for x in self.categories]})
             rows = []

@@ -871,6 +871,14 @@ class ReplySafety(unittest.TestCase):
             self.assertEqual(self.safe(text), text)
 
 
+class CategoryLookup(unittest.TestCase):
+    def test_an_exact_category_id_wins_over_a_name_match(self):
+        import json
+        cat = tools.Catalog()
+        self.assertEqual(json.loads(cat.lookup(category="ordering", level="sales"))["category"], "Online ordering & web store")
+        self.assertEqual(json.loads(cat.lookup(category="opm", level="sales"))["category"], "Ordering platform management")
+        self.assertEqual(json.loads(cat.lookup(category="loyalty", level="sales"))["category"], "Loyalty & CRM")
+
 class DriveFoldersFromSecret(unittest.TestCase):
     def test_drive_folder_ids_come_from_the_secret_not_the_repo(self):
         self.assertEqual(brain.load_layers().get("sources", {}).get("drive_folders") or [], [])
