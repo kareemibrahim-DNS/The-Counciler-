@@ -193,7 +193,7 @@ How to choose: Pick on how deep the merchant goes: quick wallet cards, loyalty p
 
 # Category: Online ordering & web store
 
-How to choose: Pick on which aggregators the merchant uses, single vs multi-brand, and country.
+How to choose: Pick on country first. Prices exist only in some currencies, so check that before anything else.
 
 ## Ordable
 - Category: Online ordering & web store

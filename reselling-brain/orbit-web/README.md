@@ -1,6 +1,6 @@
 # Reseller Bot web surface (built in Orbit, kept here)
 
-These files are the web version of the reseller bot that was built inside Orbit (PR #122 on `orbit-reselling-wizard`, not merged). They are kept here so everything from this project lives in The-Counciler-. **Nothing here changes Orbit, and nothing is synced back.**
+These files are the web version of the reseller bot that was built inside Orbit. They are kept here so everything from this project lives in The-Counciler-. **Nothing here changes Orbit, and nothing is synced back.**
 
 | File | What it is |
 | --- | --- |
