@@ -31,12 +31,14 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from access import OWNER_DM_ONLY_REPLY, Directory, country_of, decide, handoff_lines, is_away, is_owner_command
-from brain import KNOWLEDGE_DIR, OWNER_LEARNED_FILE, TEAM_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply
+from brain import (KNOWLEDGE_DIR, OWNER_LEARNED_FILE, TEAM_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply,
+                   secret_summary)
 from tools import Learner, SlackReader, build_tools
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
+logging.info(secret_summary())
 REQUIRED_ENV = ("SLACK_BOT_TOKEN", "SLACK_APP_TOKEN", "ANTHROPIC_API_KEY")
 _missing = [name for name in REQUIRED_ENV if not os.environ.get(name, "").strip()]
 if _missing:

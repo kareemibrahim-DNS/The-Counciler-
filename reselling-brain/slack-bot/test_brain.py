@@ -392,6 +392,10 @@ class RealLayersTest(unittest.TestCase):
         zipped = base64.b64encode(gzip.compress(json.dumps(items).encode())).decode()
         self.assertEqual([(d.id, d.audience, d.body) for d in brain.owner_docs_from_env(zipped)], [("p", "team", "GZ-MARKER")])
         self.assertEqual(tools.team_catalog_notes(zipped), {"Supy": {"watch": "Y"}})
+        self.assertEqual(brain.secret_summary(zipped),
+                         "Private knowledge loaded: 1 team, 0 manager, 0 cost, 0 owner docs, team notes for 1 partners.")
+        self.assertIn("can't be read", brain.secret_summary(zipped[:-8] + "AAAAAAA="))
+        self.assertIn("not set", brain.secret_summary(""))
 
     def test_sales_never_sees_discount_rules(self):
         cat = tools.Catalog()

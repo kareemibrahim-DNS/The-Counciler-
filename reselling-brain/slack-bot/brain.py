@@ -70,6 +70,22 @@ def owner_docs_from_env(value: str | None = None) -> list[Doc]:
                 body=str(i["body"]).strip()) for i in items if i.get("id") and i.get("body")]
 
 
+def secret_summary(value: str | None = None) -> str:
+    """One log line that says whether the secret loaded, with counts only (never ids or text)."""
+    raw = os.environ.get("BRAIN_OWNER_KNOWLEDGE_B64", "") if value is None else value
+    if not raw.strip():
+        return "BRAIN_OWNER_KNOWLEDGE_B64 is not set: only the common layer is loaded."
+    try:
+        items = decode_secret(raw)
+    except Exception as exc:
+        return f"BRAIN_OWNER_KNOWLEDGE_B64 can't be read ({type(exc).__name__}). Set it again from Kareem's copy."
+    docs = owner_docs_from_env(raw)
+    counts = {a: sum(d.audience == a for d in docs) for a in PRIVATE_AUDIENCES}
+    notes = next((len(i.get("catalog") or {}) for i in items if isinstance(i, dict) and i.get("catalog")), 0)
+    return ("Private knowledge loaded: " + ", ".join(f"{n} {a}" for a, n in counts.items())
+            + f" docs, team notes for {notes} partners.")
+
+
 def owner_docs_from_file(path: Path = OWNER_LEARNED_FILE) -> list[Doc]:
     """Facts Kareem approved as owner-only with `approve <id>`. Always audience owner."""
     if not path.exists():
