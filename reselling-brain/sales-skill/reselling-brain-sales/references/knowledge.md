@@ -129,26 +129,26 @@ Use this for a generic answer: the cycle exists, where an issue usually comes fr
 - **Take care:** fill in every field, and promise nothing until it is approved.
 
 ## Billing cycle (unified billing)
-- **How it runs:** Foodics invoices and collects every reseller deal. The subscription and the 30-day window for changes count from the invoice issue date, not from the service start date.
-- **Issues usually come from:** counting from the go-live date instead of the invoice date.
-- **Take care:** check the invoice date before you promise a refund, cancellation, upgrade or downgrade.
+- **How it runs:** Foodics invoices and collects every reseller deal. Dates and change windows follow the Reseller Policy.
+- **Issues usually come from:** promising the merchant a date or a change before Partnerships confirms it.
+- **Take care:** check with Partnerships before you promise a refund, cancellation, upgrade or downgrade.
 
 ## Renewal cycle
-- **How it runs:** renewal invoices go out ahead of the renewal date. A merchant who doesn't pay gets a grace period that depends on their tier before the renewal counts as lost. On renewal, the merchant goes back to list prices.
-- **Issues usually come from:** a non-renewal flagged too late, or a merchant expecting their first-year price to carry on.
+- **How it runs:** renewal invoices go out ahead of the renewal date. Payment terms and renewal pricing follow the Reseller Policy.
+- **Issues usually come from:** a non-renewal flagged too late, or a renewal price promised before checking with Partnerships.
 - **Take care:** tell Partnerships about a non-renewal **before** the renewal date. The Salesforce alert alone is not the flag.
 
 ## Bought but not live
-- **How it runs:** a service that was bought but isn't live yet has no refund right. The fix is a billing adjustment (moving the start and end dates).
-- **Issues usually come from:** asking for a refund instead of an adjustment.
-- **Take care:** ask Partnerships for a billing adjustment.
+- **How it runs:** a service that was bought but isn't live yet goes to Partnerships, who decide how billing is handled.
+- **Issues usually come from:** promising the merchant a refund or a fix before Partnerships decides.
+- **Take care:** raise it with Partnerships in #reseller-hub.
 
 ## Blocked accounts (MP block)
-- **How it runs:** a blocked account goes from #mp-block-requests to the partner, who deactivates the service. It's a deactivation only, not churn.
+- **How it runs:** a blocked account goes from #mp-block-requests to the partner, who deactivates the service.
 - **Issues usually come from:** a request sent outside #mp-block-requests.
 - **Take care:** use #mp-block-requests only.
 
 ## Partner tickets
-- **How it runs:** a ticket moves through statuses until it is closed: open, waiting on a reply, pending, urgent. A re-opened ticket starts again.
+- **How it runs:** a partner ticket stays with Partnerships until it is closed.
 - **Issues usually come from:** a ticket stuck because one side is waiting on the other.
 - **Take care:** keep the case in one thread with Partnerships, and never contact the partner directly.

@@ -13,7 +13,7 @@ describe("audience", () => {
     expect(audienceFor({ name: "partner-x", isIm: false, isExtShared: false }, channels)).toEqual({ mode: "partner", partner: "Grubtech" });
   });
   it("refuses partner-named channels even without the secret", () => {
-    for (const name of ["ksa-grubtech", "uae-supy", "egypt-x", "kw-jo-y", "foodics-z"])
+    for (const name of ["ksa-w", "uae-v", "egypt-x", "kw-jo-y", "foodics-z"])
       expect(audienceFor({ name, isIm: false, isExtShared: false }).mode, name).toBe("external");
   });
   it("refuses unmapped shared channels", () => {

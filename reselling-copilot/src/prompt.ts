@@ -84,7 +84,7 @@ function audienceRules(a: Audience, policy: Policy | null): string {
     return `\n\nAUDIENCE: This channel includes staff from ${a.partner}. Answer ONLY about ${a.partner}. Do not name, price or compare any other partner. Do not mention discount rules, approval bands, or internal policy; give list prices and structure only. If asked about another partner, reply: "I can only discuss ${a.partner} in this channel."`;
   if (!policy)
     return `\n\nAUDIENCE: Foodics internal. Discount rules are not loaded here: for a discount, point to the "i need discount" form in #reseller-hub.`;
-  return `\n\nAUDIENCE: Foodics internal. You may include "Discount eligibility" on quotes using the POLICY (branch tier × billing range × deal type; one-time fees are never discounted).\n\nPOLICY (internal):\nBranch tiers: ${policy.tiers.map((t) => t.join(": ")).join("; ")}.\nRanges: ${policy.ranges.map((t) => t.join(": ")).join("; ")}.\nDeal types: ${policy.deal.map((t) => t.join(": ")).join("; ")}.\nNotes: ${policy.notes.join(" ")}`;
+  return `\n\nAUDIENCE: Foodics internal. You may include "Discount eligibility" on quotes using the POLICY below.\n\nPOLICY (internal):\nBranch tiers: ${policy.tiers.map((t) => t.join(": ")).join("; ")}.\nRanges: ${policy.ranges.map((t) => t.join(": ")).join("; ")}.\nDeal types: ${policy.deal.map((t) => t.join(": ")).join("; ")}.\nNotes: ${policy.notes.join(" ")}`;
 }
 
 /** Stable part first (cacheable), then the audience-specific part. */

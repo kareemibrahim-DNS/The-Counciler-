@@ -199,7 +199,7 @@ class PartnerSpaceTest(unittest.TestCase):
         return brain.partner_space(**base)
 
     def test_partner_country_and_shared_channels_are_blocked(self):
-        for name in ["ksa-grubtech", "uae-deliverect", "egypt-urbanpiper", "kw-jo-grubtech", "foodics-urbanpiper"]:
+        for name in ["ksa-partnera", "uae-partnerb", "egypt-partnerc", "kw-jo-partnerd", "foodics-partnere"]:
             self.assertTrue(self.gate(channel_name=name), name)
 
     def test_slack_connect_channels_and_external_users_are_blocked(self):
@@ -211,7 +211,7 @@ class PartnerSpaceTest(unittest.TestCase):
         self.assertFalse(self.gate(is_im=True))
 
     def test_allowed_channels_override_a_pattern(self):
-        self.assertFalse(self.gate(channel_name="ksa-reselling-internal", layers={"allowed_channels": ["ksa-reselling-internal"]}))
+        self.assertFalse(self.gate(channel_name="ksa-internal-example", layers={"allowed_channels": ["ksa-internal-example"]}))
 
 
 class CatalogTest(unittest.TestCase):
@@ -251,7 +251,7 @@ class RealLayersTest(unittest.TestCase):
                 {"id": "discount-eligibility", "audience": "team", "body": "DISCOUNT-BANDS-MARKER."},
                 {"id": "catalog-team-notes", "audience": "team", "catalog": {"Supy": {"watch": "TEAM-WATCH-MARKER."}}},
                 {"id": "trackers-and-contacts", "audience": "manager", "body": "Partner X: CONTACT-NAME. TRACKER-NAME tracker."},
-                {"id": "program-cycles", "audience": "manager", "body": "Q4 target TARGET-NUMBER USD."},
+                {"id": "program-cycles", "audience": "manager", "body": "Q4 target TARGET-NUMBER USD. CYCLE-DETAIL-MARKER."},
                 {"id": "cost-prices", "audience": "cost", "body": "| COST-TABLE-ROW |"},
                 {"id": "contracts", "audience": "cost", "body": "Partner Y CONTRACT-STATUS."},
                 {"id": "gaps", "body": "GAP-LIST"},
@@ -308,8 +308,8 @@ class RealLayersTest(unittest.TestCase):
         for common in ["Unified billing", "i need discount", "Centralized Communication", "who fits this merchant",
                        "Renewal cycle", "This part I can't answer here", "Unified pricing", "no price burning"]:
             self.assertIn(common, p, common)
-        for deep in ["45 days", "3 months before", "48 working hours", "15 days"]:  # cycle details stay deeper
-            self.assertNotIn(deep, p, deep)
+        self.assertNotIn("CYCLE-DETAIL-MARKER", p, "cycle details stay at manager level")
+        self.assertIn("CYCLE-DETAIL-MARKER", self.prompt("manager"))
 
     def test_tracker_names_are_only_for_kareem_and_hatem(self):
         # Real tracker names live only in the secret; the repo's files must not name any tracker.
@@ -546,7 +546,7 @@ class AccessTest(unittest.TestCase):
     def test_shared_pending_and_partner_named_channels_are_blocked(self):
         for ch in [{"name": "x", "is_ext_shared": True}, {"name": "x", "is_shared": True},
                    {"name": "x", "is_pending_ext_shared": True}, {"name": "x", "pending_shared": ["TGRUBTECH"]},
-                   {"name": "ksa-grubtech"}, {"name": "foodics-urbanpiper"}, {"name": "g", "is_mpim": True}]:
+                   {"name": "ksa-partnera"}, {"name": "foodics-partnerb"}, {"name": "g", "is_mpim": True}]:
             d = decide("UK", "C4", "channel", channels={"C4": ch}, members={"C4": ["UK"]})
             self.assertFalse(d.answer, ch)
 
@@ -864,11 +864,21 @@ class ReplySafety(unittest.TestCase):
         self.assertEqual(out, "https://docs.google.com/spreadsheets/d/1AbCdEfGhIjKlMnOp")
 
     def test_pings_are_neutralised_and_text_is_kept(self):
-        out = self.safe("ping <!channel> <!here|here> <!subteam^S123|group> <@U012345> <@W0ABC|bob> <#C123|ksa-grubtech>")
+        out = self.safe("ping <!channel> <!here|here> <!subteam^S123|group> <@U012345> <@W0ABC|bob> <#C123|ksa-partnera>")
         for raw in ["<!channel>", "<!here", "<!subteam", "<@U012345>", "<@W0ABC"]:
             self.assertNotIn(raw, out)
         for text in ["Use Basic for <3 terminals", "Node.js, e.g. ARR 1.5", "Form: https://share.hsforms.com/1zJtdrnCcQOmv9G6xplalig5lyyw."]:
             self.assertEqual(self.safe(text), text)
+
+
+class DriveFoldersFromSecret(unittest.TestCase):
+    def test_drive_folder_ids_come_from_the_secret_not_the_repo(self):
+        self.assertEqual(brain.load_layers().get("sources", {}).get("drive_folders") or [], [])
+        env = {"GOOGLE_SERVICE_ACCOUNT_JSON": "{}", "BRAIN_DRIVE_FOLDERS": "FOLDER-A, FOLDER-B,"}
+        with mock.patch.dict(os.environ, env), mock.patch.object(tools, "drive_search", return_value="ok") as ds:
+            tmap = tools.build_tools(slack=None, learner=None, sources={})
+            tmap["drive_search"]["fn"]("policy")
+        ds.assert_called_once_with("policy", ["FOLDER-A", "FOLDER-B"])
 
 
 if __name__ == "__main__":

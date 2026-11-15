@@ -41,8 +41,8 @@ levels:
 # Slack Connect channels, channels with a guest or an outside member, and users from another
 # workspace are always blocked, whatever the channel name.
 blocked_channels:
-  - "^(ksa|uae|egypt|kw-jo|kw|jo|eg)-"   # per-partner country channels, e.g. ksa-grubtech
-  - "^foodics-"                         # shared channels, e.g. foodics-urbanpiper
+  - "^(ksa|uae|egypt|kw-jo|kw|jo|eg)-"   # per-partner country channels, e.g. ksa-<partner>
+  - "^foodics-"                         # shared channels, e.g. foodics-<partner>
 # Internal channels that match a pattern above can be allowed here (the member check still applies).
 allowed_channels: []
 
@@ -75,5 +75,5 @@ sources:
     # Trackers are manager-level (Kareem, 14 Nov 2026): give them audience: manager, never team.
     # example: { id: "<spreadsheet id>", title: "<sheet title>", range: "A1:Z1000", audience: manager }
     # (real sheet names are added on the server, not in this shared repo)
-  drive_folders:
-    - 1w3T0Ql99xAt9n1a6HwalH3sY1AiB98uL   # Partnerships - Reseller Program
+  # Drive folders (owner only) come from the BRAIN_DRIVE_FOLDERS secret (comma-separated ids), not from this shared repo.
+  drive_folders: []

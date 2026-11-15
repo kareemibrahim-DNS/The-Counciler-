@@ -396,7 +396,9 @@ def escalate(kind: str, reason: str = "", ctx: dict | None = None) -> str:
 def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: dict, catalog: Catalog | None = None) -> dict[str, dict]:
     """name -> {schema, fn}. Which level may use which tool is decided in layers.yaml."""
     sheets = sources.get("sheets") or {}
-    folders = sources.get("drive_folders") or []
+    # Drive folder ids are owner-only pointers, so they come from a secret, not from the shared layers.yaml.
+    folders = list(sources.get("drive_folders") or []) + [
+        f.strip() for f in os.environ.get("BRAIN_DRIVE_FOLDERS", "").split(",") if f.strip()]
     t: dict[str, dict] = {}
 
     def add(name: str, desc: str, props: dict, required: list[str], fn: Callable[..., str], level_aware: bool = False):

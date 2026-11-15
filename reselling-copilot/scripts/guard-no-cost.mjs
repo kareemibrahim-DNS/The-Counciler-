@@ -63,6 +63,26 @@ for (const file of ["web/index.html", ...readdirSync("data").map((f) => join("da
   for (const re of DISCOUNT_BANDS) if (re.test(text)) problems.push(`${file}: looks like discount bands (${re})`);
 }
 
+// Real partner channel names (<country>-<partner>, foodics-<partner>) are team-only, in tests and comments too.
+{
+  const partners = JSON.parse(readFileSync("data/partners.json", "utf8"));
+  const slugs = Object.keys(partners).filter((n) => !/[()]/.test(n)).map((n) => n.toLowerCase().replace(/[^a-z0-9]/g, ""));
+  const REAL_CHANNEL = new RegExp(`\\b(ksa|uae|egypt|kw-jo|kw|jo|eg|foodics)-(${slugs.join("|")})\\b`, "i");
+  const EXT = /\.(md|mdc|py|ts|js|mjs|ya?ml|json|html|csv|txt)$/;
+  const walk = (dir) => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (["node_modules", ".git", "dist", ".wrangler"].includes(e.name)) continue;
+      const f = join(dir, e.name);
+      if (e.isDirectory()) walk(f);
+      else if (EXT.test(e.name)) {
+        const m = readFileSync(f, "utf8").match(REAL_CHANNEL);
+        if (m) problems.push(`${f}: names the partner channel "${m[0]}" (team-only; use a placeholder like ksa-partnera)`);
+      }
+    }
+  };
+  walk("..");
+}
+
 // Reselling Brain (../reselling-brain): only the common layer (base, sales) lives in this shared repo.
 // Team, manager, cost and owner knowledge reaches the bot through the BRAIN_OWNER_KNOWLEDGE_B64 secret.
 const BRAIN = "../reselling-brain";
@@ -75,7 +95,7 @@ for (const f of brainFiles) {
   if (!["base", "sales"].includes(audience)) problems.push(`${file}: audience must be base or sales here (team, manager, cost and owner files stay in the secret)`);
   if (PARTNER_CHANNEL.test(text)) problems.push(`${file}: names a partner channel (team-only)`);
   for (const re of DISCOUNT_BANDS) if (re.test(text)) problems.push(`${file}: looks like discount bands (${re})`);
-  if (/\b(30|27|23|20)\s?%/.test(text) && /markup/i.test(text) && /\|\s*(Monthly|Annual|Quarterly)[^|]*\|\s*\d+\s?%/i.test(text)) problems.push(`${file}: looks like a markup table`);
+  if (/markup/i.test(text) && /\|\s*(Monthly|Annual|Quarterly)[^|]*\|\s*\d+\s?%/i.test(text)) problems.push(`${file}: looks like a markup table`);
   // Targets or KPIs with real amounts are manager-only (no real values are written here).
   if (/\btargets?\b[^\n]{0,60}\d{1,3}(,\d{3}){2}|\$\d+(\.\d+)?M\b[^\n]{0,20}\bKPI\b/i.test(text)) problems.push(`${file}: looks like owner targets`);
   if (/\btracker\b/i.test(text)) problems.push(`${file}: names an internal tracker (trackers are for Kareem and Hatem only)`);
