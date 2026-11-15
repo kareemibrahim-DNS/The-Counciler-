@@ -1,17 +1,17 @@
-# Reselling Brain
+# Reselling Brain: the Foodics Reseller Bot
 
-One brain for the Foodics Reseller Program, used in three places:
+This folder, in The-Counciler-, is the home of the reseller bot. Everything lives here; nothing is synced to another repo.
+**Never change `orbit-reselling-wizard` (Orbit) from this work** (Kareem, 15 Nov 2026).
 
-| Surface | Who | Folder |
+| Surface | Who | Where |
 | --- | --- | --- |
-| Claude Skill | Kareem | saved from the review card in Claude |
-| Slack bot | The team | `slack-bot/` |
-| Orbit | Orbit users | `orbit-reselling-wizard` (`/api/brain` + `reselling-brain.html`), built from a copy of these files |
+| Slack bot (with layers) | Everyone at Foodics | `slack-bot/`, deployed on Railway from this folder |
+| Claude skill (common layer) | Anyone using @Claude in Slack | `sales-skill/`, built by `slack-bot/build_sales_skill.py` |
+| Owner skill | Kareem | uploaded in Kareem's own Claude account |
 
-All three read the same files in `knowledge/` (rules, policy, partners) and `catalog/` (line items and Salesforce list prices). To update the brain, edit a file there, then:
-- Slack: send `reload` to the bot (Kareem only), or restart it.
-- Orbit: copy the changed files to `orbit-reselling-wizard/reselling-brain/`, run `node scripts/build-brain-knowledge.mjs` there and open a PR.
-- Skill: ask Claude to update the Reselling Brain skill.
+All of them read the same files in `knowledge/` (rules, policy, partners, flows, cycles) and `catalog/` (line items and Salesforce list prices). To update the brain, edit a file there, then:
+- Slack: push to the deploy branch (Railway redeploys) or send `reload` to the bot (Kareem only).
+- Claude skill: run `cd slack-bot && python build_sales_skill.py --zip /tmp` and upload the zip.
 
 ## Common-layer skill for @Claude in Slack (no IT approval needed)
 The Claude app is already installed in the Foodics Slack. It gives **everyone the same knowledge** (no layers), so it only ever gets the common layer: `sales-skill/reselling-brain-sales/` (the `base` knowledge files plus the catalogue: resellers, list prices, quotes, comparisons, merchant fit, forms, flows). It is built from the bot's own files:
@@ -33,7 +33,7 @@ This repo is shared with other AI assistants. Manager, cost and owner files (cyc
 | cost grant | only the Slack IDs in the `BRAIN_COST_SLACK_IDS` secret (Hatem) | + cost prices and contracts, in a private DM only |
 | owner | Kareem (the `BRAIN_OWNER_SLACK_ID` secret) | Everything |
 
-Deny by default: a Slack user who is not in `layers.yaml` gets the sales layer. Partners in Orbit get no access.
+Deny by default: a Slack user who is not in `layers.yaml` gets the sales layer. Partners get nothing.
 The owner and the cost grant come only from Railway secrets. A line in `layers.yaml` alone can't give them, because this repo is shared.
 
 ### Triggers: when the bot answers

@@ -18,6 +18,7 @@ This repo is worked on by several AI assistants plus the Foodics Partnerships te
 4. **Exact Salesforce names.** Line-item names in `data/catalog.json` must match Salesforce exactly. Don't rename, translate or "fix" them.
 5. **Don't invent data.** If a price, partner or rule is missing, leave it missing and open an issue tagged `needs-data`.
 6. **Small PRs.** One task per PR, with `npm run check` passing. Describe what you changed and how you tested it.
+7. **The reseller bot lives here.** The Reselling Brain (`reselling-brain/`) is the reseller bot. Never change `kareemibrahim-DNS/orbit-reselling-wizard` (Orbit) as part of this work: no commits, branches, PRs or syncs there.
 
 ## Commands
 

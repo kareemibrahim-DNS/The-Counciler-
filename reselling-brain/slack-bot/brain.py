@@ -1,7 +1,7 @@
 """Reselling Brain core: loads the shared knowledge files and asks Claude.
 
-The same knowledge folder feeds the Claude Skill and Orbit, so an update in
-../knowledge reaches every surface.
+The same knowledge folder feeds the Slack bot and the common-layer Claude skill,
+so an update in ../knowledge reaches every surface. This repo is the only home.
 """
 from __future__ import annotations
 

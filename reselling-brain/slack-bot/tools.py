@@ -258,7 +258,7 @@ class Learner:
         return "\n".join(f"#{k} [{v['audience']}] {v['fact']}" for k, v in q.items()) or "Nothing pending."
 
 
-# ---------- catalogue (list prices only; same files Orbit builds from) ----------
+# ---------- catalogue (list prices only; same files the Claude skill is built from) ----------
 CATALOG_DIR = Path(os.environ.get("BRAIN_CATALOG_DIR", Path(__file__).resolve().parent.parent / "catalog"))
 CURRENCY = {"SA": "SAR", "KSA": "SAR", "AE": "AED", "UAE": "AED", "KW": "KWD", "KWT": "KWD",
             "JO": "JOD", "JOR": "JOD", "EG": "EGP", "EGT": "EGP", "INT": "USD", "USD": "USD"}

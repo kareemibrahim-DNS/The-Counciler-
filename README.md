@@ -1,5 +1,10 @@
 # The Counciler
 
+## The Foodics Reseller Bot lives here
+**`reselling-brain/`** is the reseller bot: the Slack bot (deployed on Railway) with layers (everyone, team, manager, cost, owner), mention triggers and hand-offs to Kareem, Hatem and Althurayyaa; the knowledge files; the Salesforce list-price catalogue; and the common-layer skill for @Claude in Slack. Start at `reselling-brain/README.md`.
+Nothing is synced to Orbit (`orbit-reselling-wizard`); never change Orbit from this repo's work.
+
+## Also in this repo
 Kareem's personal AI Council: send an idea from the app or from Slack, the best-suited AI replies with a 1-2-3 plan, and the app shows how much API balance is left and when it runs out.
 
 - **SPEC.md** — the full project spec. Read it before writing any code.
