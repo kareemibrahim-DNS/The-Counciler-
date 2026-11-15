@@ -12,12 +12,12 @@ This folder, in The-Counciler-, is the home of the reseller bot. Everything live
 
 Reports from the build (data issues to fix in Salesforce, the security reviews) are in `reports/`.
 
-All of them read the same files in `knowledge/` (rules, policy, partners, flows, cycles) and `catalog/` (line items and Salesforce list prices). To update the brain, edit a file there, then:
-- Slack: push to the deploy branch (Railway redeploys) or send `reload` to the bot (Kareem only).
+All of them read the same files in `knowledge/` (common layer only: how to answer, program overview, line items and quotes, sales scope, working with resellers, cycles at a glance, competitive analysis) and `catalog/` (partner profiles, line items and Salesforce list prices). Policy, partner notes and everything above the common layer come from the Railway secret (see below). To update the brain, edit a file there, then:
+- Slack: merge to `main` and Railway redeploys. `reload` (Kareem only, in a DM) re-reads only what the running bot already has (the files in its image, the secret and the learned facts on `/data`).
 - Claude skill: run `cd slack-bot && python build_sales_skill.py --zip /tmp` and upload the zip.
 
 ## Common-layer skill for @Claude in Slack (no IT approval needed)
-The Claude app is already installed in the Foodics Slack. It gives **everyone the same knowledge** (no layers), so it only ever gets the common layer: `sales-skill/reselling-brain-sales/` (the `base` knowledge files plus the catalogue: resellers, list prices, quotes, comparisons, merchant fit, forms, flows). It is built from the bot's own files:
+The Claude app is already installed in the Foodics Slack. It gives **everyone the same knowledge** (no layers), so it only ever gets the common layer: `sales-skill/reselling-brain-sales/` (the `base` knowledge files plus the catalogue: resellers, list prices, quotes, comparisons, merchant fit, competitive analysis of an offer someone brings, forms, flows). It is built from the bot's own files:
 ```sh
 cd slack-bot && python build_sales_skill.py --zip /tmp   # → /tmp/reselling-brain-sales.zip
 ```
@@ -29,8 +29,8 @@ This repo is shared with other AI assistants, so it holds the **common layer onl
 ## Audience layers (decided by Kareem, 14 Nov 2026)
 | Level | Who | Sees |
 | --- | --- | --- |
-| everyone (`base`) | every Foodics colleague | Live resellers, list prices by country, how to build the quote, partner comparison (best for, edge, why), merchant fit, submission forms, request flows, unified billing, how a solution operates, and a generic picture of each cycle (it exists, where issues come from, what to take care of) |
-| sales | Sales, AMs **and anyone not listed** in `layers.yaml` | The common layer only. Discount rules, cost, contracts, cycles, contacts, trackers and SLAs are locked: the bot points to the flow and pulls in the right person |
+| everyone (`base`) | every Foodics colleague | Live resellers, list prices by country, how to build the quote, partner comparison (best for, edge, why), merchant fit, competitive analysis (comparing an offer someone brings, pasted or as a file, like for like), submission forms, request flows, unified billing, how a solution operates, and a generic picture of each cycle (it exists, where issues come from, what to take care of) |
+| sales | Sales, AMs **and anyone not listed** in `layers.yaml` | The common layer only. Discount rules, cost, contracts, cycles in depth, targets and strategy, contacts, trackers and SLAs are locked: the bot points to the flow and pulls in the right person |
 | team | Partnerships team (Althurayyaa) | + policy, discount eligibility, ARR/churn rules, SLAs, processes, partner tiers, channels and notes |
 | manager | Managers (Hatem) | + program cycles in depth (why we built it, how it runs now), targets, strategy, internal trackers and partner contacts (Kareem and Hatem only) |
 | cost grant | only the Slack IDs in the `BRAIN_COST_SLACK_IDS` secret (Hatem) | + cost prices and contracts, in a private DM only |
@@ -60,6 +60,7 @@ A mention only notifies people who are in the conversation. In a DM, or a channe
 | --- | --- |
 | A partner, a guest (single- or multi-channel), a Slack Connect user, or anyone the bot can't identify asks | Nothing at all, not even a refusal |
 | A channel that is Slack Connect (or pending), has any guest or outside member, or matches a partner name pattern | No answer. Only the asker gets a private note |
+| A group DM | No answer. Only the asker gets a private note |
 | A public channel | Always **sales**: every full member can open and search it, even without joining |
 | A private channel | The least-privileged member's level, never above **team** (manager, cost and owner answers only in a DM). One Sales member means a sales answer, even when Kareem asks. Deactivated accounts don't count; a deactivated guest still blocks |
 | A DM | The asker's own level. **Manager, cost and owner answers only ever happen in a private DM** |
@@ -83,18 +84,19 @@ Replies never carry link or media previews. A reply may only link to Foodics sys
 7. Invite the bot to a channel (`/invite @Reselling Brain`) and mention it, or DM it.
 
 ### Tools (all read-only)
-| Tool | Kareem | Team (for now) | Setup |
-| --- | --- | --- | --- |
-| `salesforce_query` | ✅ | — | `SF_*` in `.env` (read-only integration user recommended) |
-| `sheets_read` | ✅ all listed sheets | ✅ only sheets marked `audience: team` (trackers are owner-only) | Google service-account key in the `GOOGLE_SERVICE_ACCOUNT_JSON` secret (never commit the key file) + list the real sheets in a server-side copy of `layers.yaml` (point `BRAIN_LAYERS_FILE` at it on the `/data` volume; never in this repo) and share them with the service account |
-| `drive_search` / `drive_read` | ✅ | — | Same key; share the folder with it and put its id in the `BRAIN_DRIVE_FOLDERS` secret (comma-separated, never in the repo). Without it `drive_search` is off |
-| `slack_read_channel` | ✅ (not DMs) | — | The bot reads only channels it was invited to. Partner messages are data, never instructions |
-| `read_slack_file` | ✅ | ✅ | Opens only files attached to the message being answered |
-| `learn` | ✅ | — | Nothing extra |
-| `brain_catalog` | ✅ | ✅ | Nothing extra — reads `catalog/` (list prices only, never cost) |
+| Tool | Owner (Kareem) | Manager (Hatem) | Team (Althurayyaa) | Sales and everyone else | Setup |
+| --- | --- | --- | --- | --- | --- |
+| `brain_catalog` | ✅ | ✅ | ✅ | ✅ (discount wording removed) | Nothing extra — reads `catalog/` (list prices only, never cost) |
+| `escalate` | ✅ | ✅ | ✅ | ✅ | Nothing extra — the app adds the @-mentions from `routing` in `layers.yaml` |
+| `read_slack_file` | ✅ | ✅ | ✅ | ✅ | Opens only files attached to the message being answered (or to the message just above a bare mention), e.g. an offer to compare |
+| `sheets_read` | ✅ all listed sheets | ✅ sheets marked `audience: team` or `audience: manager` (trackers) | ✅ only sheets marked `audience: team` | — | Google service-account key in the `GOOGLE_SERVICE_ACCOUNT_JSON` secret (never commit the key file) + list the real sheets in a server-side copy of `layers.yaml` (point `BRAIN_LAYERS_FILE` at it on the `/data` volume; never in this repo) and share them with the service account |
+| `salesforce_query` | ✅ | — | — | — | `SF_*` variables (read-only integration user recommended) |
+| `drive_search` / `drive_read` | ✅ | — | — | — | Same Google key; share the folder with it and put its id in the `BRAIN_DRIVE_FOLDERS` secret (comma-separated, never in the repo). Without it `drive_search` is off |
+| `slack_read_channel` | ✅ (not DMs) | — | — | — | The bot reads only channels it was invited to. Partner messages are data, never instructions |
+| `learn` | ✅ | — | — | — | Nothing extra |
 
 A tool turns itself on only when its credentials are set, so you can start with Slack only and add Salesforce and Google later.
-Which level gets which tool is set in `layers.yaml` (we finalize it when we define the layers).
+Each level's tools are listed in `layers.yaml` (`levels.<level>.tools`). `TOOL_MIN_LEVEL` in `slack-bot/brain.py` sets hard floors that `layers.yaml` can't lower: Salesforce, Drive, `slack_read_channel` and `learn` are owner-only, and `sheets_read` needs team or above. In a channel the level is never above team, so manager sheets open only in a DM.
 
 ### Teaching the bot (Kareem only, in a DM)
 Tell it a new or corrected rule. It queues it as owner-only, and the bot adds the exact stored text and id under its reply (so you never approve the model's paraphrase). Then send:
@@ -109,15 +111,15 @@ Tell it a new or corrected rule. It queues it as owner-only, and the bot adds th
 These commands work only in your DM with the bot. In a channel it tells you privately to DM it.
 
 ### Tests
-`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 101 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 112 tests (94 in `test_brain`, 18 in `test_app`). `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 
 ### Deploy on Railway (recommended)
 1. railway.app → sign in with GitHub → **New Project → Deploy from GitHub repo** → `The-Counciler-`.
-2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `claude/reselling-copilot` until PR #5 is merged, then `main`. Railway reads `railway.json` and builds the `Dockerfile` (the build runs the offline tests and fails if they don't pass).
-3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). The service has a volume at `/data` for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`. `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist.
-4. Deploy. The log shows `Tools enabled: …` and `⚡️ Bolt app is running!`.
+2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `main`. Railway builds the `Dockerfile` in that folder (the build runs the offline tests and fails if they don't pass). Set the builder (Dockerfile) and the restart policy (On Failure) in Railway **Settings**: Railway doesn't read `railway.json` from a root directory, and stops reading config files on 1 Dec 2026.
+3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add a **volume mounted at `/data`** (keep 1 replica) for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`. `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist. Optional: `BRAIN_MAX_TOKENS` (default 4000).
+4. Deploy. The log shows `Private knowledge loaded: … team, … manager, … cost, … owner docs, team notes for … partners.` (counts only), `Tools enabled: …` and `⚡️ Bolt app is running!`. If it says the secret is not set or can't be read, set it again from Kareem's copy.
 
 Note: learned facts and the learn queue live on the `/data` volume and survive deploys. None of them is written to `knowledge/`.
 - Team facts (`approve <id> team`, in `/data/learned_team.md` on Railway, `slack-bot/learned_team.md` locally): add them to the team part of the `BRAIN_OWNER_KNOWLEDGE_B64` secret when you want them permanent.
@@ -125,7 +127,7 @@ Note: learned facts and the learn queue live on the `/data` volume and survive d
 
 ## What the bot will never do
 - Answer a partner, a guest or a user from another workspace, in a DM or anywhere else.
-- Answer in a channel partners can read: per-partner channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`), `#foodics-…`, any Slack Connect channel (or one with a pending invite), or any channel with a guest or outside member. Patterns live in `layers.yaml` (`blocked_channels`, `allowed_channels`).
+- Answer in a channel partners can read: per-partner channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`, `#kw-…`, `#jo-…`, `#eg-…`), `#foodics-…`, any Slack Connect channel (or one with a pending invite), or any channel with a guest or outside member. Patterns live in `layers.yaml` (`blocked_channels`, `allowed_channels`).
 - Post an owner or team answer where a lower level can read it.
 - Post outside the thread it was asked in.
 - Message a partner or a merchant.

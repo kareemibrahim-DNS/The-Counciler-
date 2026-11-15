@@ -12,8 +12,9 @@ Who reads the reply decides the level (see access.py):
 
 Triggers: a DM, or an @mention in a channel. A mention reads the message just above it (or the
 thread it is in), so "@Reselling Brain" under a question answers that question.
-Hand-offs: when a question needs a person, the bot adds them under the reply (access.handoff_line):
-decisions go to Kareem (Hatem when Kareem is away), operational details to Althurayyaa with cc.
+Hand-offs: when a question needs a person, the bot adds them under the reply (access.handoff_lines):
+decisions go to Kareem (Hatem when Kareem is away), operational details to Althurayyaa with cc, deep cycle
+questions to Kareem and Hatem.
 
 Kareem-only commands, in a DM only: reload · pending · approve <id> [team] · reject <id> · away · back · status
 """

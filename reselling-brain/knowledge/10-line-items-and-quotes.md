@@ -46,4 +46,4 @@ Call `brain_catalog` with a `category` to get a side-by-side (best for, edge, li
 ## Known data issues (verify before quoting)
 - Older internal price lists don't match Salesforce. Always use `brain_catalog`: Salesforce wins.
 - Eight VOLT lines have inconsistent prices across currencies (flagged ⚠).
-- ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.
+- ShopBrain Essential: its main-branch lines are inactive in Salesforce (since June 2026); only the Additional Branch lines are active, so an Essential quote can't be built correctly yet. Check in #reseller-hub.

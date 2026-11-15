@@ -46,7 +46,4 @@ Price line:
 Then ask the agent to update the CSVs and run `npm run feed`.
 
 ## Orbit export
-
-1. Export Partners + Line Items (+ price sheet when available) from Orbit.
-2. Map columns into the three CSVs above (or paste here and ask for a rebuild).
-3. Leave `Not loaded` commercial/ops cells until the contract/Orbit row is real — do not invent.
+Not used. The feed comes only from `../reselling-copilot/data` (Salesforce list prices) via `npm run feed:salesforce`. Old internal price sheets are never used or copied here.

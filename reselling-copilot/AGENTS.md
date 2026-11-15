@@ -7,7 +7,7 @@ This repo is worked on by several AI assistants plus the Foodics Partnerships te
 **Reselling Copilot** helps the Foodics Marketplace reselling team build quotes for partner apps (Grubtech, Deliverect, ShopBrain, BrandWallet, ...):
 
 - `web/index.html`: a self-contained page (partner catalogue, same-category comparison, quote rules, chat).
-- `src/`: a Slack bot (Cloudflare Worker). Mention it in a channel or DM it; it replies in the thread using Claude.
+- `src/`: a Slack bot (Cloudflare Worker), on hold: in Slack, use the Reselling Brain (`reselling-brain/slack-bot`). Mention it in a channel or DM it; it replies in the thread using Claude.
 - `data/`: the single source of truth: line items + **list prices** from the Salesforce price book, partner profiles and categories. The discount policy and the Slack channel → partner map are team-only, so they are in the `POLICY_JSON` secret, not here.
 
 ## Golden rules (non-negotiable)
@@ -38,7 +38,7 @@ npm run deploy     # Partnerships only
 | `src/prompt.ts` | System prompt + catalogue slicing (only relevant partners are sent, for speed) |
 | `src/llm.ts` | Claude call (official `@anthropic-ai/sdk`) |
 | `src/slack.ts` | Signature verification + Slack Web API |
-| `data/*.json` | Catalogue, partners, categories, policy, channel map |
+| `data/*.json` | Catalogue, partners, categories (the policy and channel map are in the `POLICY_JSON` secret, never here) |
 | `web/index.html` | Stand-alone page with the same data embedded |
 | `docs/ROADMAP.md` | Open tasks and which assistant picks them up |
 | `scripts/export-grok-feed.mjs` | Regenerates `../reseller-programs/feed/*.csv` (the Grok Agent SDK bot) from `data/`. Edit `data/`, never the CSVs. Only signed resellers are exported. |

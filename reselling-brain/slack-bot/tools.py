@@ -405,7 +405,7 @@ def escalate(kind: str, reason: str = "", ctx: dict | None = None) -> str:
 
 # ---------- registry ----------
 def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: dict, catalog: Catalog | None = None) -> dict[str, dict]:
-    """name -> {schema, fn}. Which level may use which tool is decided in layers.yaml."""
+    """name -> {schema, fn}. layers.yaml lists each level's tools, within the hard floors in brain.TOOL_MIN_LEVEL."""
     sheets = sources.get("sheets") or {}
     # Drive folder ids are owner-only pointers, so they come from a secret, not from the shared layers.yaml.
     folders = drive_folders(sources)

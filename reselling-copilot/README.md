@@ -39,4 +39,4 @@ Slack setup: [`docs/SLACK_SETUP.md`](docs/SLACK_SETUP.md). Working with AI assis
 
 - Only Salesforce list prices are used here. Old internal price sheets are not, and are never copied into this repo.
 - Eight VOLT lines have inconsistent prices across currencies (flagged ⚠ in the data), e.g. VOLT Hosting with SAP [Monthly] is USD 5,000 but SAR 1,750.
-- ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.
+- ShopBrain Essential: its main-branch lines are inactive in Salesforce (since June 2026); only the Additional Branch lines are active, so an Essential quote can't be built correctly yet. Check in #reseller-hub.

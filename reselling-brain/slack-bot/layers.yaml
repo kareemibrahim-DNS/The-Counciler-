@@ -1,9 +1,10 @@
 # Audience layers — decided by Kareem on 14 Nov 2026.
 #   everyone (base): live resellers, list prices by country, how to build the quote, partner comparison
-#                    (best for, edge, why), merchant fit, how to work with resellers (flows), unified billing,
-#                    and how a partner's solution operates. Discount rules are never shown at this level.
+#                    (best for, edge, why), merchant fit, competitive analysis (an offer someone brings), submission
+#                    forms, request flows, unified billing and pricing, how a partner's solution operates, and the
+#                    generic cycle picture. Discount rules are never shown at this level.
 #   sales   : Sales, AMs and ANYONE not listed below. Sees the base layer only.
-#   team    : Partnerships team (Althurayyaa). + policy, discount eligibility, SLAs, processes, partner operations.
+#   team    : Partnerships team (Althurayyaa). + policy, discount eligibility, ARR/churn rules, SLAs, processes, partner tiers, partner operations, channels and notes.
 #   manager : managers (Hatem). + program cycles in depth (why we built it, how it runs now), targets, strategy,
 #             internal trackers and partner contacts (Kareem and Hatem only). Everyone else gets the generic
 #             cycle picture (13-cycles-at-a-glance) and deep cycle questions go to Kareem or Hatem.
@@ -29,14 +30,14 @@ levels:
     instructions: "Manager. Everything the team sees, plus program cycles, targets, strategy, trackers and partner contacts. Cost and contracts only if this person has the cost grant."
   team:
     sees: [team, base]
-    # read_slack_file opens only files attached to the asker's own message.
+    # read_slack_file opens only files attached to the message being answered (or to the message just above a bare mention).
     tools: [brain_catalog, escalate, sheets_read, read_slack_file]
     instructions: "Partnerships team member. Policy, discount eligibility, SLAs, processes, partner operations and the catalogue. No cost, contracts, contacts, trackers, targets or strategy."
   sales:
     sees: [sales, base]
     # read_slack_file opens only files attached to the message being answered (an offer to compare).
     tools: [brain_catalog, escalate, read_slack_file]
-    instructions: "Sales, Account Manager or any other colleague. The common layer: resellers, list prices, quotes, comparisons, merchant fit, flows and operations. Nothing locked."
+    instructions: "Sales, Account Manager or any other colleague. The common layer: resellers, list prices, quotes, comparisons, merchant fit, competitive analysis, flows and operations. Nothing locked."
 
 # Channels partners can read. The bot never answers there (it tells only the asker, privately).
 # Slack Connect channels, channels with a guest or an outside member, and users from another

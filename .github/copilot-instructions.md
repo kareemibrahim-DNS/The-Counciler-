@@ -7,4 +7,4 @@ Applies to `reselling-copilot/`. Follow `reselling-copilot/AGENTS.md`.
 - Keep Salesforce line-item names exactly as they are in `reselling-copilot/data/catalog.json`.
 - Run `npm run check` before proposing a change. Add a test when you touch `reselling-copilot/src/policy.ts` or `reselling-copilot/src/prompt.ts`.
 - When reviewing PRs, flag any change that could leak one partner's pricing to another partner or expose discount rules in a partner channel.
-- The reseller bot is `reselling-brain/` in this repo. Never propose changes to `orbit-reselling-wizard` (Orbit) as part of this work.
+- The reseller bot is `reselling-brain/` in this repo (Python, deployed on Railway from `main`). Follow the root `AGENTS.md` for it: `knowledge/` holds the common layer only (`audience: base` or `sales`); team, manager, cost and owner knowledge stays in the `BRAIN_OWNER_KNOWLEDGE_B64` secret. Run `cd reselling-brain/slack-bot && python -m unittest test_brain test_app`. Never propose changes to `orbit-reselling-wizard` (Orbit) as part of this work.

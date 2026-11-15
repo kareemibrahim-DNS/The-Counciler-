@@ -21,7 +21,7 @@ OWNER_LEARNED_FILE = Path(os.environ.get("BRAIN_OWNER_LEARNED_FILE", Path(__file
 TEAM_LEARNED_FILE = Path(os.environ.get("BRAIN_TEAM_LEARNED_FILE", Path(__file__).resolve().parent / "learned_team.md"))
 LAYERS_FILE = Path(os.environ.get("BRAIN_LAYERS_FILE", Path(__file__).resolve().parent / "layers.yaml"))
 MODEL = os.environ.get("BRAIN_MODEL", "claude-sonnet-5-5")
-MAX_TOKENS = int(os.environ.get("BRAIN_MAX_TOKENS", "1500"))
+MAX_TOKENS = int(os.environ.get("BRAIN_MAX_TOKENS", "4000"))
 
 _FRONT = re.compile(r"^---\n(.*?)\n---\n", re.S)
 
@@ -34,7 +34,7 @@ class Doc:
 
 
 # Audiences (Kareem, 14 Nov 2026):
-#   base    everyone at Foodics: resellers, list prices, quotes, comparisons, merchant fit, flows, unified billing
+#   base    everyone at Foodics: resellers, list prices, quotes, comparisons, merchant fit, competitive analysis, flows, unified billing
 #   sales   instructions for the base level only (what is locked and how to point to the flow)
 #   team    Partnerships team: policy, discount eligibility, SLAs, processes, partner operations
 #   manager managers: program cycles, targets, strategy, internal trackers, partner contacts
@@ -312,10 +312,13 @@ a partner's latest Slack thread, a ticket's status, a contract clause, an attach
 - When the question needs a person (a decision, or operational detail you don't have), explain the flow, then call `escalate` once.
 """
 MAX_TOOL_TURNS = 8
+CUT_SHORT_NOTE = "_This answer was cut short. Ask a narrower question, or split it into parts._"
+REFUSAL_REPLY = "This part I can't answer here. Ask Kareem Ibrahim."
 LEVEL_RANK = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
 
 
-# Hard floors, whatever layers.yaml (a shared file) lists: tools that read private sources stay owner-only.
+# Hard floors, whatever layers.yaml (a shared file) lists: Salesforce, Drive, Slack channels and learn stay owner-only;
+# sheets_read needs team (and each sheet's audience); read_slack_file opens only files on the message being answered.
 TOOL_MIN_LEVEL = {"salesforce_query": "owner", "drive_search": "owner", "drive_read": "owner",
                   "slack_read_channel": "owner", "learn": "owner", "sheets_read": "team",
                   # Everyone may open a file attached to the message being answered, to compare an offer they bring.
@@ -371,7 +374,12 @@ class Brain:
             resp = self.client.messages.create(messages=messages, **kwargs)
             uses = [b for b in resp.content if getattr(b, "type", "") == "tool_use"]
             if not uses or resp.stop_reason != "tool_use":
-                return "".join(b.text for b in resp.content if getattr(b, "type", "") == "text").strip()
+                answer = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text").strip()
+                if resp.stop_reason == "refusal":
+                    return REFUSAL_REPLY
+                if resp.stop_reason == "max_tokens":  # say it was cut, instead of looking like a full answer
+                    return f"{answer}\n\n{CUT_SHORT_NOTE}" if answer else CUT_SHORT_NOTE
+                return answer
             messages.append({"role": "assistant", "content": [b.model_dump() if hasattr(b, "model_dump") else b for b in resp.content]})
             results = []
             for u in uses:
