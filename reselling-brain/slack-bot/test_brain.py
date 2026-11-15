@@ -290,14 +290,28 @@ class RealLayersTest(unittest.TestCase):
 
     def test_sales_sees_the_common_layer_and_nothing_locked(self):
         ids = [d.id for d in brain.visible_docs("sales", self.layers, self.docs)]
-        self.assertEqual(sorted(ids), ["how-to-answer", "line-items-and-quotes", "program-overview", "sales-scope",
-                                       "working-with-resellers"])
+        self.assertEqual(sorted(ids), ["cycles-at-a-glance", "how-to-answer", "line-items-and-quotes", "program-overview",
+                                       "sales-scope", "working-with-resellers"])
         p = self.prompt("sales")
         for secret in ["30 days of the invoice date", "Diamond", "CONTACT-NAME", "COST-TABLE-ROW", "TRACKER-NAME", "CONTRACT-STATUS",
                        "TARGET-NUMBER", "GAP-LIST", "minimum of the range", "4%–10%", "never discounted"]:
             self.assertNotIn(secret, p, secret)
-        for common in ["Unified billing", "i need discount", "Centralized Communication", "who fits this merchant"]:
+        for common in ["Unified billing", "i need discount", "Centralized Communication", "who fits this merchant",
+                       "Renewal cycle", "This part I can't answer here"]:
             self.assertIn(common, p, common)
+        for deep in ["45 days", "3 months before", "48 working hours", "15 days"]:  # cycle details stay deeper
+            self.assertNotIn(deep, p, deep)
+
+    def test_tracker_names_are_only_for_kareem_and_hatem(self):
+        names = ["TRACKER-NAME", "TRACKER-NAME", "TRACKER-NAME", "TRACKER-NAME", "TRACKER-NAME"]
+        for level in ("sales", "team"):
+            p = self.prompt(level)
+            for n in names:
+                self.assertNotIn(n, p, f"{level}: {n}")
+        for d in brain.load_docs(private=False):
+            for n in names:
+                self.assertNotIn(n, d.body, f"{d.id}: {n}")
+        self.assertIn("TRACKER-NAME", self.prompt("manager"))
 
     def test_managers_see_cycles_and_contacts_but_cost_only_with_the_grant(self):
         p = self.prompt("manager")
@@ -662,6 +676,19 @@ class EscalationTest(unittest.TestCase):
         self.assertFalse(access.is_away({"status_emoji": ":airplane:"}, 0))
         for text_ in ["On leave", "Vacationing", "OOO till Sunday", "sick leave"]:
             self.assertTrue(access.is_away({"status_text": text_}, 0), text_)
+
+    def test_deep_cycle_questions_go_to_kareem_or_hatem(self):
+        self.assertEqual(self.line("cycles", "US", False), "➡️ Deeper explanation: <@UK> <@UH>")
+        self.assertEqual(self.line("cycles", "UA", True), "➡️ Deeper explanation: <@UH> (Kareem is away)")
+        self.assertEqual(self.line("cycles", "UK", False), "")
+        self.assertEqual(self.line("cycles", "UH", False), "")
+
+    def test_escalate_accepts_cycles(self):
+        ctx = {}
+        tools.escalate("cycles", "renewal grace", ctx)
+        self.assertEqual(ctx["handoffs"], [{"kind": "cycles", "reason": "renewal grace"}])
+        with self.assertRaises(ValueError):
+            tools.escalate("gossip", "", {})
 
     def test_both_kinds_never_mention_anyone_twice(self):
         out = access.handoff_lines(["operations", "decision"], asker="US", away=False, routing=self.R)

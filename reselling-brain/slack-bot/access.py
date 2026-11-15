@@ -166,9 +166,10 @@ def decide(*, event: dict, directory: Directory, workspace_team: str, level_of: 
     return Decision(True, level=level, where="channel", reason="channel")
 
 
-# ---------- who gets pulled in (Kareem, 14 Nov 2026) ----------
-# decision   (discounts, exceptions, approvals, cost, contracts): Kareem; Hatem when Kareem is away.
-# operations (detailed solution and operations questions): Althurayyaa, cc Kareem; cc Hatem when Kareem is away.
+# ---------- who gets pulled in (Kareem, 14-15 Nov 2026) ----------
+# decision   (confidential data or calculations, exceptions, approvals): Kareem; Hatem when Kareem is away.
+# operations (detailed and day-to-day operations): Althurayyaa, cc Kareem; cc Hatem when Kareem is away.
+# cycles     (deep questions about how a cycle works or why): Kareem or Hatem; Hatem when Kareem is away.
 DEFAULT_AWAY_EMOJIS = (":palm_tree:", ":desert_island:", ":beach_with_umbrella:", ":face_with_thermometer:")
 DEFAULT_AWAY_WORDS = ("vacation", "vacationing", "holiday", "on leave", "annual leave", "sick leave", "sick", "ooo", "out of office",
                       "agaza", "إجازة", "اجازة", "عطلة")
@@ -202,14 +203,21 @@ def handoff_line(kind: str, *, asker: str, away: bool, routing: dict, present: s
     owner, manager, ops = routing.get("owner", ""), routing.get("manager", ""), routing.get("operations", "")
     skip = set(skip or ())
     lead = manager if away else owner
-    to, cc = ([lead], []) if kind == "decision" else ([ops], [lead])
-    to = [u for u in to if u and u != asker]
+    if kind == "decision":
+        to, cc = [lead], []
+    elif kind == "cycles":
+        if asker in (owner, manager):
+            return ""  # Kareem and Hatem are the ones who explain cycles
+        to, cc = ([manager] if away else [owner, manager]), []
+    else:
+        to, cc = [ops], [lead]
+    to = [u for u in dict.fromkeys(to) if u and u != asker and u not in skip]
     cc = [u for u in cc if u and u != asker and u not in to and u not in skip]
     if not to and cc:
         to, cc = cc, []
     if not to:
         return ""
-    label = "Decision needed" if kind == "decision" else "Operational details"
+    label = {"decision": "Decision needed", "cycles": "Deeper explanation"}.get(kind, "Operational details")
     line = f"➡️ {label}: " + _who(to, present)
     if cc:
         line += " · cc " + _who(cc, present)
@@ -223,7 +231,7 @@ def handoff_line(kind: str, *, asker: str, away: bool, routing: dict, present: s
 def handoff_lines(kinds: list[str], *, asker: str, away: bool, routing: dict, present: set[str] | None = None) -> str:
     """One line per kind, decision first, and nobody is mentioned twice."""
     lines, mentioned = [], set()
-    for kind in [k for k in ("decision", "operations") if k in kinds]:
+    for kind in [k for k in ("decision", "cycles", "operations") if k in kinds]:
         line = handoff_line(kind, asker=asker, away=away, routing=routing, present=present, skip=mentioned)
         if line:
             lines.append(line)

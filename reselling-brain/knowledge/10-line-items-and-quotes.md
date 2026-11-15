@@ -40,6 +40,6 @@ Call `brain_catalog` with a `category` to get a side-by-side (best for, edge, li
 - Inventory: ShopBrain (tiered per branch, mid price, optional accounting) · Supy (premium per outlet, 3-license minimum, deepest procurement and recipe costing).
 
 ## Known data issues (verify before quoting)
-- The the old internal price-list sheet price list does not match Salesforce, and its KSA column holds KWD values for Ordable, Zyda and Mnasati. Salesforce wins.
+- Older internal price lists don't match Salesforce. Always use `brain_catalog`: Salesforce wins.
 - Eight VOLT lines have inconsistent prices across currencies (flagged ⚠).
 - ShopBrain Essential has no main-branch line in Salesforce, only additional-branch lines.

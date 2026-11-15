@@ -1,7 +1,7 @@
 ---
 id: discount-eligibility
 audience: team
-source: the old internal price-list sheet Policy tab (3 Oct 2026)
+source: Kareem's discount policy (3 Oct 2026)
 updated: 2026-11-14
 ---
 # Discount eligibility (Partnerships team only)

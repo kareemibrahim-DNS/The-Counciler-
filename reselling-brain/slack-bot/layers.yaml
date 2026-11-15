@@ -4,8 +4,9 @@
 #                    and how a partner's solution operates. Discount rules are never shown at this level.
 #   sales   : Sales, AMs and ANYONE not listed below. Sees the base layer only.
 #   team    : Partnerships team (Althurayyaa). + policy, discount eligibility, SLAs, processes, partner operations.
-#   manager : managers (Hatem). + program cycles (why we built it, how it runs now), targets, strategy,
-#             internal trackers and partner contacts.
+#   manager : managers (Hatem). + program cycles in depth (why we built it, how it runs now), targets, strategy,
+#             internal trackers and partner contacts (Kareem and Hatem only). Everyone else gets the generic
+#             cycle picture (13-cycles-at-a-glance) and deep cycle questions go to Kareem or Hatem.
 #   cost    : cost prices and contracts. Locked for everyone except the Slack IDs in the BRAIN_COST_SLACK_IDS
 #             secret (Hatem) and Kareem. Only ever answered in a private DM.
 #   owner   : Kareem (the BRAIN_OWNER_SLACK_ID secret). Everything.
@@ -53,8 +54,9 @@ people:
   U02VD9VGNA0: { level: manager, name: Hatem Ashour }    # cost + contracts via the BRAIN_COST_SLACK_IDS secret
 
 # Who the bot pulls in under a reply (code adds the @-mentions; the model never writes them):
-#   decision   (discounts, exceptions, approvals, cost, contracts) -> owner; manager when the owner is away
-#   operations (detailed solution and operations questions)        -> operations, cc owner (cc manager when away)
+#   decision   (confidential data or calculations, exceptions, approvals) -> owner; manager when the owner is away
+#   operations (detailed and day-to-day operations)                     -> operations, cc owner (cc manager when away)
+#   cycles     (deep questions about how a cycle works or why)          -> owner and manager; manager when away
 # "Away" = Kareem's `away` DM command (until `back`), or a Slack status with one of these emojis or words
 # (whole words; "back from vacation" doesn't count; business travel doesn't count).
 routing:

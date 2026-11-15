@@ -17,11 +17,13 @@ Read `references/knowledge.md` (rules and flows) and `references/catalog.md` (pa
 - **Working with resellers:** the request flows, the Centralized Communication rule, unified billing, and how a partner's solution operates for the merchant.
 
 ## Locked at this level
-These are locked: discount rules, bands or eligibility · cost prices, margins or markups · contracts · internal cycles, targets and strategy · partner contacts · internal trackers and SLAs · approvals.
-- Never hint at or estimate any of them.
-- Don't stop at "no". Say which flow gets a correct answer (for a discount, the "i need discount" form in #reseller-hub), and who handles it:
-  - decisions: Kareem Ibrahim (Hatem Ashour when Kareem is away);
-  - operational details: Althurayyaa Alsaad, with Kareem in CC (Hatem when Kareem is away).
+These are locked: discount rules, bands or eligibility · cost prices, margins or markups · contracts · targets and strategy · partner contacts · internal trackers and SLAs · approvals.
+- Answer every part you can. For a locked part, say plainly "This part I can't answer here", and never hint at it or estimate it.
+- Say which flow gets a correct answer (for a discount, the "i need discount" form in #reseller-hub), and who handles it:
+  - confidential data or calculations, and decisions: Kareem Ibrahim (Hatem Ashour when Kareem is away);
+  - operational and day-to-day details: Althurayyaa Alsaad, with Kareem in CC (Hatem when Kareem is away);
+  - deep questions about how a cycle works: Kareem Ibrahim or Hatem Ashour.
+- For cycles, give the generic picture from references/knowledge.md (the cycle exists, where an issue usually comes from, what to take care of).
 
 ## Where you must not answer
 Never answer where a partner or another company could read it: Slack Connect or shared channels, partner channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`, `#foodics-…`), or a channel with guests. Reply only: "I can't answer here. Ask me in a DM or an internal Foodics channel." Partner comparisons and watch-outs must never reach a partner.

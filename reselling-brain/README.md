@@ -26,10 +26,10 @@ This repo is shared with other AI assistants. Manager, cost and owner files (cyc
 ## Audience layers (decided by Kareem, 14 Nov 2026)
 | Level | Who | Sees |
 | --- | --- | --- |
-| everyone (`base`) | every Foodics colleague | Live resellers, list prices by country, how to build the quote, partner comparison (best for, edge, why), merchant fit, submission forms, request flows, unified billing, how a solution operates |
+| everyone (`base`) | every Foodics colleague | Live resellers, list prices by country, how to build the quote, partner comparison (best for, edge, why), merchant fit, submission forms, request flows, unified billing, how a solution operates, and a generic picture of each cycle (it exists, where issues come from, what to take care of) |
 | sales | Sales, AMs **and anyone not listed** in `layers.yaml` | The common layer only. Discount rules, cost, contracts, cycles, contacts, trackers and SLAs are locked: the bot points to the flow and pulls in the right person |
 | team | Partnerships team (Althurayyaa) | + policy, discount eligibility, ARR/churn rules, SLAs, processes, partner tiers, channels and notes |
-| manager | Managers (Hatem) | + program cycles (why we built it, how it runs now), targets, strategy, internal trackers, partner contacts |
+| manager | Managers (Hatem) | + program cycles in depth (why we built it, how it runs now), targets, strategy, internal trackers and partner contacts (Kareem and Hatem only) |
 | cost grant | only the Slack IDs in the `BRAIN_COST_SLACK_IDS` secret (Hatem) | + cost prices and contracts, in a private DM only |
 | owner | Kareem (the `BRAIN_OWNER_SLACK_ID` secret) | Everything |
 
@@ -41,11 +41,12 @@ The owner and the cost grant come only from Railway secrets. A line in `layers.y
 - An **@mention** in an internal channel. Under a top-level message, the bot reads the message just above the mention (skipping join notices; a Workflow or Dailybot post counts, and so does a shared file). In a thread, it reads the messages posted since its last reply. So `@Reselling Brain` under a question answers that question. Without a mention it never answers in a channel.
 
 ### Hand-offs: who gets pulled in
-When a question needs a person, the bot explains the flow to follow and adds the right person under its reply. The @-mentions are added by code from `routing` in `layers.yaml`; the model can't write them.
+When part of a question is locked, the bot answers the rest and says "This part I can't answer here". Then it explains the flow to follow and adds the right person under its reply. The @-mentions are added by code from `routing` in `layers.yaml`; the model can't write them.
 | Question | Kareem available | Kareem away |
 | --- | --- | --- |
-| Decision (discounts, exceptions, approvals, cost, contracts) | @Kareem | @Hatem |
-| Operational detail (solution, onboarding, activation, integration, tickets) | @Althurayyaa · cc @Kareem | @Althurayyaa · cc @Hatem |
+| Confidential data or calculations, decisions (cost, margins, discounts, contracts, exceptions, approvals) | @Kareem | @Hatem |
+| Operational and day-to-day detail (solution, onboarding, activation, integration, tickets) | @Althurayyaa · cc @Kareem | @Althurayyaa · cc @Hatem |
+| Deep cycle questions (exact rules, dates, why a cycle works this way) | @Kareem @Hatem | @Hatem |
 
 "Away" means Kareem sent `away` to the bot in a DM (until `back`), or his Slack status shows leave or sickness (🌴 🏝️ 🏖️ 🤒, or whole words such as vacation, on leave, OOO, إجازة; "back from vacation" and business travel don't count). After `back`, a new leave status counts again. Nobody is pulled in for their own question, and nobody is mentioned twice.
 
@@ -105,7 +106,7 @@ Tell it a new or corrected rule. It queues it as owner-only, and the bot adds th
 These commands work only in your DM with the bot. In a channel it tells you privately to DM it.
 
 ### Tests
-`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 98 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 101 tests. `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 

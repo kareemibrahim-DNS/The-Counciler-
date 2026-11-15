@@ -356,9 +356,12 @@ class Catalog:
 
 
 # ---------- escalation (the app turns it into @-mentions) ----------
+ESCALATION_KINDS = ("decision", "operations", "cycles")
+
+
 def escalate(kind: str, reason: str = "", ctx: dict | None = None) -> str:
-    if kind not in ("decision", "operations"):
-        raise ValueError("kind must be decision or operations")
+    if kind not in ESCALATION_KINDS:
+        raise ValueError("kind must be decision, operations or cycles")
     if ctx is not None:
         ctx.setdefault("handoffs", [])
         if not any(h["kind"] == kind for h in ctx["handoffs"]):
@@ -410,11 +413,12 @@ def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: 
             {"file_id": {"type": "string"}}, ["file_id"],
             lambda file_id, _ctx=None: slack.read_file(file_id, (_ctx or {}).get("file_ids")))
         t["read_slack_file"]["ctx_aware"] = True
-    add("escalate", "Call once when the question needs a person: kind 'decision' (discounts, exceptions, approvals, "
-        "cost, contracts, commercial terms, new partner outreach) or 'operations' (detailed operational questions about "
-        "a partner's solution, onboarding, activation, integration, tickets). The bot adds the right person to your reply. "
-        "Still tell the asker which flow to follow.",
-        {"kind": {"type": "string", "enum": ["decision", "operations"]}, "reason": {"type": "string"}}, ["kind"],
+    add("escalate", "Call once when part of the question needs a person: kind 'decision' (confidential data or "
+        "calculations such as cost, margins, discounts or contract terms; exceptions; approvals; new partner outreach), "
+        "'operations' (detailed or day-to-day operational questions about a partner's solution, onboarding, activation, "
+        "integration, tickets) or 'cycles' (deep questions about how a cycle works or why). The bot names the right person "
+        "under your reply. Still say which part you can't answer and which flow to follow.",
+        {"kind": {"type": "string", "enum": list(ESCALATION_KINDS)}, "reason": {"type": "string"}}, ["kind"],
         lambda kind, reason="", _ctx=None: escalate(kind, reason, _ctx))
     t["escalate"]["ctx_aware"] = True
     if learner:

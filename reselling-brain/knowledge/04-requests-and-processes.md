@@ -13,7 +13,6 @@ updated: 2026-11-14
 ## Reseller Hub (#reseller-hub on Slack)
 - Where the team submits discount requests, refunds, cancellations, questions and exceptions.
 - Built as Slack Workflow Builder forms, one trigger per request type (e.g. "i need discount", "i need refund", "i need cancellation"). No upgrade/downgrade forms.
-- It replaced the old the old internal price-list sheet form, which is retired.
 - **Kareem approves every request himself.** He involves Hatem only when he chooses. Kareem invites channel members himself.
 
 ## MP block requests

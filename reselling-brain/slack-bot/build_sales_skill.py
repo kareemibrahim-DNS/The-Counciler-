@@ -66,6 +66,8 @@ SKILL_WORDING = [
     ("Call `brain_catalog` with a `category` to get a side-by-side", "Use the category section in references/catalog.md for a side-by-side"),
     ("(`brain_catalog` with a category shows the side-by-side)", "(the category section in references/catalog.md shows the side-by-side)"),
     ("(`brain_catalog` shows it)", "(see references/catalog.md)"),
+    ("Always use `brain_catalog`: Salesforce wins.", "Always use references/catalog.md: Salesforce wins."),
+    ("the bot pulls in Kareem or Hatem.", "ask Kareem Ibrahim or Hatem Ashour."),
 ]
 
 
@@ -75,7 +77,7 @@ def knowledge_markdown() -> str:
     for d in brain.load_docs(private=False):
         if d.audience != "base":
             continue
-        body = re.sub(r"\n## When the answer needs a person or a flow\n.*?(?=\n## |\Z)", "\n", d.body, flags=re.S)
+        body = re.sub(r"\n## When part of the question is locked at this level\n.*?(?=\n## |\Z)", "\n", d.body, flags=re.S)
         for tool_text, skill_text in SKILL_WORDING:
             body = body.replace(tool_text, skill_text)
         if "`brain_catalog`" in body or "`escalate`" in body:

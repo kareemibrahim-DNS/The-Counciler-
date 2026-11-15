@@ -29,7 +29,7 @@ SLAs are the maximum. Earlier is better. Working days are KSA working days (Sund
 - Usual cases: 48 working hours for response, resolution or feedback.
 - Urgent cases: 24 working hours.
 
-## Partner ticket statuses (TRACKER-NAME)
+## Partner ticket statuses
 - **Open:** newly received. Must move to another status within 24 hours.
 - **Due:** partner asked and Foodics has not answered, or Foodics asked and the partner has not answered.
 - **Pending:** the initiator got a reply with a question and has not replied back; or not solved with a clear reason.
