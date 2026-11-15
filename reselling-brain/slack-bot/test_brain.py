@@ -248,7 +248,7 @@ class RealLayersTest(unittest.TestCase):
         fake = [{"id": "trackers-and-contacts", "audience": "manager", "body": "Partner X: CONTACT-NAME. TRACKER-NAME tracker."},
                 {"id": "program-cycles", "audience": "manager", "body": "Q4 target TARGET-NUMBER USD."},
                 {"id": "cost-prices", "audience": "cost", "body": "| COST-TABLE-ROW |"},
-                {"id": "contracts", "audience": "cost", "body": "Supy CONTRACT-STATUS."},
+                {"id": "contracts", "audience": "cost", "body": "Partner Y CONTRACT-STATUS."},
                 {"id": "gaps", "body": "GAP-LIST"},
                 {"id": "sneaky", "audience": "base", "body": "FORCED-TO-OWNER"}]
         os.environ["BRAIN_OWNER_KNOWLEDGE_B64"] = base64.b64encode(json.dumps(fake).encode()).decode()
@@ -303,14 +303,11 @@ class RealLayersTest(unittest.TestCase):
             self.assertNotIn(deep, p, deep)
 
     def test_tracker_names_are_only_for_kareem_and_hatem(self):
-        names = ["TRACKER-NAME", "TRACKER-NAME", "TRACKER-NAME", "TRACKER-NAME", "TRACKER-NAME"]
-        for level in ("sales", "team"):
-            p = self.prompt(level)
-            for n in names:
-                self.assertNotIn(n, p, f"{level}: {n}")
+        # Real tracker names live only in the secret; the repo's files must not name any tracker.
         for d in brain.load_docs(private=False):
-            for n in names:
-                self.assertNotIn(n, d.body, f"{d.id}: {n}")
+            self.assertNotRegex(d.body, r"(?i)\btracker\b|ask\? –", d.id)
+        for level in ("sales", "team"):
+            self.assertNotIn("TRACKER-NAME", self.prompt(level), level)
         self.assertIn("TRACKER-NAME", self.prompt("manager"))
 
     def test_managers_see_cycles_and_contacts_but_cost_only_with_the_grant(self):

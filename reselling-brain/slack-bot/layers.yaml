@@ -71,8 +71,7 @@ sources:
   sheets:
     # audience: team → the team (and managers) may read it; audience: manager → managers only; none → Kareem only.
     # Trackers are manager-level (Kareem, 14 Nov 2026): give them audience: manager, never team.
-    # tickets: { id: "<spreadsheet id>", title: "TRACKER-NAME", range: "A1:Z1000" }
-    # example: { id: "<spreadsheet id>", title: "<sheet title>" }
-    # targets: { id: "<spreadsheet id>", title: "<sheet title>" }
+    # example: { id: "<spreadsheet id>", title: "<sheet title>", range: "A1:Z1000", audience: manager }
+    # (real sheet names are added on the server, not in this shared repo)
   drive_folders:
     - 1w3T0Ql99xAt9n1a6HwalH3sY1AiB98uL   # Partnerships - Reseller Program

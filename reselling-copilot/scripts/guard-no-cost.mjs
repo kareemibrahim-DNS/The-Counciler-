@@ -52,7 +52,9 @@ for (const f of brainFiles) {
   const audience = (text.match(/^audience:\s*(\S+)/m) || [])[1];
   if (!["base", "sales", "team"].includes(audience)) problems.push(`${file}: audience must be base, sales or team here (manager, cost and owner files stay out of this repo)`);
   if (/\b(30|27|23|20)\s?%/.test(text) && /markup/i.test(text) && /\|\s*(Monthly|Annual|Quarterly)[^|]*\|\s*\d+\s?%/i.test(text)) problems.push(`${file}: looks like a markup table`);
-  if (/TARGET-NUMBER|TARGET-KPI/i.test(text)) problems.push(`${file}: looks like owner targets`);
+  // Targets or KPIs with real amounts are manager-only (no real values are written here).
+  if (/\btargets?\b[^\n]{0,60}\d{1,3}(,\d{3}){2}|\$\d+(\.\d+)?M\b[^\n]{0,20}\bKPI\b/i.test(text)) problems.push(`${file}: looks like owner targets`);
+  if (/\btracker\b/i.test(text)) problems.push(`${file}: names an internal tracker (trackers are for Kareem and Hatem only)`);
 }
 try {
   for (const f of readdirSync(join(BRAIN, "catalog")).filter((x) => x.endsWith(".json"))) {
