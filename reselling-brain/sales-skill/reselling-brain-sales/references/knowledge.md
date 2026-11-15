@@ -91,6 +91,10 @@ Use the category section in references/catalog.md for a side-by-side (best for, 
 ## Unified billing
 - Any deal, started by Foodics or by the partner, is invoiced and collected by Foodics. The partner focuses on closing deals, and the merchant deals with one bill from Foodics.
 
+## Unified pricing
+- The list price of a service is the same whether Foodics or the partner sells it, in every country. So there is no price burning between Foodics and the partner when both talk to the same merchant.
+- If a partner isn't on unified pricing, Foodics' list price is still lower than the partner's own price.
+
 ## How to sell a reseller partner
 1. Pick the partner that fits the merchant (the category section in references/catalog.md shows the side-by-side).
 2. Build the quote from the list prices and the partner's quote structure.

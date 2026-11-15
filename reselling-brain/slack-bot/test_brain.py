@@ -297,7 +297,7 @@ class RealLayersTest(unittest.TestCase):
                        "TARGET-NUMBER", "GAP-LIST", "minimum of the range", "4%–10%", "never discounted"]:
             self.assertNotIn(secret, p, secret)
         for common in ["Unified billing", "i need discount", "Centralized Communication", "who fits this merchant",
-                       "Renewal cycle", "This part I can't answer here"]:
+                       "Renewal cycle", "This part I can't answer here", "Unified pricing", "no price burning"]:
             self.assertIn(common, p, common)
         for deep in ["45 days", "3 months before", "48 working hours", "15 days"]:  # cycle details stay deeper
             self.assertNotIn(deep, p, deep)

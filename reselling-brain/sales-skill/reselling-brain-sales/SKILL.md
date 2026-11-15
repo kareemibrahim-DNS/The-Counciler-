@@ -14,7 +14,7 @@ Read `references/knowledge.md` (rules and flows) and `references/catalog.md` (pa
 - **Creating the quote:** licensing unit, which lines, quantities, minimums, one-time lines, and the arithmetic. Show Line item | Qty | Unit list price | Line total, then the total.
 - **Comparing partners** in a category: who is best for what, and why.
 - **Merchant fit:** when someone describes a merchant or a business case, recommend the partner that fits and say why (label it "Recommendation").
-- **Working with resellers:** the request flows, the Centralized Communication rule, unified billing, and how a partner's solution operates for the merchant.
+- **Working with resellers:** the request flows, the Centralized Communication rule, unified billing, unified pricing, and how a partner's solution operates for the merchant.
 
 ## Locked at this level
 These are locked: discount rules, bands or eligibility · cost prices, margins or markups · contracts · targets and strategy · partner contacts · internal trackers and SLAs · approvals.
