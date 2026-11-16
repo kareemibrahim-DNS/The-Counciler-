@@ -438,7 +438,9 @@ class Catalog:
 
 
 # ---------- competitor quotes (what merchants show Sales; never cost) ----------
-QUOTES_FILE = Path(os.environ.get("BRAIN_COMPETITOR_QUOTES", Path(__file__).with_name("competitor_quotes.json")))
+# On Railway the /data volume keeps saved prices across deploys, even before BRAIN_COMPETITOR_QUOTES is set.
+QUOTES_FILE = Path(os.environ.get("BRAIN_COMPETITOR_QUOTES") or (
+    "/data/competitor_quotes.json" if Path("/data").is_dir() else Path(__file__).with_name("competitor_quotes.json")))
 QUOTE_BILLING = ("Monthly", "Quarterly", "Annual", "One-time")
 QUOTE_CSV_COLUMNS = ["id", "reported_on", "competitor", "product", "country", "currency", "price", "billing", "scope", "notes"]
 # Only the price a competitor quoted the merchant is kept. Anything that reads like cost or margin is refused,
