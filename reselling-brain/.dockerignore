@@ -5,3 +5,4 @@ slack-bot/learned_team.md
 slack-bot/state.json
 **/__pycache__
 **/*.pyc
+slack-bot/watch.json

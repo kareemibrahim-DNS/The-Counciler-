@@ -28,7 +28,8 @@ PARTNER_SPACE_REPLY = ("I don't answer in channels that partners or other worksp
                        "Ask me in a DM, or in an internal Foodics channel.")
 CANNOT_CHECK_REPLY = "I can't check who can read this channel, so I won't answer here. Ask me in a DM."
 OWNER_DM_ONLY_REPLY = "Send owner commands to me in a DM."
-_OWNER_COMMAND = re.compile(r"^(reload|refresh brain|pending|away|back|status|(approve|reject)\s+#?[0-9a-f]{6}(\s+(team|owner))?)$")
+_OWNER_COMMAND = re.compile(r"^(reload|refresh brain|pending|away|back|status|review|digest|note(\s.*)?|(teach|dismiss)\s+#?[0-9a-f]{6}|"
+                            r"(approve|reject)\s+#?[0-9a-f]{6}(\s+(team|owner))?)$", re.S)
 
 
 def is_owner_command(text: str) -> bool:
