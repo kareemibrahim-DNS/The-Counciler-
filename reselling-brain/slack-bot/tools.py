@@ -363,8 +363,8 @@ class Catalog:
             elif n not in names:
                 names.append(n)
         if unknown:
-            return _clip({"error": f"not in the reseller catalogue: {', '.join(unknown)}. The Reselling Brain holds no "
-                                   "competitor data: compare an offer only from what the asker brings.",
+            return _clip({"error": f"not in the reseller catalogue: {', '.join(unknown)}. A competitor: use only its offer "
+                                   "the asker brings, or `competitor_quotes` (merchant-reported). Never guess.",
                           "partners": sorted(self.partners)})
         if len(names) < 2:
             return _clip({"error": "name at least two different partners to compare"})
@@ -437,6 +437,131 @@ class Catalog:
         return _clip({"categories": [{"id": c["id"], "name": c["name"], "partners": c["partners"]} for c in self.categories]})
 
 
+# ---------- competitor quotes (what merchants show Sales; never cost) ----------
+QUOTES_FILE = Path(os.environ.get("BRAIN_COMPETITOR_QUOTES", Path(__file__).with_name("competitor_quotes.json")))
+QUOTE_BILLING = ("Monthly", "Quarterly", "Annual", "One-time")
+QUOTE_CSV_COLUMNS = ["id", "reported_on", "competitor", "product", "country", "currency", "price", "billing", "scope", "notes"]
+# Only the price a competitor quoted the merchant is kept. Anything that reads like cost or margin is refused,
+# so the store can never carry our cost (or anyone's) to Sales and AMs.
+NO_COST_WORDS = re.compile(r"\b(costs?(?![- ]?cent(?:er|re))|cost[- ]price|wholesale|margins?|mark-?ups?|payouts?|commissions?|buy[- ]price|"
+                           r"purchase price|net price|هامش|تكلفة|سعر التكلفة)\b", re.I)
+FORBIDDEN_COLUMNS = re.compile(r"^(cost|costs|cost_price|costprice|buy|buy_price|wholesale|margin|markup|payout|commission)$", re.I)
+MAX_QUOTES = 5000
+STALE_DAYS = 180
+
+
+class CompetitorQuotes:
+    """Prices merchants were quoted by competitors, as Sales and AMs report them. Data, never verified, never guessed."""
+
+    def __init__(self, path: Path = QUOTES_FILE, catalog: "Catalog | None" = None):
+        self.path, self.catalog = path, catalog
+
+    def _load(self) -> list[dict]:
+        try:
+            return json.loads(self.path.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+
+    def _save(self, rows: list[dict]) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = self.path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
+        os.replace(tmp, self.path)  # atomic
+
+    def save(self, competitor: str, product: str, country: str, price: Any, currency: str, billing: str,
+             scope: str = "", notes: str = "", reported_by: str = "") -> str:
+        competitor, product = (competitor or "").strip()[:80], (product or "").strip()[:120]
+        scope, notes = (scope or "").strip()[:200], (notes or "").strip()[:300]
+        if not competitor or not product:
+            raise ValueError("Give the competitor's name and the product they quoted.")
+        if self.catalog and self.catalog._partner(competitor):
+            raise ValueError(f"{competitor} is one of our reseller partners. Don't save its direct quote as a competitor price: "
+                             "raise it with Partnerships in #reseller-hub (unified pricing).")
+        code = str(country or "").upper()
+        if code not in CURRENCY:
+            raise ValueError("country must be SA, AE, KW, JO, EG or INT.")
+        cur = str(currency or "").strip().upper()
+        if not re.fullmatch(r"[A-Z]{3}", cur):
+            raise ValueError("currency must be a 3-letter code as written in their offer, for example SAR or USD.")
+        try:
+            amount = float(str(price).replace(",", ""))
+        except ValueError:
+            raise ValueError("price must be a number, exactly as their offer states it.")
+        if not 0 < amount < 10_000_000:
+            raise ValueError("price must be above 0.")
+        bill = next((b for b in QUOTE_BILLING if _norm(b) == _norm(billing)), None)
+        if not bill:
+            raise ValueError(f"billing must be one of {', '.join(QUOTE_BILLING)}, as their offer states it.")
+        text = " ".join([competitor, product, scope, notes])
+        if NO_COST_WORDS.search(text):
+            raise ValueError("Only the price the competitor quoted the merchant can be saved. Leave out cost, margin, "
+                             "markup, commission or wholesale wording.")
+        rows = self._load()
+        if len(rows) >= MAX_QUOTES:
+            raise ValueError("The competitor price store is full. Ask Kareem.")
+        row = {"id": uuid.uuid4().hex[:6], "reported_on": time.strftime("%Y-%m-%d"), "competitor": competitor,
+               "product": product, "country": "SA" if code == "KSA" else "AE" if code == "UAE" else code,
+               "currency": cur, "price": round(amount, 2), "billing": bill, "scope": scope, "notes": notes,
+               "reported_by": reported_by or ""}
+        rows.append(row)
+        self._save(rows)
+        return (f"Saved #{row['id']}: {competitor} quoted {product} at {cur} {row['price']:g} ({bill}) in {row['country']}. "
+                "It is stored as merchant-reported, not verified.")
+
+    def search(self, competitor: str | None = None, country: str | None = None, product: str | None = None,
+               level: str = "sales") -> str:
+        rows = self._load()
+        if competitor:
+            rows = [r for r in rows if _norm(competitor) in _norm(r["competitor"])]
+        if product:
+            rows = [r for r in rows if _norm(product) in _norm(r["product"])]
+        if country:
+            code = str(country).upper()
+            code = {"KSA": "SA", "UAE": "AE", "KWT": "KW", "JOR": "JO", "EGT": "EG"}.get(code, code)
+            rows = [r for r in rows if r["country"] == code]
+        rows = sorted(rows, key=lambda r: r["reported_on"], reverse=True)[:20]
+        today = time.time()
+        out = []
+        for r in rows:
+            row = {k: r[k] for k in QUOTE_CSV_COLUMNS}
+            row["source"] = "merchant-reported by a Foodics colleague, not verified"
+            try:
+                age = (today - time.mktime(time.strptime(r["reported_on"], "%Y-%m-%d"))) / 86400
+                if age > STALE_DAYS:
+                    row["warning"] = f"older than {STALE_DAYS} days: ask for a current offer"
+            except ValueError:
+                pass
+            if level in ("owner", "manager", "team") and r.get("reported_by"):
+                row["reported_by"] = r["reported_by"]
+            out.append(row)
+        return _clip({"quotes": out, "note": "Use these only as what merchants reported. Never present them as verified, "
+                                              "and never fill a gap with a guess." if out else
+                      "No competitor prices saved for this. Ask for the offer; never guess."})
+
+    def drop(self, qid: str) -> str:
+        rows = self._load()
+        keep = [r for r in rows if r["id"] != qid]
+        if len(keep) == len(rows):
+            return f"No competitor quote #{qid}."
+        self._save(keep)
+        return f"Removed competitor quote #{qid}."
+
+    def csv(self) -> str:
+        """The store as CSV. Fixed columns only, and it refuses to export anything that reads like cost or margin."""
+        import csv as _csv
+        if any(FORBIDDEN_COLUMNS.match(c) for c in QUOTE_CSV_COLUMNS):
+            raise ValueError("forbidden column in the competitor CSV")
+        buf = io.StringIO()
+        w = _csv.writer(buf)
+        w.writerow(QUOTE_CSV_COLUMNS)
+        for r in sorted(self._load(), key=lambda r: r["reported_on"], reverse=True):
+            cells = [str(r.get(c, "")) for c in QUOTE_CSV_COLUMNS]
+            if NO_COST_WORDS.search(" ".join(cells)):
+                continue  # never export a row that reads like cost, even if one was written by hand
+            w.writerow([("'" + c) if c[:1] in "=+-@" else c for c in cells])  # no spreadsheet formulas
+        return buf.getvalue()
+
+
 # ---------- escalation (the app turns it into @-mentions) ----------
 ESCALATION_KINDS = ("decision", "operations", "cycles")
 
@@ -453,7 +578,8 @@ def escalate(kind: str, reason: str = "", ctx: dict | None = None) -> str:
 
 
 # ---------- registry ----------
-def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: dict, catalog: Catalog | None = None) -> dict[str, dict]:
+def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: dict, catalog: Catalog | None = None,
+                quotes: CompetitorQuotes | None = None) -> dict[str, dict]:
     """name -> {schema, fn}. layers.yaml lists each level's tools, within the hard floors in brain.TOOL_MIN_LEVEL."""
     sheets = sources.get("sheets") or {}
     # Drive folder ids are owner-only pointers, so they come from a secret, not from the shared layers.yaml.
@@ -477,6 +603,26 @@ def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: 
             lambda partner=None, category=None, country=None, compare=None, _level="sales":
                 catalog.compare(compare, country, _level) if compare else catalog.lookup(partner, category, country, _level),
             level_aware=True)
+    if quotes is None:
+        quotes = CompetitorQuotes(catalog=catalog)
+    elif quotes.catalog is None:
+        quotes.catalog = catalog  # so a partner's own direct quote is never saved as a competitor price
+    add("competitor_quotes", "Competitor prices that merchants were quoted, as Foodics colleagues reported them "
+        "(merchant-reported, not verified). Filter by competitor, country (SA, AE, KW, JO, EG or INT) and product.",
+        {"competitor": {"type": "string"}, "country": {"type": "string"}, "product": {"type": "string"}}, [],
+        lambda competitor=None, country=None, product=None, _level="sales": quotes.search(competitor, country, product, _level),
+        level_aware=True)
+    add("competitor_quote_save", "Save a competitor's price that a merchant was quoted, only when the asker asks you to save it "
+        "and gives the competitor, product, country, price, currency and billing exactly as the offer states them. "
+        "Never a guess, and never cost or margin.",
+        {"competitor": {"type": "string"}, "product": {"type": "string"}, "country": {"type": "string"},
+         "price": {"type": "number"}, "currency": {"type": "string"},
+         "billing": {"type": "string", "enum": list(QUOTE_BILLING)},
+         "scope": {"type": "string", "description": "branches, brands or modules the price covers, if the offer says"},
+         "notes": {"type": "string", "description": "free months, one-time fees or minimums the offer states; no merchant names"}},
+        ["competitor", "product", "country", "price", "currency", "billing"],
+        lambda _ctx=None, **kw: quotes.save(**kw, reported_by=(_ctx or {}).get("asker", "")))
+    t["competitor_quote_save"]["ctx_aware"] = True
     if os.environ.get("SF_ACCESS_TOKEN") or os.environ.get("SF_USERNAME"):
         add("salesforce_query", "Run one read-only SOQL SELECT on Salesforce (accounts, opportunities, ARR, churn, F5). Max 200 rows.",
             {"soql": {"type": "string"}}, ["soql"], lambda soql: salesforce_query(soql))

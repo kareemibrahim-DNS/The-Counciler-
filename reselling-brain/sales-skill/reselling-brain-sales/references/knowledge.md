@@ -183,7 +183,7 @@ Use this when someone asks how one of our partners compares with another (for ex
 
 ## Comparing an offer someone brings
 1. **Read it.** Use the pasted text, or read the attached file. Use only what the offer says. If something is not in it, write "not in their offer". Never guess a competitor's price, feature or billing frequency. If a screenshot or file is unclear or cut off, list what you could read and ask for the rest. If their offer has no prices, compare scope and features only.
-2. **Only a competitor's name, no offer:** the Reselling Brain holds no competitor data. Don't describe their product or prices from memory. Ask for their offer, and meanwhile give our side: the partner that fits and its price for the merchant's size.
+2. **Only a competitor's name, no offer:** check the competitor prices colleagues saved (below). Don't describe their product or prices from memory. Ask for their offer, and meanwhile give our side: the partner that fits and its price for the merchant's size.
 3. **Find our match** in references/catalog.md: the partner or partners that solve the same need in that country.
 4. **Make it like for like:**
    - **Same billing period.** Use our line for the same period when the partner has one (monthly against monthly, annual against yearly). If our partner is sold only annually, turn their monthly price into a full-year total and say ours is billed annually.
@@ -199,6 +199,12 @@ Use this when someone asks how one of our partners compares with another (for ex
    - unified pricing: the list price is the same whether Foodics or the partner sells it, so there is no price burning;
    - one point of contact: Partnerships handles the partner.
 8. **Close with a Recommendation** (which option fits this merchant, and why) and the next step: build the quote, then submit it with that partner's form.
+
+## Competitor prices colleagues saved
+Sales and AMs can save what a competitor quoted a merchant, so the next comparison starts from real offers.
+- **Saving:** only when the asker asks you to save it. Ask them to save it with the Reselling Brain bot in Slack, with the competitor, product, country, price, currency and billing exactly as their offer states them, plus scope and notes (free months, one-time fees, minimums) if it says. Ask for anything missing; never fill it in. No merchant names or contacts. If the competitor is one of our own partners, don't save it: that goes to Partnerships (see Rules).
+- **Using them:** when someone names a competitor with no offer, or asks how we compare with a competitor, point the asker to the Reselling Brain bot in Slack, which holds the competitor prices colleagues saved. Show each one as "merchant-reported on <date>, not verified", next to our match, like for like (same rules as above). One saved quote is one merchant's offer, not the competitor's price list: say so. If a quote is old, say so and ask for a current offer.
+- If nothing is saved, say so and ask for their offer. Never guess a competitor's price, and never mix a saved quote into the asker's own offer.
 
 ## When the asker wants something to send the merchant
 - Write a draft only; the asker sends it.

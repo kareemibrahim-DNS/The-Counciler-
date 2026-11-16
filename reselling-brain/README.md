@@ -83,10 +83,12 @@ Replies never carry link or media previews. A reply may only link to Foodics sys
    ```
 7. Invite the bot to a channel (`/invite @Reselling Brain`) and mention it, or DM it.
 
-### Tools (all read-only)
+### Tools (all read-only, except `learn` and `competitor_quote_save`)
 | Tool | Owner (Kareem) | Manager (Hatem) | Team (Althurayyaa) | Sales and everyone else | Setup |
 | --- | --- | --- | --- | --- | --- |
 | `brain_catalog` | ✅ | ✅ | ✅ | ✅ (discount wording removed) | Nothing extra — reads `catalog/` (list prices only, never cost). `compare` puts 2–4 of our partners side by side |
+| `competitor_quotes` | ✅ (+ who reported it) | ✅ (+ who reported it) | ✅ (+ who reported it) | ✅ | Reads the competitor prices colleagues saved, marked merchant-reported and not verified |
+| `competitor_quote_save` | ✅ | ✅ | ✅ | ✅ | Saves a competitor's quoted price (competitor, product, country, price, currency, billing) to `BRAIN_COMPETITOR_QUOTES` (`/data/competitor_quotes.json` on Railway, never in git). Refuses our own partners and any cost, margin, markup or commission wording |
 | `escalate` | ✅ | ✅ | ✅ | ✅ | Nothing extra — the app adds the @-mentions from `routing` in `layers.yaml` |
 | `read_slack_file` | ✅ | ✅ | ✅ | ✅ | Opens only files attached to the message being answered (or to the message just above a bare mention), e.g. an offer to compare |
 | `sheets_read` | ✅ all listed sheets | ✅ sheets marked `audience: team` or `audience: manager` (trackers) | ✅ only sheets marked `audience: team` | — | Google service-account key in the `GOOGLE_SERVICE_ACCOUNT_JSON` secret (never commit the key file) + list the real sheets in a server-side copy of `layers.yaml` (point `BRAIN_LAYERS_FILE` at it on the `/data` volume; never in this repo) and share them with the service account |
@@ -104,6 +106,8 @@ Tell it a new or corrected rule. It queues it as owner-only, and the bot adds th
 - `approve <id> team` → shared with the team, live immediately. Facts about cost, margin, markup, commission, contracts, targets or strategy are refused and stay pending
 - `reject <id>` → dropped
 - `pending` → list what's waiting
+- `quotes csv` → the competitor prices colleagues saved, as CSV (fixed columns; rows that read like cost are never exported)
+- `drop quote <id>` → remove a wrong competitor price
 - `reload` → re-read the knowledge files
 - `away` / `back` → hand decisions to Hatem while you're off, then take them back
 - `status` → shows whether the bot thinks you're away, and why
@@ -118,7 +122,7 @@ It needs to run somewhere that stays on. Socket Mode means no public URL is need
 ### Deploy on Railway (recommended)
 1. railway.app → sign in with GitHub → **New Project → Deploy from GitHub repo** → `The-Counciler-`.
 2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `main`. Railway builds the `Dockerfile` in that folder (the build runs the offline tests and fails if they don't pass). Set the builder (Dockerfile) and the restart policy (On Failure) in Railway **Settings**: Railway doesn't read `railway.json` from a root directory, and stops reading config files on 1 Dec 2026.
-3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add a **volume mounted at `/data`** (keep 1 replica) for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`. `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist. Optional: `BRAIN_MAX_TOKENS` (default 4000).
+3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add a **volume mounted at `/data`** (keep 1 replica) for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`, `BRAIN_COMPETITOR_QUOTES=/data/competitor_quotes.json`. `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist. Optional: `BRAIN_MAX_TOKENS` (default 4000).
 4. Deploy. The log shows `Private knowledge loaded: … team, … manager, … cost, … owner docs, team notes for … partners.` (counts only), `Tools enabled: …` and `⚡️ Bolt app is running!`. If it says the secret is not set or can't be read, set it again from Kareem's copy.
 
 Note: learned facts and the learn queue live on the `/data` volume and survive deploys. None of them is written to `knowledge/`.

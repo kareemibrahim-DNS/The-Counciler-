@@ -22,21 +22,21 @@ default_level: sales
 levels:
   owner:
     sees: [owner, cost, manager, team, base]
-    tools: [brain_catalog, escalate, salesforce_query, sheets_read, drive_search, drive_read, slack_read_channel, read_slack_file, learn]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, salesforce_query, sheets_read, drive_search, drive_read, slack_read_channel, read_slack_file, learn]
     instructions: "This is Kareem. Full detail, including cost, contracts, targets and strategy."
   manager:
     sees: [manager, team, base]
-    tools: [brain_catalog, escalate, sheets_read, read_slack_file]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, sheets_read, read_slack_file]
     instructions: "Manager. Everything the team sees, plus program cycles, targets, strategy, trackers and partner contacts. Cost and contracts only if this person has the cost grant."
   team:
     sees: [team, base]
     # read_slack_file opens only files attached to the message being answered (or to the message just above a bare mention).
-    tools: [brain_catalog, escalate, sheets_read, read_slack_file]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, sheets_read, read_slack_file]
     instructions: "Partnerships team member. Policy, discount eligibility, SLAs, processes, partner operations and the catalogue. No cost, contracts, contacts, trackers, targets or strategy."
   sales:
     sees: [sales, base]
     # read_slack_file opens only files attached to the message being answered (an offer to compare).
-    tools: [brain_catalog, escalate, read_slack_file]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, read_slack_file]
     instructions: "Sales, Account Manager or any other colleague. The common layer: resellers, list prices, quotes, comparisons, merchant fit, competitive analysis, flows and operations. Nothing locked."
 
 # Channels partners can read. The bot never answers there (it tells only the asker, privately).

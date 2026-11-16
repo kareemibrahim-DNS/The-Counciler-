@@ -322,7 +322,9 @@ LEVEL_RANK = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
 TOOL_MIN_LEVEL = {"salesforce_query": "owner", "drive_search": "owner", "drive_read": "owner",
                   "slack_read_channel": "owner", "learn": "owner", "sheets_read": "team",
                   # Everyone may open a file attached to the message being answered, to compare an offer they bring.
-                  "read_slack_file": "sales"}
+                  "read_slack_file": "sales",
+                  # Competitor prices merchants were quoted: everyone may read and save them (never cost; see tools.py).
+                  "competitor_quotes": "sales", "competitor_quote_save": "sales"}
 
 
 def tools_for(level: str, layers: dict, tools: dict) -> dict:
