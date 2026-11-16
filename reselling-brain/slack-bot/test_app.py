@@ -41,6 +41,8 @@ def fake_api_call(self, api_method, **kw):
         data = {"members": CHANNELS[args["channel"]][1], "response_metadata": {"next_cursor": ""}}
     elif api_method == "conversations.replies":
         data = {"messages": REPLIES.get(args.get("ts"), [])}
+    elif api_method == "conversations.open":
+        data = {"channel": {"id": "DK"}}
     elif api_method == "conversations.history":
         above = ABOVE.get(args.get("channel"), [])
         data = {"messages": above if isinstance(above, list) else [above]}
@@ -353,3 +355,27 @@ class BrainWatch(unittest.TestCase):
         said, eph = self.wiring.run_event(OWNER, "CPRIV", "<@UBOT> review")
         self.assertEqual(said, [])
         self.assertEqual([e["text"] for e in eph], [app.OWNER_DM_ONLY_REPLY])
+
+    def test_the_digest_goes_to_kareem_every_other_sunday_at_1130_riyadh_once(self):
+        import datetime as dt
+        import watch
+        at = lambda y, m, d, h, mi: dt.datetime(y, m, d, h - 3, mi, tzinfo=dt.timezone.utc).timestamp()  # Riyadh time
+        self.assertEqual(watch.digest_slot(at(2026, 11, 22, 11, 29)), "")
+        self.assertEqual(watch.digest_slot(at(2026, 11, 22, 11, 30)), "2026-11-22")
+        self.assertEqual(watch.digest_slot(at(2026, 11, 29, 12, 0)), "", "the Sunday in between is skipped")
+        self.assertEqual(watch.digest_slot(at(2026, 12, 6, 18, 0)), "2026-12-06")
+        self.assertEqual(watch.digest_slot(at(2026, 12, 7, 11, 30)), "", "a missed slot isn't sent the next day")
+        self.assertEqual(app.watch.claim_digest(at(2026, 12, 6, 11, 35)), "2026-12-06")
+        self.assertEqual(app.watch.claim_digest(at(2026, 12, 6, 11, 40)), "", "sent once only")
+
+    def test_the_digest_dm_opens_kareems_dm_and_posts_there(self):
+        stop = mock.Mock()
+        stop.wait.side_effect = [False, True]
+        CALLS.clear()
+        with mock.patch.object(app.watch, "claim_digest", return_value="2026-11-22"):
+            app.digest_loop(stop, every=0)
+        opened = [a for m, a in CALLS if m == "conversations.open"]
+        posted = [a for m, a in CALLS if m == "chat.postMessage"]
+        self.assertEqual(opened[0]["users"], OWNER)
+        self.assertEqual(len(posted), 1)
+        self.assertIn("2-week Brain Watch digest (2026-11-22)", posted[0]["text"])

@@ -26,6 +26,11 @@ from collections import Counter
 from pathlib import Path
 
 WATCH_FILE = Path(os.environ.get("BRAIN_WATCH_FILE", Path(__file__).with_name("watch.json")))
+# The 2-week digest DM (Kareem, 16 Nov 2026): every other Sunday at 11:30 Riyadh time (UTC+3, no DST),
+# starting Sunday 22 Nov 2026. A missed slot (bot down) is sent once when it comes back, the same day only.
+DIGEST_ANCHOR = (2026, 11, 22)
+DIGEST_AT = (11, 30)
+RIYADH = 3 * 3600
 KEEP_DAYS = 60          # older answers are dropped from the file
 SCAN_DAYS = 14          # threads younger than this are re-read on `review`
 SCAN_LIMIT = 80         # at most this many threads per `review` (Slack rate limits)
@@ -45,6 +50,16 @@ def _topic(question: str) -> str:
             "can", "you", "me", "please", "and", "or", "with", "it", "this", "that", "our", "my", "be", "any", "there"}
     keep = [w for w in words if w not in stop and not w.isdigit()]
     return " ".join(sorted(set(keep[:8]))) or _short(question, 40).lower()
+
+
+def digest_slot(now: float) -> str:
+    """Today's digest slot ('YYYY-MM-DD') if a digest is due at `now`, else ''."""
+    import datetime as dt
+    local = dt.datetime.fromtimestamp(now + RIYADH, dt.timezone.utc).replace(tzinfo=None)
+    days = (local.date() - dt.date(*DIGEST_ANCHOR)).days
+    if days < 0 or days % 14 or (local.hour, local.minute) < DIGEST_AT:
+        return ""
+    return local.date().isoformat()
 
 
 class Watch:
@@ -119,6 +134,18 @@ class Watch:
             return None
         fix = " / ".join(s["text"] for s in a["stepped_in"])
         return f"Q: {a['question']} -> correct answer: {fix}"
+
+    def claim_digest(self, now: float | None = None) -> str:
+        """The due slot, marked as sent so it goes out once (survives restarts on /data); '' if none is due."""
+        slot = digest_slot(time.time() if now is None else now)
+        if not slot:
+            return ""
+        data = self._load()
+        if data.get("digest_sent") == slot:
+            return ""
+        data["digest_sent"] = slot
+        self._save(data)
+        return slot
 
     # ---------- scanning ----------
     def scan(self, client, *, watched: dict[str, str], bot_ids: set[str]) -> int:

@@ -53,7 +53,7 @@ When part of a question is locked, the bot answers the rest and says "This part 
 
 "Away" means Kareem sent `away` to the bot in a DM (until `back`), or his Slack status shows leave or sickness (🌴 🏝️ 🏖️ 🤒, or whole words such as vacation, on leave, OOO, إجازة; "back from vacation" and business travel don't count). After `back`, a new leave status counts again. Nobody is pulled in for their own question, and nobody is mentioned twice.
 
-A mention only notifies people who are in the conversation. In a DM, or a channel the person isn't in, the line says so and tells the asker to message them or post in #reseller-hub. (The bot never posts outside the thread it was asked in.)
+A mention only notifies people who are in the conversation. In a DM, or a channel the person isn't in, the line says so and tells the asker to message them or post in #reseller-hub. (The bot never posts outside the thread it was asked in. The only exception is the 2-week digest DM to Kareem.)
 
 ### Who reads the reply decides the level (`slack-bot/access.py`)
 | Where | Answer level |
@@ -119,6 +119,7 @@ The bot logs every answer it gives (on the `/data` volume, never in git) so you 
 Commands:
 - `review` → re-reads the threads of the last 14 days, then shows the three lists with ids and thread links
 - `digest` → the 2-week digest: insights (answers, share without a clear answer, response time, where, who asks most by Slack title or level, top askers, most asked questions), then the review. Nothing goes into the brain until you `teach` and `approve` it
+  - The bot also DMs you the digest on its own **every other Sunday at 11:30 Riyadh time**, starting Sunday 22 Nov 2026 (Kareem, 16 Nov 2026). It's the only message the bot starts itself, and it only goes to you. If the bot was down at 11:30 it sends it when it's back, the same day only.
 - `note <text>` → adds your own note (a DM that starts with `note ` is always taken as a note)
 - `teach <id>` → turns a correction or a note into a learn proposal; then `approve <id>` / `approve <id> team` as usual
 - `dismiss <id>` → drops an item from the review
@@ -126,7 +127,7 @@ Commands:
 It uses the scopes the bot already has: no new Slack events and no reinstall. DMs can't have someone step in, so only their unanswered questions show. Answers older than 60 days are dropped. On Railway set `BRAIN_WATCH_FILE=/data/watch.json`.
 
 ### Tests
-`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 116 tests (94 in `test_brain`, 22 in `test_app`). `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 118 tests (94 in `test_brain`, 24 in `test_app`). `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 
@@ -144,7 +145,7 @@ Note: learned facts and the learn queue live on the `/data` volume and survive d
 - Answer a partner, a guest or a user from another workspace, in a DM or anywhere else.
 - Answer in a channel partners can read: per-partner channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`, `#kw-…`, `#jo-…`, `#eg-…`), `#foodics-…`, any Slack Connect channel (or one with a pending invite), or any channel with a guest or outside member. Patterns live in `layers.yaml` (`blocked_channels`, `allowed_channels`).
 - Post an owner or team answer where a lower level can read it.
-- Post outside the thread it was asked in.
+- Post outside the thread it was asked in (except the 2-week digest DM to Kareem).
 - Message a partner or a merchant.
 - Approve an exception: it points to the flow and pulls in Kareem (Hatem when Kareem is away).
 - Answer in a channel without being mentioned.

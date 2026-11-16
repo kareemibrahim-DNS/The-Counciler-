@@ -3,6 +3,7 @@
 Answers when mentioned in a channel or messaged directly, using the shared
 knowledge plus read-only tools (Salesforce, Google Sheets/Drive, Slack, files).
 It only ever replies in the same thread; it never posts elsewhere or messages partners.
+The one exception: the 2-week Brain Watch digest, which it DMs to Kareem only (every other Sunday, 11:30 Riyadh).
 Run: python app.py  (Socket Mode, no public URL needed)
 
 Who reads the reply decides the level (see access.py):
@@ -25,6 +26,7 @@ import json
 import logging
 import os
 import re
+import threading
 import time
 from pathlib import Path
 
@@ -156,9 +158,7 @@ def owner_command(text: str) -> str | None:
     t = raw.lower()
     if t in {"review", "digest"}:
         watch.scan(app.client, watched=watched_people(), bot_ids={b for b in (BOT_ID, BOT_USER_ID) if b})
-        if t == "digest":  # Slack mentions in a DM to Kareem don't notify anyone, they just show names
-            return watch.insights() + "\n\n" + watch.report()
-        return watch.report()
+        return watch.insights() + "\n\n" + watch.report() if t == "digest" else watch.report()
     if t == "note" or t.startswith(("note ", "note\n")):
         return watch.note(raw[4:])
     m = re.match(r"^(teach|dismiss)\s+#?([0-9a-f]{6})$", t)
@@ -339,7 +339,27 @@ def on_dm(event, client, say, context):
     answer(event, client, say, context)
 
 
+def digest_text() -> str:
+    watch.scan(app.client, watched=watched_people(), bot_ids={b for b in (BOT_ID, BOT_USER_ID) if b})
+    return watch.insights() + "\n\n" + watch.report()
+
+
+def digest_loop(stop: threading.Event, every: int = 300) -> None:
+    """Every other Sunday at 11:30 Riyadh time: DM Kareem the 2-week digest. The only message the bot
+    starts itself, and only ever to Kareem."""
+    while not stop.wait(every):
+        try:
+            slot = watch.claim_digest() if OWNER_ID else ""
+            if slot:
+                dm = app.client.conversations_open(users=OWNER_ID)["channel"]["id"]
+                app.client.chat_postMessage(channel=dm, text=f"*Your 2-week Brain Watch digest ({slot})*\n\n" + digest_text(),
+                                            unfurl_links=False, unfurl_media=False)
+        except Exception:
+            logging.exception("digest DM failed")
+
+
 if __name__ == "__main__":
+    threading.Thread(target=digest_loop, args=(threading.Event(),), daemon=True).start()
     try:
         directory.refresh()
     except Exception as exc:
