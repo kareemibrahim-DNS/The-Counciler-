@@ -34,7 +34,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from access import OWNER_DM_ONLY_REPLY, Directory, country_of, decide, handoff_lines, is_away, is_owner_command
 from brain import (KNOWLEDGE_DIR, OWNER_LEARNED_FILE, TEAM_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply,
                    secret_summary)
-from tools import Learner, SlackReader, build_tools
+from tools import CompetitorQuotes, Learner, SlackReader, build_tools
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -59,7 +59,9 @@ MAX_HISTORY = 12
 
 learner = Learner(KNOWLEDGE_DIR, Path(os.environ.get("BRAIN_LEARN_QUEUE", Path(__file__).with_name("learn_queue.json"))),
                   owner_file=OWNER_LEARNED_FILE, team_file=TEAM_LEARNED_FILE)
-tools = build_tools(slack=SlackReader(app.client, BOT_TOKEN), learner=learner, sources=load_layers().get("sources") or {})
+quotes = CompetitorQuotes()
+tools = build_tools(slack=SlackReader(app.client, BOT_TOKEN), learner=learner, sources=load_layers().get("sources") or {},
+                    quotes=quotes)
 brain = Brain(tools=tools)
 directory = Directory(app.client)
 logging.info("Tools enabled: %s", ", ".join(sorted(tools)) or "none")
@@ -158,6 +160,17 @@ def owner_command(text: str) -> str | None:
         return "Brain reloaded ✅"
     if t == "pending":
         return learner.pending()
+    if t == "quotes csv":  # the competitor price store, in Kareem's DM only (owner commands never run elsewhere)
+        body = quotes.csv()
+        if body.count("\n") <= 1:
+            return "No competitor prices saved yet."
+        if len(body) > 35000:
+            body = body[:35000].rsplit("\n", 1)[0] + "\n"
+            return f"Competitor prices (merchant-reported, not verified), newest first, cut to fit:\n```\n{body}```"
+        return f"Competitor prices (merchant-reported, not verified):\n```\n{body}```"
+    m = re.match(r"^drop quote\s+#?([0-9a-f]{6})$", t)
+    if m:
+        return quotes.drop(m.group(1))
     m = re.match(r"^(approve|reject)\s+#?([0-9a-f]{6})(?:\s+(team|owner))?$", t)
     if m:
         msg = learner.approve(m.group(2), m.group(3) or "owner") if m.group(1) == "approve" else learner.reject(m.group(2))
@@ -243,7 +256,7 @@ def answer(event, client, say, context):
     elif not question and not files:
         question = "Answer the last question in this thread."
     queued_before = set(learner.queued()) if d.level == "owner" else set()
-    ctx = {"file_ids": [f.get("id") for f in files if f.get("id")]}
+    ctx = {"file_ids": [f.get("id") for f in files if f.get("id")], "asker": event["user"]}
     try:  # quote the asker's own country by default
         found = country_of(directory.user(event["user"]), (brain.layers.get("people") or {}).get(event["user"]))
         if found:

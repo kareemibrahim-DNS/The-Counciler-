@@ -1,12 +1,12 @@
 ---
 id: competitive-analysis
 audience: base
-source: "Kareem's request (15 Nov 2026), who fits this merchant and comparing an offer someone brings"
+source: "Kareem's request (15 Nov 2026), who fits this merchant, comparing two of our partners and comparing an offer someone brings"
 updated: 2026-11-15
 ---
 # Competitive analysis
 
-Use this when someone asks who fits a merchant best, or brings something to compare: a competitor's offer, a partner's own quote, a screenshot, a pasted price list or a file.
+Use this when someone asks who fits a merchant best, how two of our partners compare, or brings something to compare: a competitor's offer, a partner's own quote, a screenshot, a pasted price list or a file.
 
 ## Which country
 - Use the **merchant's** country when the question says where the merchant is (a city counts: Riyadh → KSA, Dubai → UAE, Kuwait City → Kuwait, Amman → Jordan, Cairo → Egypt). Otherwise use the asker's country. If it isn't clear, ask.
@@ -23,9 +23,17 @@ Use this when someone asks who fits a merchant best, or brings something to comp
 4. Several needs (for example ordering and loyalty): one Recommendation per need, each from its own category. Two partners that fit equally: say it's close and name the one question that decides it.
 5. If no live partner sells in that country, or none fits, say so plainly. Never stretch a partner to fit.
 
+## Comparing two of our partners
+Use this when someone asks how one of our partners compares with another (for example "Grubtech or Deliverect?", "Xero vs Wafeq for this merchant").
+1. Call `brain_catalog` with `compare` (the partner names) and the merchant's country. If a name isn't one of our partners, it's a competitor: follow "Comparing an offer someone brings".
+2. **Same category:** show a table: | | partner A | partner B | with best for, edge, licensing unit, billing, countries, entry price (exact Salesforce line name) and watch-outs. Then use the category's "How to choose" to say which one fits. With the merchant's size, add the math for both: full quote totals, same billing period, recurring fees apart from one-time fees.
+3. **Different categories:** say they solve different needs and aren't alternatives, and name what each one is for. If the merchant needs both, give one Recommendation per need.
+4. A partner with no price in that country isn't sold there: say so and don't recommend it there.
+5. Close with a **Recommendation** and the one question that decides it if it's close. Never say one partner is bad; say when each one wins.
+
 ## Comparing an offer someone brings
 1. **Read it.** Use the pasted text, or open the attached file with `read_slack_file`. Use only what the offer says. If something is not in it, write "not in their offer". Never guess a competitor's price, feature or billing frequency. If a screenshot or file is unclear or cut off, list what you could read and ask for the rest. If their offer has no prices, compare scope and features only.
-2. **Only a competitor's name, no offer:** the Reselling Brain holds no competitor data. Don't describe their product or prices from memory. Ask for their offer, and meanwhile give our side: the partner that fits and its price for the merchant's size.
+2. **Only a competitor's name, no offer:** check the competitor prices colleagues saved (below). Don't describe their product or prices from memory. Ask for their offer, and meanwhile give our side: the partner that fits and its price for the merchant's size.
 3. **Find our match** with `brain_catalog`: the partner or partners that solve the same need in that country.
 4. **Make it like for like:**
    - **Same billing period.** Use our line for the same period when the partner has one (monthly against monthly, annual against yearly). If our partner is sold only annually, turn their monthly price into a full-year total and say ours is billed annually.
@@ -41,6 +49,12 @@ Use this when someone asks who fits a merchant best, or brings something to comp
    - unified pricing: the list price is the same whether Foodics or the partner sells it, so there is no price burning;
    - one point of contact: Partnerships handles the partner.
 8. **Close with a Recommendation** (which option fits this merchant, and why) and the next step: build the quote, then submit it with that partner's form.
+
+## Competitor prices colleagues saved
+Sales and AMs can save what a competitor quoted a merchant, so the next comparison starts from real offers.
+- **Saving:** only when the asker asks you to save it. Call `competitor_quote_save` with the competitor, product, country, price, currency and billing exactly as their offer states them, plus scope and notes (free months, one-time fees, minimums) if it says. Ask for anything missing; never fill it in. No merchant names or contacts. If the competitor is one of our own partners, don't save it: that goes to Partnerships (see Rules).
+- **Using them:** when someone names a competitor with no offer, or asks how we compare with a competitor, call `competitor_quotes` for that competitor and country. Show each one as "merchant-reported on <date>, not verified", next to our match, like for like (same rules as above). One saved quote is one merchant's offer, not the competitor's price list: say so. If a quote is old, say so and ask for a current offer.
+- If nothing is saved, say so and ask for their offer. Never guess a competitor's price, and never mix a saved quote into the asker's own offer.
 
 ## When the asker wants something to send the merchant
 - Write a draft only; the asker sends it.
