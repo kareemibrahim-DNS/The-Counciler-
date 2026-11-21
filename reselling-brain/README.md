@@ -53,7 +53,7 @@ When part of a question is locked, the bot answers the rest and says "This part 
 
 "Away" means Kareem sent `away` to the bot in a DM (until `back`), or his Slack status shows leave or sickness (🌴 🏝️ 🏖️ 🤒, or whole words such as vacation, on leave, OOO, إجازة; "back from vacation" and business travel don't count). After `back`, a new leave status counts again. Nobody is pulled in for their own question, and nobody is mentioned twice.
 
-A mention only notifies people who are in the conversation. In a DM, or a channel the person isn't in, the line says so and tells the asker to message them or post in #reseller-hub. (The bot never posts outside the thread it was asked in.)
+A mention only notifies people who are in the conversation. In a DM, or a channel the person isn't in, the line says so and tells the asker to message them or post in #reseller-hub. (The bot never posts outside the thread it was asked in. The only exception is the 2-week digest DM to Kareem.)
 
 ### Who reads the reply decides the level (`slack-bot/access.py`)
 | Where | Answer level |
@@ -114,15 +114,31 @@ Tell it a new or corrected rule. It queues it as owner-only, and the bot adds th
 
 These commands work only in your DM with the bot. In a channel it tells you privately to DM it.
 
+### Brain Watch: gaps and corrections (Kareem only, in a DM)
+The bot logs every answer it gives (on the `/data` volume, never in git) so you can see where it fell short:
+- **Someone stepped in:** in a channel thread the bot answered, you, Hatem or Althurayyaa (`routing` in `layers.yaml`) wrote after its reply, and weren't the asker or asking the bot again. You decide in `review` whether it was a real correction.
+- **Asked without an answer or a clear answer:** the bot handed off, said a part is locked, said it isn't in the brain yet, or failed. Grouped by similar wording, most asked first.
+- **Your notes:** anything you add yourself.
+
+Commands:
+- `review` → re-reads the threads of the last 14 days, then shows the three lists with ids and thread links
+- `digest` → the 2-week digest: insights (answers, share without a clear answer, response time, where, who asks most by Slack title or level, top askers, most asked questions), then the review. Nothing goes into the brain until you `teach` and `approve` it
+  - The bot also DMs you the digest on its own **every other Sunday at 11:30 Riyadh time**, starting Sunday 22 Nov 2026 (Kareem, 16 Nov 2026). It's the only message the bot starts itself, and it only goes to you. If the bot was down at 11:30 it sends it when it's back, the same day only.
+- `note <text>` → adds your own note (a DM that starts with `note ` is always taken as a note)
+- `teach <id>` → turns a correction or a note into a learn proposal; then `approve <id>` / `approve <id> team` as usual
+- `dismiss <id>` → drops an item from the review
+
+It uses the scopes the bot already has: no new Slack events and no reinstall. DMs can't have someone step in, so only their unanswered questions show. Answers older than 60 days are dropped. On Railway set `BRAIN_WATCH_FILE=/data/watch.json`.
+
 ### Tests
-`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 112 tests (94 in `test_brain`, 18 in `test_app`). `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 130 tests (106 in `test_brain`, 24 in `test_app`). `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 
 ### Deploy on Railway (recommended)
 1. railway.app → sign in with GitHub → **New Project → Deploy from GitHub repo** → `The-Counciler-`.
 2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `main`. Railway builds the `Dockerfile` in that folder (the build runs the offline tests and fails if they don't pass). Set the builder (Dockerfile) and the restart policy (On Failure) in Railway **Settings**: Railway doesn't read `railway.json` from a root directory, and stops reading config files on 1 Dec 2026.
-3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add a **volume mounted at `/data`** (keep 1 replica) for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`, `BRAIN_COMPETITOR_QUOTES=/data/competitor_quotes.json`. `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist. Optional: `BRAIN_MAX_TOKENS` (default 4000).
+3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add a **volume mounted at `/data`** (keep 1 replica) for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`, `BRAIN_COMPETITOR_QUOTES=/data/competitor_quotes.json`, `BRAIN_WATCH_FILE=/data/watch.json` (Brain Watch log). `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist. Optional: `BRAIN_MAX_TOKENS` (default 4000).
 4. Deploy. The log shows `Private knowledge loaded: … team, … manager, … cost, … owner docs, team notes for … partners.` (counts only), `Tools enabled: …` and `⚡️ Bolt app is running!`. If it says the secret is not set or can't be read, set it again from Kareem's copy.
 
 Note: learned facts and the learn queue live on the `/data` volume and survive deploys. None of them is written to `knowledge/`.
@@ -133,7 +149,7 @@ Note: learned facts and the learn queue live on the `/data` volume and survive d
 - Answer a partner, a guest or a user from another workspace, in a DM or anywhere else.
 - Answer in a channel partners can read: per-partner channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`, `#kw-…`, `#jo-…`, `#eg-…`), `#foodics-…`, any Slack Connect channel (or one with a pending invite), or any channel with a guest or outside member. Patterns live in `layers.yaml` (`blocked_channels`, `allowed_channels`).
 - Post an owner or team answer where a lower level can read it.
-- Post outside the thread it was asked in.
+- Post outside the thread it was asked in (except the 2-week digest DM to Kareem).
 - Message a partner or a merchant.
 - Approve an exception: it points to the flow and pulls in Kareem (Hatem when Kareem is away).
 - Answer in a channel without being mentioned.

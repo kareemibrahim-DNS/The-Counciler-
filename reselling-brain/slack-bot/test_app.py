@@ -41,6 +41,8 @@ def fake_api_call(self, api_method, **kw):
         data = {"members": CHANNELS[args["channel"]][1], "response_metadata": {"next_cursor": ""}}
     elif api_method == "conversations.replies":
         data = {"messages": REPLIES.get(args.get("ts"), [])}
+    elif api_method == "conversations.open":
+        data = {"channel": {"id": "DK"}}
     elif api_method == "conversations.history":
         above = ABOVE.get(args.get("channel"), [])
         data = {"messages": above if isinstance(above, list) else [above]}
@@ -80,7 +82,7 @@ def setUpModule():
     _patches.append(mock.patch.dict(os.environ, {
         "SLACK_BOT_TOKEN": "xoxb-test", "SLACK_APP_TOKEN": "xapp-test", "ANTHROPIC_API_KEY": "sk-test",
         "BRAIN_OWNER_SLACK_ID": OWNER, "BRAIN_LEARN_QUEUE": os.path.join(tmp, "q.json"),
-        "BRAIN_STATE_FILE": os.path.join(tmp, "state.json")}))
+        "BRAIN_STATE_FILE": os.path.join(tmp, "state.json"), "BRAIN_WATCH_FILE": os.path.join(tmp, "watch.json")}))
     _patches.append(mock.patch.object(BaseClient, "api_call", fake_api_call))
     for p in _patches:
         p.start()
@@ -93,14 +95,15 @@ def tearDownModule():
 
 
 class AppWiring(unittest.TestCase):
-    def run_event(self, user, channel, text_="", script=None, **extra):
+    def run_event(self, user, channel, text_="", script=None, reply_ts=None, **extra):
         CALLS.clear()
         said = []
         app.brain.client = FakeClaude(script or [text("ok")])
         event = {"user": user, "channel": channel, "text": text_, "ts": "1.1", **extra}
         if channel.startswith("D"):
             event.setdefault("channel_type", "im")
-        app.answer(event, app.app.client, lambda **k: said.append(k), {"bot_user_id": BOT})
+        app.answer(event, app.app.client, lambda **k: said.append(k) or ({"ts": reply_ts} if reply_ts else None),
+                   {"bot_user_id": BOT})
         ephemeral = [a for m, a in CALLS if m == "chat.postEphemeral"]
         for s in said:
             self.assertIs(s.get("unfurl_links"), False)
@@ -291,3 +294,88 @@ class AppWiring(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BrainWatch(unittest.TestCase):
+    """Kareem's review of gaps and corrections (watch.py), wired through app.py."""
+
+    def setUp(self):
+        app.watch.path.unlink(missing_ok=True)
+        self.wiring = AppWiring()
+
+    def ids(self, where="answers"):
+        return list(app.watch._load()[where])
+
+    def owner(self, cmd):
+        said, _ = self.wiring.run_event(OWNER, "DK", cmd)
+        return said[0]["text"]
+
+    def test_a_team_follow_up_after_the_bot_counts_as_stepping_in_but_a_new_question_does_not(self):
+        REPLIES["5.0"] = [{"ts": "5.0", "user": SALES, "text": "<@UBOT> grubtech price in KSA?"}]
+        self.wiring.run_event(SALES, "CPUB", "<@UBOT> grubtech price in KSA?", script=[text("It is 100 SAR.")],
+                              reply_ts="5.1", ts="5.0", thread_ts="5.0")
+        REPLIES["5.0"] += [{"ts": "5.1", "bot_id": "B1", "user": BOT, "text": "It is 100 SAR."},
+                           {"ts": "5.2", "user": TEAM, "text": "Correction: it's 120 SAR from Dec"},
+                           {"ts": "5.3", "user": OWNER, "text": "<@UBOT> and for UAE?"},
+                           {"ts": "5.4", "user": SALES, "text": "thanks"}]
+        report = self.owner("review")
+        self.assertIn("Correction: it's 120 SAR from Dec", report)
+        self.assertNotIn("and for UAE", report, "asking the bot again is not a correction")
+        self.assertNotIn("thanks", report, "the asker's own reply is not a correction")
+        rid = self.ids()[0]
+        self.assertIn(f"#{rid}", report)
+        queued = self.owner(f"teach {rid}")
+        self.assertIn("Queued #", queued)
+        self.assertIn("120 SAR", queued)
+        self.assertEqual(app.brain.client.calls, [], "commands never reach the model")
+        self.assertIn("Dismissed", self.owner(f"dismiss {rid}"))
+        self.assertNotIn("120 SAR", self.owner("review"))
+
+    def test_unanswered_questions_are_grouped_most_asked_first(self):
+        for q in ("what is the discount for wafeq?", "discount for Wafeq what is"):
+            self.wiring.run_event(SALES, "DS", q, script=[text("This part I can't answer here. Use the form.")])
+        self.wiring.run_event(SALES, "DS", "list resellers", script=[text("Here they are: ...")])
+        report = self.owner("review")
+        self.assertIn("2× ", report)
+        self.assertNotIn("list resellers", report)
+        digest = self.owner("digest")
+        self.assertIn("3 answers to 1 people", digest)
+        self.assertIn("2 without a clear answer", digest)
+        self.assertIn("Response time: median", digest)
+
+    def test_kareems_notes_show_in_the_review_and_can_be_taught(self):
+        self.assertIn("Noted #", self.owner("note Grubtech quotes need the Branch count first"))
+        nid = self.ids("notes")[0]
+        self.assertIn("Branch count", self.owner("review"))
+        self.assertIn("Branch count", self.owner(f"teach {nid}"))
+
+    def test_watch_commands_are_owner_only_and_dm_only(self):
+        said, _ = self.wiring.run_event(SALES, "DS", "review", script=[text("I answer questions.")])
+        self.assertEqual(said[0]["text"], "I answer questions.", "for anyone else it's a normal question")
+        said, eph = self.wiring.run_event(OWNER, "CPRIV", "<@UBOT> review")
+        self.assertEqual(said, [])
+        self.assertEqual([e["text"] for e in eph], [app.OWNER_DM_ONLY_REPLY])
+
+    def test_the_digest_goes_to_kareem_every_other_sunday_at_1130_riyadh_once(self):
+        import datetime as dt
+        import watch
+        at = lambda y, m, d, h, mi: dt.datetime(y, m, d, h - 3, mi, tzinfo=dt.timezone.utc).timestamp()  # Riyadh time
+        self.assertEqual(watch.digest_slot(at(2026, 11, 22, 11, 29)), "")
+        self.assertEqual(watch.digest_slot(at(2026, 11, 22, 11, 30)), "2026-11-22")
+        self.assertEqual(watch.digest_slot(at(2026, 11, 29, 12, 0)), "", "the Sunday in between is skipped")
+        self.assertEqual(watch.digest_slot(at(2026, 12, 6, 18, 0)), "2026-12-06")
+        self.assertEqual(watch.digest_slot(at(2026, 12, 7, 11, 30)), "", "a missed slot isn't sent the next day")
+        self.assertEqual(app.watch.claim_digest(at(2026, 12, 6, 11, 35)), "2026-12-06")
+        self.assertEqual(app.watch.claim_digest(at(2026, 12, 6, 11, 40)), "", "sent once only")
+
+    def test_the_digest_dm_opens_kareems_dm_and_posts_there(self):
+        stop = mock.Mock()
+        stop.wait.side_effect = [False, True]
+        CALLS.clear()
+        with mock.patch.object(app.watch, "claim_digest", return_value="2026-11-22"):
+            app.digest_loop(stop, every=0)
+        opened = [a for m, a in CALLS if m == "conversations.open"]
+        posted = [a for m, a in CALLS if m == "chat.postMessage"]
+        self.assertEqual(opened[0]["users"], OWNER)
+        self.assertEqual(len(posted), 1)
+        self.assertIn("2-week Brain Watch digest (2026-11-22)", posted[0]["text"])

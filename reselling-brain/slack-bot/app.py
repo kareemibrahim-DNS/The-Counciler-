@@ -3,6 +3,7 @@
 Answers when mentioned in a channel or messaged directly, using the shared
 knowledge plus read-only tools (Salesforce, Google Sheets/Drive, Slack, files).
 It only ever replies in the same thread; it never posts elsewhere or messages partners.
+The one exception: the 2-week Brain Watch digest, which it DMs to Kareem only (every other Sunday, 11:30 Riyadh).
 Run: python app.py  (Socket Mode, no public URL needed)
 
 Who reads the reply decides the level (see access.py):
@@ -17,6 +18,7 @@ decisions go to Kareem (Hatem when Kareem is away), operational details to Althu
 questions to Kareem and Hatem.
 
 Kareem-only commands, in a DM only: reload · pending · approve <id> [team] · reject <id> · away · back · status
+Brain Watch (watch.py), also Kareem-only in a DM: review · digest · note <text> · teach <id> · dismiss <id>
 """
 from __future__ import annotations
 
@@ -24,6 +26,7 @@ import json
 import logging
 import os
 import re
+import threading
 import time
 from pathlib import Path
 
@@ -35,6 +38,7 @@ from access import OWNER_DM_ONLY_REPLY, Directory, country_of, decide, handoff_l
 from brain import (KNOWLEDGE_DIR, OWNER_LEARNED_FILE, TEAM_LEARNED_FILE, Brain, load_layers, partner_space, safe_reply,
                    secret_summary)
 from tools import CompetitorQuotes, Learner, SlackReader, build_tools
+from watch import Watch
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -63,6 +67,7 @@ quotes = CompetitorQuotes()
 tools = build_tools(slack=SlackReader(app.client, BOT_TOKEN), learner=learner, sources=load_layers().get("sources") or {},
                     quotes=quotes)
 brain = Brain(tools=tools)
+watch = Watch()
 directory = Directory(app.client)
 logging.info("Tools enabled: %s", ", ".join(sorted(tools)) or "none")
 
@@ -143,8 +148,27 @@ def owner_away() -> bool:
     return is_away(profile, time.time(), brain.layers.get("routing"))
 
 
+def watched_people() -> dict[str, str]:
+    """Kareem, Hatem and Althurayyaa (routing in layers.yaml): the people whose follow-ups count as stepping in."""
+    r, people = routing(), brain.layers.get("people") or {}
+    ids = [r.get(k) for k in ("owner", "manager", "operations") if r.get(k)]
+    return {u: ((people.get(u) or {}).get("name") or u).split()[0] for u in ids}
+
+
 def owner_command(text: str) -> str | None:
-    t = text.strip().lower()
+    raw = text.strip()
+    t = raw.lower()
+    if t in {"review", "digest"}:
+        watch.scan(app.client, watched=watched_people(), bot_ids={b for b in (BOT_ID, BOT_USER_ID) if b})
+        return watch.insights() + "\n\n" + watch.report() if t == "digest" else watch.report()
+    if t == "note" or t.startswith(("note ", "note\n")):
+        return watch.note(raw[4:])
+    m = re.match(r"^(teach|dismiss)\s+#?([0-9a-f]{6})$", t)
+    if m and m.group(1) == "dismiss":
+        return watch.dismiss(m.group(2))
+    if m:
+        fact = watch.teach_text(m.group(2))
+        return learner.propose(fact) if fact else f"#{m.group(2)} has no correction or note to teach."
     if t in {"away", "back"}:
         _save_state({"owner_away": t == "away", "status_at_back": _status_key(_owner_profile())})
         return ("Marked you away: decisions go to Hatem and operations cc Hatem until you send `back`."
@@ -179,11 +203,37 @@ def owner_command(text: str) -> str | None:
     return None
 
 
-def post(say, text: str, thread_ts: str, handoff: str = "") -> None:
+def post(say, text: str, thread_ts: str, handoff: str = "") -> str:
     """Every reply: unknown links removed, pings neutralised, no link or media previews.
-    `handoff` is built by code (handoff_line), so its @-mentions are kept."""
+    `handoff` is built by code (handoff_line), so its @-mentions are kept. Returns the reply's ts when Slack gives one."""
     body = safe_reply(text, brain.known_links)
-    say(text=body + (f"\n\n{handoff}" if handoff else ""), thread_ts=thread_ts, unfurl_links=False, unfurl_media=False)
+    res = say(text=body + (f"\n\n{handoff}" if handoff else ""), thread_ts=thread_ts, unfurl_links=False, unfurl_media=False)
+    try:
+        return (res or {}).get("ts") or ""
+    except Exception:
+        return ""
+
+
+def log_answer(client, event, *, d, thread_ts: str, reply_ts: str, question: str, reply: str, kinds: list, error: bool,
+               started: float) -> None:
+    """Brain Watch: log the answer so `review` can show gaps and corrections. Never breaks a reply."""
+    link = ""
+    if reply_ts and d.where != "dm":
+        try:
+            link = client.chat_getPermalink(channel=event["channel"], message_ts=reply_ts).get("permalink") or ""
+        except Exception:
+            pass
+    watch.record(channel=event["channel"], thread_ts=thread_ts, reply_ts=reply_ts, asker=event["user"],
+                 question=clean(event.get("text", "")) or question, reply=reply, handoffs=kinds, where=d.where,
+                 link=link, error=error, secs=time.time() - started, level=d.level, team=_title(event["user"]))
+
+
+def _title(uid: str) -> str:
+    try:
+        p = (directory.user(uid) or {}).get("profile") or {}
+        return p.get("title") or ""
+    except Exception:
+        return ""
 
 
 ABOVE_SUBTYPES = (None, "bot_message", "file_share", "thread_broadcast", "me_message")
@@ -263,11 +313,12 @@ def answer(event, client, say, context):
             ctx["country"] = found
     except Exception:
         pass
+    error, started = False, time.time()
     try:
         reply = brain.ask(question, event["user"], history, level=d.level, where=d.where, ctx=ctx)
     except Exception:
         logging.exception("brain error")
-        reply, ctx["handoffs"] = "Something went wrong on my side. Try again, or ask Kareem.", []
+        reply, ctx["handoffs"], error = "Something went wrong on my side. Try again, or ask Kareem.", [], True
     if d.level == "owner":  # show Kareem exactly what was queued, not the model's description of it
         new = {k: v for k, v in learner.queued().items() if k not in queued_before}
         if new:
@@ -281,7 +332,10 @@ def answer(event, client, say, context):
         except Exception:
             present = {event["user"]}
         handoff = handoff_lines(kinds, asker=event["user"], away=owner_away(), routing=routing(), present=present)
-    post(say, reply or "Not in the Reselling Brain yet — ask Kareem.", thread_ts, handoff)
+    reply = reply or "Not in the Reselling Brain yet — ask Kareem."
+    reply_ts = post(say, reply, thread_ts, handoff)
+    log_answer(client, event, d=d, thread_ts=thread_ts, reply_ts=reply_ts, question=question, reply=reply,
+               kinds=kinds, error=error, started=started)
 
 
 @app.event("app_mention")
@@ -298,7 +352,27 @@ def on_dm(event, client, say, context):
     answer(event, client, say, context)
 
 
+def digest_text() -> str:
+    watch.scan(app.client, watched=watched_people(), bot_ids={b for b in (BOT_ID, BOT_USER_ID) if b})
+    return watch.insights() + "\n\n" + watch.report()
+
+
+def digest_loop(stop: threading.Event, every: int = 300) -> None:
+    """Every other Sunday at 11:30 Riyadh time: DM Kareem the 2-week digest. The only message the bot
+    starts itself, and only ever to Kareem."""
+    while not stop.wait(every):
+        try:
+            slot = watch.claim_digest() if OWNER_ID else ""
+            if slot:
+                dm = app.client.conversations_open(users=OWNER_ID)["channel"]["id"]
+                app.client.chat_postMessage(channel=dm, text=f"*Your 2-week Brain Watch digest ({slot})*\n\n" + digest_text(),
+                                            unfurl_links=False, unfurl_media=False)
+        except Exception:
+            logging.exception("digest DM failed")
+
+
 if __name__ == "__main__":
+    threading.Thread(target=digest_loop, args=(threading.Event(),), daemon=True).start()
     try:
         directory.refresh()
     except Exception as exc:
