@@ -14,7 +14,7 @@
 # Deny by default: a person not listed in `people` gets the sales layer.
 # The owner is whoever BRAIN_OWNER_SLACK_ID names; an `owner` entry here alone gives sales.
 # Who READS the reply also counts (slack-bot/access.py):
-#   - partners, guests and other workspaces get nothing;
+#   - partners, guests and other workspaces (and any channel they can read) get the partner level only;
 #   - manager, cost and owner answers only happen in a private DM;
 #   - a private channel gets its least-privileged member's level (never above team); a public channel gets sales.
 default_level: sales
@@ -22,26 +22,32 @@ default_level: sales
 levels:
   owner:
     sees: [owner, cost, manager, team, base]
-    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, salesforce_query, sheets_read, drive_search, drive_read, slack_read_channel, read_slack_file, learn]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, salesforce_find, salesforce_query, sheets_read, drive_search, drive_read, slack_read_channel, read_slack_file, learn]
     instructions: "This is Kareem. Full detail, including cost, contracts, targets and strategy."
   manager:
     sees: [manager, team, base]
-    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, sheets_read, read_slack_file]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, salesforce_find, sheets_read, read_slack_file]
     instructions: "Manager. Everything the team sees, plus program cycles, targets, strategy, trackers and partner contacts. Cost and contracts only if this person has the cost grant."
   team:
     sees: [team, base]
     # read_slack_file opens only files attached to the message being answered (or to the message just above a bare mention).
-    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, sheets_read, read_slack_file]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, salesforce_find, sheets_read, read_slack_file]
     instructions: "Partnerships team member. Policy, discount eligibility, SLAs, processes, partner operations and the catalogue. No cost, contracts, contacts, trackers, targets or strategy."
   sales:
     sees: [sales, base]
     # read_slack_file opens only files attached to the message being answered (an offer to compare).
-    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, read_slack_file]
+    tools: [brain_catalog, competitor_quotes, competitor_quote_save, escalate, salesforce_find, read_slack_file]
     instructions: "Sales, Account Manager or any other colleague. The common layer: resellers, list prices, quotes, comparisons, merchant fit, competitive analysis, flows and operations. Nothing locked."
+  partner:
+    # Partners, guests, Slack Connect and other workspaces, and any channel they can read (Kareem, 21 Nov 2026).
+    # Hard floors in brain.py, whatever this file says: only the program overview and answer rules, only `escalate`.
+    sees: [base]
+    tools: [escalate]
+    instructions: "Someone outside Foodics. The program overview only; everything else goes to a Foodics colleague."
 
-# Channels partners can read. The bot never answers there (it tells only the asker, privately).
+# Channels partners can read. The bot answers there only at the partner level.
 # Slack Connect channels, channels with a guest or an outside member, and users from another
-# workspace are always blocked, whatever the channel name.
+# workspace always get the partner level, whatever the channel name.
 blocked_channels:
   - "^(ksa|uae|egypt|kw-jo|kw|jo|eg)-"   # per-partner country channels, e.g. ksa-<partner>
   - "^foodics-"                         # shared channels, e.g. foodics-<partner>

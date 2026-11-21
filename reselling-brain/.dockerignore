@@ -6,4 +6,5 @@ slack-bot/state.json
 **/__pycache__
 **/*.pyc
 slack-bot/watch.json
+slack-bot/followed.json
 slack-bot/competitor_quotes.json

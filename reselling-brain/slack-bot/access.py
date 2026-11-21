@@ -1,12 +1,15 @@
 """Who is asking, and who can read the reply.
 
 The bot decides two things before it answers:
-1. Is the asker a Foodics full member? Guests, Slack Connect users and anyone the bot
-   cannot identify are partners or outsiders: they get nothing, not even a refusal.
+1. Is the asker a Foodics full member? Guests, Slack Connect users and people from other
+   workspaces are partners or outsiders. Since 21 Nov 2026 (Kareem) the bot answers them too,
+   but only at the `partner` level: the program overview and hand-offs, no tools, no prices,
+   no partner comparisons, nothing locked (see brain.PARTNER_DOCS and PARTNER_NOTE).
 2. Who can read the reply? In a DM, only the asker. In a private channel, every member, so
    the answer is written for the least-privileged member and never above team level. A public
    channel can be opened and searched by every full member, so it always gets the sales level.
-   Owner-level answers only ever happen in Kareem's DM.
+   A Slack Connect or partner channel, or any channel with a guest or outside member, gets the
+   partner level. Owner-level answers only ever happen in Kareem's DM.
 
 Every check fails closed: if Slack cannot tell us who is asking or who can read the
 channel, the bot does not answer there.
@@ -20,12 +23,10 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 
-LEVEL_ORDER = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
+LEVEL_ORDER = {"partner": 0, "sales": 1, "team": 2, "manager": 3, "owner": 4}
 CHANNEL_MAX_LEVEL = "team"  # owner answers never leave Kareem's DM
 SHARED_FLAGS = ("is_ext_shared", "is_shared", "is_org_shared", "is_pending_ext_shared", "pending_shared")
 
-PARTNER_SPACE_REPLY = ("I don't answer in channels that partners or other workspaces can read. "
-                       "Ask me in a DM, or in an internal Foodics channel.")
 CANNOT_CHECK_REPLY = "I can't check who can read this channel, so I won't answer here. Ask me in a DM."
 OWNER_DM_ONLY_REPLY = "Send owner commands to me in a DM."
 _OWNER_COMMAND = re.compile(r"^(reload|refresh brain|pending|away|back|status|quotes csv|drop quote\s+#?[0-9a-f]{6}|"
@@ -76,6 +77,7 @@ class Decision:
     where: str = "dm"            # "dm" or "channel"
     notice: str | None = None    # shown only to the asker (ephemeral) when the bot won't answer
     reason: str = ""
+    outsider: bool = False       # the asker is a partner, guest or from another workspace
 
 
 class Directory:
@@ -154,21 +156,26 @@ def decide(*, event: dict, directory: Directory, workspace_team: str, level_of: 
     except Exception as exc:
         logging.error("Cannot look up the asker %s (%s). Not answering. Does the app have the users:read scope?", uid, exc)
         return Decision(False, reason="asker-unknown")
-    if not asker or asker.get("is_bot") or is_outsider(asker, workspace_team):
-        return Decision(False, reason="outsider")  # partners get nothing, not even a refusal
+    if not asker or asker.get("is_bot"):
+        return Decision(False, reason="bot-or-unknown")
+    outsider = is_outsider(asker, workspace_team)
     if is_dm(event):
+        if outsider:
+            return Decision(True, level="partner", where="dm", reason="partner-dm", outsider=True)
         return Decision(True, level=level_of(uid), where="dm", reason="dm")
     try:
         ch = directory.channel(event["channel"])
-        if ch.get("is_im") or ch.get("is_mpim") or is_shared_channel(ch) or name_blocked(ch.get("name")):
-            return Decision(False, notice=PARTNER_SPACE_REPLY, reason="partner-channel")
+        if ch.get("is_im"):
+            return Decision(False, notice=CANNOT_CHECK_REPLY, reason="im-not-dm")
+        if outsider or is_shared_channel(ch) or name_blocked(ch.get("name")):
+            return Decision(True, level="partner", where="channel", reason="partner-channel", outsider=outsider)
         levels = []
         for m in directory.members(event["channel"]):
             u = directory.user(m)
             if u and u.get("deleted") and (u.get("is_bot") or not is_outsider({**u, "deleted": False}, workspace_team)):
-                continue  # deactivated staff and removed apps can't read; a deactivated guest still blocks
+                continue  # deactivated staff and removed apps can't read; a deactivated guest still counts
             if is_outsider(u, workspace_team):
-                return Decision(False, notice=PARTNER_SPACE_REPLY, reason="outsider-member")
+                return Decision(True, level="partner", where="channel", reason="outsider-member")
             if not u.get("is_bot"):
                 levels.append(level_of(m))
         if ch.get("is_private") is not True:

@@ -6,10 +6,10 @@ import importlib
 import os
 import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace as NS
 from unittest import mock
 
-from access import PARTNER_SPACE_REPLY
 from slack_sdk.web.base_client import BaseClient
 from slack_sdk.web.slack_response import SlackResponse
 
@@ -129,16 +129,19 @@ class AppWiring(unittest.TestCase):
         self.run_event(TEAM, "CPUB", "<@UBOT> discount band?")
         self.assertEqual(self.level(), "sales")
 
-    def test_partner_channels_get_only_a_private_note_to_the_asker(self):
+    def test_partner_channels_get_the_partner_level_and_no_tools_but_escalate(self):
         for ch in ["CSHARED", "CGUEST"]:
             said, eph = self.run_event(OWNER, ch, "<@UBOT> hi")
-            self.assertEqual(said, [], ch)
-            self.assertEqual([(e["user"], e["text"]) for e in eph], [(OWNER, PARTNER_SPACE_REPLY)], ch)
-            self.assertEqual(app.brain.client.calls, [], ch)
+            self.assertEqual((len(said), eph), (1, []), ch)
+            self.assertEqual(self.level(), "partner", ch)
+            names = {t["name"] for t in app.brain.client.calls[0].get("tools", [])}
+            self.assertLessEqual(names, {"escalate"}, ch)
 
-    def test_a_guest_gets_nothing_at_all(self):
+    def test_a_guest_gets_a_partner_level_answer(self):
         said, eph = self.run_event(GUEST, "DG", "prices?")
-        self.assertEqual((said, eph, app.brain.client.calls), ([], [], []))
+        self.assertEqual((len(said), eph), (1, []))
+        self.assertEqual(self.level(), "partner")
+        self.assertIn("outside Foodics", app.brain.client.calls[0]["system"][0]["text"])
 
     def test_owner_commands_only_in_the_dm(self):
         said, eph = self.run_event(OWNER, "CPRIV", "<@UBOT> pending")
@@ -379,3 +382,65 @@ class BrainWatch(unittest.TestCase):
         self.assertEqual(opened[0]["users"], OWNER)
         self.assertEqual(len(posted), 1)
         self.assertIn("2-week Brain Watch digest (2026-11-22)", posted[0]["text"])
+
+
+class KareemMentionsAndFollowUps(unittest.TestCase):
+    """Kareem, 21 Nov 2026: answer as the bot when anyone tags Kareem, and follow threads the bot answered in."""
+
+    def setUp(self):
+        app.followed.path = Path(tempfile.mkdtemp()) / "followed.json"
+
+    def fire(self, event, script=None):
+        CALLS.clear()
+        said = []
+        app.brain.client = FakeClaude(script or [text("ok")])
+        app.on_message(event=event, client=app.app.client, say=lambda **k: said.append(k) or {"ts": "9.9"},
+                       context={"bot_user_id": BOT})
+        return said
+
+    def test_which_messages_trigger(self):
+        t = app.message_trigger
+        self.assertEqual(t({"user": SALES, "channel": "CPUB", "ts": "1.1", "text": f"<@{OWNER}> help"}), "kareem")
+        self.assertEqual(t({"user": OWNER, "channel": "CPUB", "ts": "1.1", "text": f"<@{OWNER}|Kareem> support"}), "kareem")
+        self.assertIsNone(t({"user": SALES, "channel": "CPUB", "ts": "1.1", "text": f"<@{BOT}> <@{OWNER}> hi"}),
+                          "a bot mention is answered by app_mention, not twice")
+        self.assertIsNone(t({"user": SALES, "channel": "CPUB", "ts": "1.1", "text": "hello all"}))
+        self.assertIsNone(t({"bot_id": "B9", "user": SALES, "channel": "CPUB", "ts": "1.1", "text": f"<@{OWNER}>"}))
+        self.assertIsNone(t({"user": SALES, "channel": "CPUB", "ts": "1.1", "subtype": "message_changed",
+                             "text": f"<@{OWNER}>"}))
+        self.assertEqual(t({"user": SALES, "channel": "DS", "channel_type": "im", "ts": "1.1", "text": "hi"}), "bot")
+
+    def test_a_kareem_mention_is_answered_by_the_bot_in_the_thread(self):
+        said = self.fire({"user": SALES, "channel": "CPUB", "ts": "5.5", "text": f"<@{OWNER}> which partner for Little Caesars?"})
+        self.assertEqual(len(said), 1)
+        self.assertEqual(said[0]["thread_ts"], "5.5")
+        q = app.brain.client.calls[0]["messages"][-1]["content"]
+        self.assertIn("this message tags Kareem", q)
+        self.assertIn("Never write as if you were Kareem", q)
+        self.assertTrue(app.followed.has("CPUB", "5.5"))
+
+    def test_no_reply_posts_nothing(self):
+        said = self.fire({"user": SALES, "channel": "CPUB", "ts": "6.6", "text": f"<@{OWNER}> lunch?"}, [text("NO_REPLY")])
+        self.assertEqual(said, [])
+        self.assertFalse(app.followed.has("CPUB", "6.6"))
+
+    def test_follow_ups_in_a_followed_thread_need_no_mention(self):
+        app.followed.add("CPUB", "7.7")
+        said = self.fire({"user": SALES, "channel": "CPUB", "ts": "7.9", "thread_ts": "7.7", "text": "and for KSA?"})
+        self.assertEqual(len(said), 1)
+        self.assertIn("nobody tagged you", app.brain.client.calls[0]["messages"][-1]["content"])
+        # not followed, someone else tagged, or Kareem/Hatem/Althurayyaa stepping in: stay quiet
+        self.assertEqual(self.fire({"user": SALES, "channel": "CPUB", "ts": "8.1", "thread_ts": "8.0", "text": "?"}), [])
+        self.assertEqual(self.fire({"user": SALES, "channel": "CPUB", "ts": "7.95", "thread_ts": "7.7",
+                                    "text": f"<@{TEAM}> can you check?"}), [])
+        self.assertEqual(self.fire({"user": TEAM, "channel": "CPUB", "ts": "7.96", "thread_ts": "7.7",
+                                    "text": "it's KSA only"}), [])
+        self.assertEqual(app.brain.client.calls, [])
+
+    def test_followed_threads_expire(self):
+        now = [1000.0]
+        f = app.Followed(Path(tempfile.mkdtemp()) / "f.json", days=7, clock=lambda: now[0])
+        f.add("C1", "1.1")
+        self.assertTrue(f.has("C1", "1.1"))
+        now[0] += 8 * 86400
+        self.assertFalse(f.has("C1", "1.1"))

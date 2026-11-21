@@ -17,6 +17,8 @@ oauth_config:
       - channels:history
       - groups:history
       - im:history
+      - mpim:history      # group DMs the bot is added to: answer when Kareem is tagged there
+      - mpim:read
       - im:read
       - im:write
       - files:read
@@ -28,6 +30,9 @@ settings:
     bot_events:
       - app_mention
       - message.im
+      - message.channels  # public channels the bot is in: answer when Kareem is tagged, follow threads it answered
+      - message.groups    # private channels the bot is in: the same
+      - message.mpim      # group DMs the bot is in: the same
   interactivity:
     is_enabled: false
   socket_mode_enabled: true

@@ -2,17 +2,22 @@
 
 Answers when mentioned in a channel or messaged directly, using the shared
 knowledge plus read-only tools (Salesforce, Google Sheets/Drive, Slack, files).
-It only ever replies in the same thread; it never posts elsewhere or messages partners.
+It only ever replies in the same thread, always as the Reselling Brain bot (never as a person).
 The one exception: the 2-week Brain Watch digest, which it DMs to Kareem only (every other Sunday, 11:30 Riyadh).
 Run: python app.py  (Socket Mode, no public URL needed)
 
 Who reads the reply decides the level (see access.py):
-- Partners, guests and other workspaces get nothing, not even a refusal.
+- Partners, guests and other workspaces get the partner level only: program overview and hand-offs, nothing locked.
 - In a DM the answer is at the asker's own level. Owner answers happen only in Kareem's DM.
 - In a channel the answer is written for its least-privileged member, never above team.
 
-Triggers: a DM, or an @mention in a channel. A mention reads the message just above it (or the
-thread it is in), so "@Reselling Brain" under a question answers that question.
+Triggers (Kareem, 21 Nov 2026):
+- a DM, or an @mention of the bot in a channel. A mention reads the message just above it (or the
+  thread it is in), so "@Reselling Brain" under a question answers that question;
+- an @mention of Kareem (BRAIN_OWNER_SLACK_ID) in any channel the bot is in: the bot answers first, as itself;
+- a follow-up in a thread the bot already answered in, without a new mention (FOLLOW_DAYS), unless it is
+  Kareem, Hatem or Althurayyaa stepping in, or it is aimed at someone else.
+For the last two the model may answer NO_REPLY (not a question for the bot) and then nothing is posted.
 Hand-offs: when a question needs a person, the bot adds them under the reply (access.handoff_lines):
 decisions go to Kareem (Hatem when Kareem is away), operational details to Althurayyaa with cc, deep cycle
 questions to Kareem and Hatem.
@@ -60,6 +65,8 @@ _AUTH = app.client.auth_test()
 WORKSPACE_TEAM = _AUTH["team_id"]  # the Foodics workspace the bot is installed in
 BOT_ID, BOT_USER_ID = _AUTH.get("bot_id", ""), _AUTH.get("user_id", "")
 MAX_HISTORY = 12
+FOLLOW_DAYS = 7  # a thread the bot answered in is followed for this long after its last activity
+NO_REPLY = "NO_REPLY"
 
 learner = Learner(KNOWLEDGE_DIR, Path(os.environ.get("BRAIN_LEARN_QUEUE", Path(__file__).with_name("learn_queue.json"))),
                   owner_file=OWNER_LEARNED_FILE, team_file=TEAM_LEARNED_FILE)
@@ -97,6 +104,39 @@ def thread_history(client, channel: str, thread_ts: str, bot_user_id: str, curre
     while out and out[0]["role"] != "user":
         out.pop(0)
     return out[-MAX_HISTORY:], pending
+
+
+class Followed:
+    """Channel threads the bot answered in, so it can answer follow-ups without a new mention. Kept on /data."""
+
+    def __init__(self, path: Path, days: int = FOLLOW_DAYS, clock=time.time):
+        self.path, self.days, self.clock, self._lock = path, days, clock, threading.Lock()
+
+    def _load(self) -> dict:
+        try:
+            return json.loads(self.path.read_text())
+        except Exception:
+            return {}
+
+    def add(self, channel: str, thread_ts: str) -> None:
+        with self._lock:
+            now, keep = self.clock(), self.days * 86400
+            data = {k: v for k, v in self._load().items() if now - v < keep}
+            data[f"{channel}:{thread_ts}"] = now
+            try:
+                self.path.parent.mkdir(parents=True, exist_ok=True)
+                tmp = self.path.with_suffix(".tmp")
+                tmp.write_text(json.dumps(data))
+                os.replace(tmp, self.path)
+            except Exception:
+                logging.exception("could not save followed threads")
+
+    def has(self, channel: str, thread_ts: str) -> bool:
+        seen = self._load().get(f"{channel}:{thread_ts}")
+        return bool(seen) and self.clock() - seen < self.days * 86400
+
+
+followed = Followed(Path(os.environ.get("BRAIN_FOLLOW_FILE", Path(__file__).with_name("followed.json"))))
 
 
 def clean(text: str) -> str:
@@ -265,27 +305,38 @@ def name_blocked(channel_name: str | None) -> bool:
                          workspace_team=None, layers=brain.layers)
 
 
-def answer(event, client, say, context):
+TRIGGER_NOTES = {
+    "kareem": ("[Context: this message tags Kareem (<@{owner}>), not you. You are the Reselling Brain, Kareem's assistant "
+               "bot, answering first so they don't wait. Never write as if you were Kareem. If it is not a question you "
+               "can help with (a personal message, a meeting, thanks, or a call only Kareem can make), reply exactly "
+               "NO_REPLY and nothing else.]"),
+    "follow": ("[Context: a new message in a thread you answered in earlier; nobody tagged you. If it is not for you "
+               "(people talking to each other, thanks, ok), reply exactly NO_REPLY and nothing else.]"),
+}
+
+
+def answer(event, client, say, context, trigger: str = "bot"):
+    """trigger: "bot" (a DM or a mention of the bot), "kareem" (a mention of Kareem) or "follow" (a thread follow-up)."""
     if not event.get("user") or event.get("bot_id"):
         return
     thread_ts = event.get("thread_ts") or event["ts"]
     d = decide(event=event, directory=directory, workspace_team=WORKSPACE_TEAM,
                level_of=brain.level_of, name_blocked=name_blocked)
-    logging.info("decision user=%s channel=%s answer=%s level=%s reason=%s",
-                 event.get("user"), event.get("channel"), d.answer, d.level, d.reason)
+    logging.info("decision user=%s channel=%s trigger=%s answer=%s level=%s reason=%s",
+                 event.get("user"), event.get("channel"), trigger, d.answer, d.level, d.reason)
     if not d.answer:
-        if d.notice:
+        if d.notice and trigger == "bot":
             notify(client, event, d.notice, thread_ts)
         return
     question = clean(event.get("text", ""))
     files = list(event.get("files") or [])
     above = None
-    if d.where == "channel" and not event.get("thread_ts"):
+    if d.where == "channel" and not event.get("thread_ts") and trigger == "bot":
         above = message_above(client, event["channel"], event["ts"])
         files += (above or {}).get("files") or []  # a bare mention under a shared file can open that file
     if not question and not files and not above and not event.get("thread_ts"):
         return
-    if OWNER_ID and event["user"] == OWNER_ID and is_owner_command(question):
+    if trigger == "bot" and OWNER_ID and event["user"] == OWNER_ID and is_owner_command(question):
         if d.where != "dm":
             notify(client, event, OWNER_DM_ONLY_REPLY, thread_ts)
             return
@@ -305,6 +356,8 @@ def answer(event, client, say, context):
                     f"\"\"\"\n{(above.get('text') or '(a file)')[:4000]}\n\"\"\"\n\n" + (question or "Answer the message above."))
     elif not question and not files:
         question = "Answer the last question in this thread."
+    if trigger in TRIGGER_NOTES:
+        question = TRIGGER_NOTES[trigger].format(owner=OWNER_ID) + "\n\n" + question
     queued_before = set(learner.queued()) if d.level == "owner" else set()
     ctx = {"file_ids": [f.get("id") for f in files if f.get("id")], "asker": event["user"]}
     try:  # quote the asker's own country by default
@@ -324,6 +377,9 @@ def answer(event, client, say, context):
         if new:
             reply = (reply or "") + "\n\n" + "\n".join(
                 f"Queued #{k} (exact text, owner only): \"{v['fact']}\"" for k, v in new.items())
+    if trigger != "bot" and (reply or "").strip().strip("`*_ .").upper() == NO_REPLY:
+        logging.info("no reply needed: trigger=%s channel=%s", trigger, event.get("channel"))
+        return
     kinds = [h["kind"] for h in ctx.get("handoffs", [])]
     handoff = ""
     if kinds:
@@ -334,6 +390,8 @@ def answer(event, client, say, context):
         handoff = handoff_lines(kinds, asker=event["user"], away=owner_away(), routing=routing(), present=present)
     reply = reply or "Not in the Reselling Brain yet — ask Kareem."
     reply_ts = post(say, reply, thread_ts, handoff)
+    if d.where == "channel":
+        followed.add(event["channel"], thread_ts)
     log_answer(client, event, d=d, thread_ts=thread_ts, reply_ts=reply_ts, question=question, reply=reply,
                kinds=kinds, error=error, started=started)
 
@@ -343,13 +401,37 @@ def on_mention(event, client, say, context):
     answer(event, client, say, context)
 
 
+_MENTION = re.compile(r"<@([A-Z0-9]+)(?:\|[^>]*)?>")
+
+
+def message_trigger(event: dict) -> str | None:
+    """Which trigger a plain message event is (see the module docstring), or None to ignore it."""
+    if event.get("bot_id") or not event.get("user"):
+        return None
+    if event.get("subtype") not in (None, "file_share", "thread_broadcast"):
+        return None
+    if event.get("channel_type") == "im":
+        return "bot" if event.get("subtype") in (None, "file_share") else None
+    mentioned = set(_MENTION.findall(event.get("text") or ""))
+    if BOT_USER_ID and BOT_USER_ID in mentioned:
+        return None  # the app_mention event answers it
+    if OWNER_ID and OWNER_ID in mentioned:
+        return "kareem"
+    thread_ts = event.get("thread_ts")
+    if not thread_ts or thread_ts == event.get("ts") or not followed.has(event.get("channel", ""), thread_ts):
+        return None
+    if event["user"] in watched_people():
+        return None  # Kareem, Hatem or Althurayyaa stepping in: Brain Watch collects it, the bot stays quiet
+    if mentioned - {BOT_USER_ID, OWNER_ID}:
+        return None  # aimed at someone else
+    return "follow"
+
+
 @app.event("message")
-def on_dm(event, client, say, context):
-    if event.get("channel_type") != "im" or event.get("bot_id"):
-        return
-    if event.get("subtype") not in (None, "file_share"):
-        return
-    answer(event, client, say, context)
+def on_message(event, client, say, context):
+    trigger = message_trigger(event)
+    if trigger:
+        answer(event, client, say, context, trigger=trigger)
 
 
 def digest_text() -> str:
