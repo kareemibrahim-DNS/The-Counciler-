@@ -900,6 +900,160 @@ class CategoryLookup(unittest.TestCase):
         self.assertEqual(json.loads(cat.lookup(category="opm", level="sales"))["category"], "Ordering platform management")
         self.assertEqual(json.loads(cat.lookup(category="loyalty", level="sales"))["category"], "Loyalty & CRM")
 
+class PartnerCompare(unittest.TestCase):
+    def setUp(self):
+        self.cat = tools.Catalog(team_notes={"Grubtech": {"slack": "#PARTNER-CHANNEL", "watch": "TEAM-WATCH-MARKER."}})
+
+    def test_two_partners_in_one_category_side_by_side(self):
+        import json
+        out = json.loads(self.cat.compare(["Grubtech", "deliverect"], "SA", "sales"))
+        self.assertEqual([r["partner"] for r in out["compare"]], ["Grubtech", "Deliverect"])
+        self.assertIn("how_to_choose", out)
+        g = out["compare"][0]
+        self.assertEqual(g["entry_price"], {"line_item": "Grubtech - gOnline License [Annual]", "price": 1421.1, "currency": "SAR"})
+        self.assertTrue(g["sold_in_country"])
+        for r in out["compare"]:
+            self.assertNotIn("slack", r)
+            self.assertNotIn("discount", r["watch_out"].lower())
+        self.assertNotIn("TEAM-WATCH-MARKER", json.dumps(out))
+        self.assertIn("TEAM-WATCH-MARKER", self.cat.compare(["Grubtech", "Deliverect"], "SA", "team"))
+
+    def test_different_categories_are_not_alternatives(self):
+        import json
+        out = json.loads(self.cat.compare("Grubtech vs Xero", "AE", "sales"))
+        self.assertNotIn("how_to_choose", out)
+        self.assertIn("not alternatives", out["note"])
+
+    def test_competitors_and_bad_input_are_refused(self):
+        import json
+        self.assertIn("Never guess", json.loads(self.cat.compare(["Grubtech", "SomeCompetitor"], "SA"))["error"])
+        self.assertIn("at least two", json.loads(self.cat.compare(["Grubtech", "grubtech"]))["error"])
+        self.assertIn("up to 4", json.loads(self.cat.compare(["Grubtech", "Deliverect", "Supy", "Xero", "Wafeq"]))["error"])
+        self.assertIn("unknown country", json.loads(self.cat.compare(["Grubtech", "Deliverect"], "XX"))["error"])
+
+    def test_the_tool_dispatches_compare(self):
+        import json
+        tmap = tools.build_tools(slack=None, learner=None, sources={}, catalog=self.cat)
+        self.assertIn("compare", tmap["brain_catalog"]["schema"]["input_schema"]["properties"])
+        out = json.loads(tmap["brain_catalog"]["fn"](compare=["Supy", "ShopBrain"], country="SA", _level="sales"))
+        self.assertEqual(len(out["compare"]), 2)
+
+
+class NoCostInSalesOutput(unittest.TestCase):
+    """Sales and AM see Salesforce list prices only. Nothing the sales level can reach names a cost, margin or markup."""
+    FORBIDDEN_KEYS = {"cost", "cost_price", "costprice", "buy_price", "wholesale", "margin", "markup", "payout", "commission"}
+
+    def _keys(self, node, found):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                found.add(k.lower())
+                self._keys(v, found)
+        elif isinstance(node, list):
+            for v in node:
+                self._keys(v, found)
+        return found
+
+    def test_every_sales_catalogue_answer_is_list_prices_only(self):
+        import json, re
+        cat = tools.Catalog()
+        outs = [cat.lookup(level="sales")]
+        for country in ("SA", "AE", "KW", "JO", "EG", "INT"):
+            outs += [cat.lookup(partner=p, country=country, level="sales") for p in cat.partners]
+            outs += [cat.lookup(category=c["id"], country=country, level="sales") for c in cat.categories]
+            names = list(cat.partners)
+            outs += [cat.compare(names[i:i + 2], country, "sales") for i in range(0, len(names) - 1, 2)]
+        words = re.compile(r"cost price|wholesale|\bmargins?\b|mark-?ups?|payouts?|buy price", re.I)
+        for text in outs:
+            self.assertFalse(self._keys(json.loads(text), set()) & self.FORBIDDEN_KEYS)
+            self.assertIsNone(words.search(text), words.search(text) and text[:200])
+
+    def test_sales_prompt_locks_cost(self):
+        layers, docs = brain.load_layers(), brain.load_docs(private=False)
+        self.assertIn("Cost prices, markups, margins and contracts are locked", brain.system_prompt("sales", layers, docs))
+        self.assertFalse([d.id for d in brain.visible_docs("sales", layers, docs + [brain.Doc(id="c", audience="cost", body="x")])
+                          if d.audience == "cost"])
+        self.assertFalse(brain.visible_docs("manager", layers, [brain.Doc(id="c", audience="cost", body="x")], cost=False))
+
+
+class CompetitorQuoteStore(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.dir = tempfile.TemporaryDirectory()
+        self.path = Path(self.dir.name) / "quotes.json"
+        self.store = tools.CompetitorQuotes(self.path, catalog=tools.Catalog())
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def _save(self, **kw):
+        args = dict(competitor="RivalPOS", product="Online ordering", country="SA", price=999, currency="sar", billing="annual")
+        args.update(kw)
+        return self.store.save(**args)
+
+    def test_save_and_find_as_merchant_reported(self):
+        import json
+        self.assertIn("merchant-reported", self._save(scope="1 branch", reported_by="U123"))
+        out = json.loads(self.store.search(competitor="rival", country="KSA", level="sales"))
+        q = out["quotes"][0]
+        self.assertEqual((q["price"], q["currency"], q["billing"], q["country"]), (999, "SAR", "Annual", "SA"))
+        self.assertIn("not verified", q["source"])
+        self.assertNotIn("reported_by", q, "Sales don't see who reported it")
+        self.assertEqual(json.loads(self.store.search(level="team"))["quotes"][0]["reported_by"], "U123")
+        self.assertEqual(json.loads(self.store.search(country="AE"))["quotes"], [])
+        self.assertIn("never guess", json.loads(self.store.search(country="AE"))["note"])
+
+    def test_cost_and_margin_wording_is_refused(self):
+        for bad in [dict(notes="our cost is 500"), dict(notes="margin 20%"), dict(product="wholesale bundle"),
+                    dict(scope="markup included"), dict(notes="commission 5"), dict(notes="سعر التكلفة 300")]:
+            with self.assertRaisesRegex(ValueError, "Only the price", msg=str(bad)):
+                self._save(**bad)
+        self.assertIn("Saved", self._save(product="Extra Cost Center"))  # a product name, not a cost
+
+    def test_bad_input_and_our_own_partners_are_refused(self):
+        with self.assertRaisesRegex(ValueError, "reseller partners"):
+            self._save(competitor="Grubtech")
+        for bad, msg in [(dict(country="QA"), "country"), (dict(currency="riyal"), "currency"), (dict(price="cheap"), "number"),
+                         (dict(price=0), "above 0"), (dict(billing="weekly"), "billing"), (dict(product=""), "product")]:
+            with self.assertRaisesRegex(ValueError, msg):
+                self._save(**bad)
+        self.assertFalse(self.path.exists())
+
+    def test_csv_export_has_fixed_columns_and_no_cost(self):
+        import csv, io, json
+        self._save(product="=HYPERLINK(1)")
+        rows = json.loads(self.path.read_text())
+        rows.append(dict(rows[0], id="abcdef", notes="cost 100"))  # a row edited by hand on the server
+        self.path.write_text(json.dumps(rows))
+        parsed = list(csv.reader(io.StringIO(self.store.csv())))
+        self.assertEqual(parsed[0], tools.QUOTE_CSV_COLUMNS)
+        self.assertFalse({c.lower() for c in parsed[0]} & NoCostInSalesOutput.FORBIDDEN_KEYS)
+        self.assertNotIn("reported_by", parsed[0])
+        self.assertEqual(len(parsed), 2, "the cost row is never exported")
+        self.assertTrue(parsed[1][3].startswith("'="), "no spreadsheet formulas")
+        self.assertIn("Removed", self.store.drop(parsed[1][0]))
+        self.assertEqual(len(list(csv.reader(io.StringIO(self.store.csv())))), 1)
+
+    def test_tools_save_with_the_real_asker_and_every_level_can_use_them(self):
+        import json
+        tmap = tools.build_tools(slack=None, learner=None, sources={}, quotes=self.store)
+        ctx = {"asker": "U999"}
+        tmap["competitor_quote_save"]["fn"](competitor="RivalPOS", product="Loyalty", country="AE", price=50,
+                                            currency="AED", billing="Monthly", _ctx=ctx)
+        self.assertEqual(json.loads(self.path.read_text())[0]["reported_by"], "U999")
+        self.assertTrue(tmap["competitor_quote_save"].get("ctx_aware"))
+        layers = brain.load_layers()
+        for level in ("sales", "team", "manager", "owner"):
+            names = brain.tools_for(level, layers, tmap)
+            self.assertIn("competitor_quotes", names, level)
+            self.assertIn("competitor_quote_save", names, level)
+
+    def test_owner_commands_are_recognised(self):
+        import access
+        self.assertTrue(access.is_owner_command("quotes csv"))
+        self.assertTrue(access.is_owner_command("drop quote #a1b2c3"))
+        self.assertFalse(access.is_owner_command("drop quote everything"))
+
+
 class DriveFoldersFromSecret(unittest.TestCase):
     def test_drive_folder_ids_come_from_the_secret_not_the_repo(self):
         self.assertEqual(brain.load_layers().get("sources", {}).get("drive_folders") or [], [])

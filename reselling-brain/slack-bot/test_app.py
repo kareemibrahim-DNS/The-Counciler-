@@ -156,7 +156,7 @@ class AppWiring(unittest.TestCase):
             return "read it"
         with mock.patch.object(app.brain, "ask", spy):
             said, _ = self.run_event(TEAM, "DT", "", files=[{"id": "F1", "name": "quote.pdf"}], subtype="file_share")
-        self.assertEqual(seen["ctx"], {"file_ids": ["F1"]})
+        self.assertEqual(seen["ctx"], {"file_ids": ["F1"], "asker": "U0BQKNQNF89"})
         self.assertIn("file_id F1", seen["question"])
         self.assertEqual(len(said), 1)
 
