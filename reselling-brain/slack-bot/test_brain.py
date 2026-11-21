@@ -1,4 +1,5 @@
 """Offline tests: no Slack, Salesforce, Google or Claude calls. Run: python -m unittest test_brain"""
+import json
 import os
 import re
 import tempfile
@@ -495,8 +496,11 @@ def decide(user, channel="D1", channel_type="im", **dir_kw):
 
 
 class AccessTest(unittest.TestCase):
-    def test_partners_and_outsiders_get_nothing_not_even_a_refusal(self):
-        for u in ["UGUEST", "USINGLE", "UEXT", "USTRANGER", "UBOT", "U_UNKNOWN"]:
+    def test_partners_and_outsiders_get_the_partner_level_only(self):
+        for u in ["UGUEST", "USINGLE", "UEXT", "USTRANGER"]:
+            d = decide(u)
+            self.assertEqual((d.answer, d.level, d.where, d.outsider), (True, "partner", "dm", True), u)
+        for u in ["UBOT", "U_UNKNOWN"]:  # bots and people Slack can't identify still get nothing
             d = decide(u)
             self.assertFalse(d.answer, u)
             self.assertIsNone(d.notice, u)
@@ -530,26 +534,31 @@ class AccessTest(unittest.TestCase):
             return access.decide(event={"user": "UH", "channel": "C8"}, directory=d, workspace_team=T,
                                  level_of=lambda u: PEOPLE.get(u, "sales"), name_blocked=lambda n: False)
         self.assertEqual((run(["UOLD", "UOLDBOT"]).answer, run(["UOLD", "UOLDBOT"]).level), (True, "team"))
-        self.assertFalse(run(["UOLDGUEST"]).answer)
+        self.assertEqual((run(["UOLDGUEST"]).answer, run(["UOLDGUEST"]).level), (True, "partner"))
 
     def test_owner_answers_never_leave_the_dm(self):
         ch = {"C2": {"name": "partnerships-leads", "is_private": True}}
         self.assertEqual(decide("UK", "C2", "channel", channels=ch, members={"C2": ["UK"]}).level, "team")
         self.assertEqual(decide("UK", "C2", "channel", channels=ch, members={"C2": ["UK", "UH", "UA", "UBOT"]}).level, "team")
 
-    def test_a_guest_or_outside_member_blocks_the_channel_whatever_its_name(self):
-        for m in ["UGUEST", "USINGLE", "UEXT", "U_UNKNOWN"]:
-            ch = {"C3": {"name": "partnera-onboarding"}}
+    def test_a_guest_or_outside_member_drops_the_channel_to_partner_whatever_its_name(self):
+        ch = {"C3": {"name": "partnera-onboarding", "is_private": True}}
+        for m in ["UGUEST", "USINGLE", "UEXT"]:
             d = decide("UK", "C3", "channel", channels=ch, members={"C3": ["UK", m]})
-            self.assertFalse(d.answer, m)
-            self.assertIn(d.notice, (access.PARTNER_SPACE_REPLY, access.CANNOT_CHECK_REPLY))
+            self.assertEqual((d.answer, d.level), (True, "partner"), m)
+        d = decide("UK", "C3", "channel", channels=ch, members={"C3": ["UK", "U_UNKNOWN"]})
+        self.assertEqual((d.answer, d.notice), (False, access.CANNOT_CHECK_REPLY), "a member Slack can't identify fails closed")
 
-    def test_shared_pending_and_partner_named_channels_are_blocked(self):
+    def test_shared_pending_and_partner_named_channels_get_the_partner_level(self):
         for ch in [{"name": "x", "is_ext_shared": True}, {"name": "x", "is_shared": True},
                    {"name": "x", "is_pending_ext_shared": True}, {"name": "x", "pending_shared": ["TGRUBTECH"]},
-                   {"name": "ksa-partnera"}, {"name": "foodics-partnerb"}, {"name": "g", "is_mpim": True}]:
+                   {"name": "ksa-partnera"}, {"name": "foodics-partnerb"}]:
             d = decide("UK", "C4", "channel", channels={"C4": ch}, members={"C4": ["UK"]})
-            self.assertFalse(d.answer, ch)
+            self.assertEqual((d.answer, d.level, d.where), (True, "partner", "channel"), ch)
+        ch = {"C9": {"name": "mpdm-x", "is_mpim": True, "is_private": True}}
+        self.assertEqual(decide("UK", "C9", "channel", channels=ch, members={"C9": ["UK", "UH"]}).level, "team")
+        ch = {"C9": {"name": "mpdm-x", "is_mpim": True, "is_private": True}}
+        self.assertEqual(decide("UK", "C9", "channel", channels=ch, members={"C9": ["UK", "UGUEST"]}).level, "partner")
 
     def test_channel_check_failure_fails_closed(self):
         d = decide("UK", "C5", "channel", fail={"channel"})
@@ -1083,3 +1092,71 @@ class DriveFoldersFromSecret(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PartnerLevelTest(unittest.TestCase):
+    """Kareem, 21 Nov 2026: the bot answers everyone, but outsiders get only the partner level."""
+
+    def setUp(self):
+        self.docs = brain.load_docs(private=False) + [brain.Doc(id="t", audience="team", body="TEAM-ONLY"),
+                                                      brain.Doc(id="o", audience="owner", body="OWNER-ONLY"),
+                                                      brain.Doc(id="c", audience="cost", body="COST-ONLY")]
+        self.layers = {"levels": {"partner": {"sees": ["owner", "cost", "team", "sales", "base"],
+                                              "tools": ["brain_catalog", "salesforce_find", "salesforce_query", "escalate"]}}}
+
+    def test_partner_docs_are_a_hard_floor_whatever_layers_yaml_says(self):
+        ids = {d.id for d in brain.visible_docs("partner", self.layers, self.docs, cost=True)}
+        self.assertEqual(ids, set(brain.PARTNER_DOCS))
+        prompt = brain.system_prompt("partner", self.layers, self.docs, where="channel")
+        for word in ["TEAM-ONLY", "OWNER-ONLY", "COST-ONLY"]:
+            self.assertNotIn(word, prompt)
+        self.assertIn("outside Foodics", prompt)
+        self.assertNotIn("competitive-analysis", prompt)
+        self.assertNotIn("line-items-and-quotes", prompt)
+
+    def test_partners_get_only_escalate(self):
+        fake = {k: {"schema": {}, "fn": None} for k in ["brain_catalog", "salesforce_find", "salesforce_query", "escalate"]}
+        self.assertEqual(set(brain.tools_for("partner", self.layers, fake)), {"escalate"})
+        sales = {"levels": {"sales": {"tools": ["salesforce_find", "salesforce_query", "escalate"]}}}
+        self.assertEqual(set(brain.tools_for("sales", sales, fake)), {"salesforce_find", "escalate"})
+
+    def test_the_real_layers_give_partners_the_partner_level(self):
+        layers = brain.load_layers()
+        self.assertIn("partner", layers["levels"])
+        self.assertEqual(access.lower("owner", "partner"), "partner")
+        self.assertEqual(access.channel_level(["owner", "partner"]), "partner")
+
+
+class SalesforceFindTest(unittest.TestCase):
+    def test_name_and_link_only_and_the_name_cannot_break_the_query(self):
+        seen = []
+
+        class SF:
+            def query(self, q):
+                seen.append(q)
+                return {"records": [{"Id": "001ABCDEFGHIJKLMNO", "Name": "Little Caesars", "AnnualRevenue": 9},
+                                    {"Id": "x'); DROP", "Name": "bad"}]}
+        out = json.loads(tools.salesforce_find("Joe's 100%_x", "account", sf=SF()))
+        self.assertEqual(out["matches"], [{"name": "Little Caesars", "type": "Account",
+                                           "link": "https://foodics.lightning.force.com/lightning/r/Account/001ABCDEFGHIJKLMNO/view"}])
+        self.assertIn("LIKE '%Joe\\'s 100\\%\\_x%'", seen[0])
+        self.assertTrue(seen[0].startswith("SELECT Id, Name FROM Account"))
+        with self.assertRaises(ValueError):
+            tools.salesforce_find("x", "account", sf=SF())
+        with self.assertRaises(ValueError):
+            tools.salesforce_find("joe", "Contract", sf=SF())
+
+    def test_the_link_stays_on_foodics_salesforce(self):
+        with mock.patch.dict(os.environ, {"SF_LINK_BASE": "https://evil.example"}):
+            self.assertEqual(tools.sf_link_base(), "https://foodics.lightning.force.com")
+        link = "https://foodics.lightning.force.com/lightning/r/Account/001ABCDEFGHIJKLMNO/view"
+        self.assertIn(link, brain.safe_reply(f"See {link}", set()))
+
+
+class ManifestTest(unittest.TestCase):
+    def test_the_app_hears_kareem_mentions_and_thread_follow_ups(self):
+        text = (Path(__file__).with_name("manifest.yml")).read_text()
+        for event in ["app_mention", "message.im", "message.channels", "message.groups", "message.mpim"]:
+            self.assertIn(f"- {event}", text)
+        for scope in ["channels:history", "groups:history", "mpim:history", "mpim:read", "users:read"]:
+            self.assertIn(f"- {scope}", text)

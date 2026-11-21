@@ -176,6 +176,8 @@ def visible_docs(level: str, layers: dict, docs: list[Doc], cost: bool = False) 
     """Docs this level may see. Hard limits apply whatever layers.yaml (a shared file) says:
     owner docs only at owner level; cost docs only for the owner or a cost grant; manager docs only from manager up."""
     sees = set((layers.get("levels") or {}).get(level, {}).get("sees", ["sales", "base"]))
+    if level == "partner":  # hard floor, whatever layers.yaml says: outsiders read only these common docs
+        return [d for d in docs if d.audience == "base" and d.id in PARTNER_DOCS]
 
     def allowed(d: Doc) -> bool:
         if d.audience == "base":
@@ -189,6 +191,15 @@ def visible_docs(level: str, layers: dict, docs: list[Doc], cost: bool = False) 
         return d.audience in sees
     return [d for d in docs if allowed(d)]
 
+
+# Partners, guests and other workspaces (Kareem, 21 Nov 2026: the bot answers everyone). Only the program overview
+# and the answer rules; no prices, no partner comparisons, no competitive analysis, no tools but `escalate`.
+PARTNER_DOCS = ("how-to-answer", "program-overview")
+PARTNER_NOTE = ("\nSomeone outside Foodics (a partner, a guest or another workspace) asks or can read this reply. "
+                "Share only what the program overview says. Never share prices, quotes, discounts, cost, margins, commission, "
+                "contracts, targets, ARR, churn, Salesforce data, internal people's notes, other partners' names, details or "
+                "comparisons, competitor analysis, or internal processes and channels. Never promise anything (approvals, "
+                "dates, prices, exceptions). For anything else, say a Foodics colleague will follow up and call `escalate`.")
 
 WHERE_NOTES = {
     "dm": "You are answering in a private DM with this person.",
@@ -207,7 +218,9 @@ def system_prompt(level: str, layers: dict, docs: list[Doc], where: str = "dm", 
     level_note = (layers.get("levels") or {}).get(level, {}).get("instructions", "")
     footer = f"\n\nThe answer is at level: {level}.\n{level_note}".rstrip()
     footer += "\n" + WHERE_NOTES.get(where, WHERE_NOTES["channel"])
-    if capped:
+    if level == "partner":
+        footer += PARTNER_NOTE
+    if capped and level != "partner":
         footer += ("\nThe asker has more access in a private DM. If the question needs more than this level allows, "
                    "say you can only share that in a DM, without hinting at the content.")
     if level != "owner" and not cost:
@@ -293,12 +306,17 @@ def safe_reply(text: str, known: set[str]) -> str:
     return re.sub(r"<@([UW][A-Z0-9]+)(?:\|[^>]*)?>", r"@\1", text)
 
 
+PARTNER_TOOL_GUIDE = """
+## Tools
+- When the question needs a Foodics colleague, say someone will follow up, then call `escalate` once.
+"""
 SALES_TOOL_GUIDE = """
 ## Tools
 - Call `brain_catalog` for every partner, line item, price and comparison. Never quote a price from memory.
 - If the tool fails or returns nothing, say so plainly; do not invent the result.
 - When the question needs a decision or operational detail you can't give, explain the flow, then call `escalate` once.
 - When a file is attached (an offer to compare, a price list), open it with `read_slack_file` before you answer.
+- When someone names a merchant, account or deal and `salesforce_find` is available, call it and add the Salesforce link. Never guess a link.
 """
 TOOL_GUIDE = """
 ## Tools
@@ -310,16 +328,19 @@ a partner's latest Slack thread, a ticket's status, a contract clause, an attach
 - When drafting a deal or discount email reply, add the Standard T&C block from the policy.
 - Use `learn` only when Kareem states a new or corrected rule; tell him it waits for his approval.
 - When the question needs a person (a decision, or operational detail you don't have), explain the flow, then call `escalate` once.
+- When someone names a merchant, account or deal and `salesforce_find` is available, call it and add the Salesforce link. Never guess a link.
 """
 MAX_TOOL_TURNS = 8
 CUT_SHORT_NOTE = "_This answer was cut short. Ask a narrower question, or split it into parts._"
 REFUSAL_REPLY = "This part I can't answer here. Ask Kareem Ibrahim."
-LEVEL_RANK = {"sales": 0, "team": 1, "manager": 2, "owner": 3}
+LEVEL_RANK = {"partner": 0, "sales": 1, "team": 2, "manager": 3, "owner": 4}
 
 
-# Hard floors, whatever layers.yaml (a shared file) lists: Salesforce, Drive, Slack channels and learn stay owner-only;
+# Hard floors, whatever layers.yaml (a shared file) lists: Salesforce queries, Drive, Slack channels and learn stay owner-only;
+# salesforce_find (a record's name and link only) is for every Foodics colleague; partners get only `escalate`;
 # sheets_read needs team (and each sheet's audience); read_slack_file opens only files on the message being answered.
-TOOL_MIN_LEVEL = {"salesforce_query": "owner", "drive_search": "owner", "drive_read": "owner",
+TOOL_MIN_LEVEL = {"escalate": "partner", "salesforce_find": "sales",
+                  "salesforce_query": "owner", "drive_search": "owner", "drive_read": "owner",
                   "slack_read_channel": "owner", "learn": "owner", "sheets_read": "team",
                   # Everyone may open a file attached to the message being answered, to compare an offer they bring.
                   "read_slack_file": "sales",
@@ -363,7 +384,7 @@ class Brain:
         cost = (where == "dm" and not capped and cost_access(slack_user_id)
                 and LEVEL_RANK.get(level, -1) >= LEVEL_RANK["manager"])
         tools = tools_for(level, self.layers, self.all_tools)
-        guide = (SALES_TOOL_GUIDE if level == "sales" else TOOL_GUIDE) if tools else ""
+        guide = ({"partner": PARTNER_TOOL_GUIDE, "sales": SALES_TOOL_GUIDE}.get(level, TOOL_GUIDE)) if tools else ""
         system = system_prompt(level, self.layers, self.docs, where=where, capped=capped, cost=cost,
                                country=(ctx or {}).get("country")) + guide
         messages = list(history or []) + [{"role": "user", "content": question}]

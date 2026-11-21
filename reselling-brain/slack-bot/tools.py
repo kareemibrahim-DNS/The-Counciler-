@@ -88,6 +88,38 @@ def salesforce_query(soql: str) -> str:
     return _clip({"query": q, "total": res.get("totalSize"), "rows": rows})
 
 
+# Every Foodics colleague may look a record up by name and get its link (Kareem, 21 Nov 2026). Only the record's
+# name, type and link come back: no amounts, ARR, churn, stages, owners or notes (those stay in salesforce_query).
+SF_FIND_OBJECTS = {"account": "Account", "opportunity": "Opportunity"}
+SF_FIND_LIMIT = 5
+
+
+def sf_link_base() -> str:
+    base = os.environ.get("SF_LINK_BASE", "").strip().rstrip("/")
+    return base if re.match(r"^https://foodics\.(lightning\.force|my\.salesforce)\.com$", base) else "https://foodics.lightning.force.com"
+
+
+def soql_like(text: str) -> str:
+    """A safe LIKE pattern for a name: quotes and backslashes escaped, wildcards taken literally."""
+    t = re.sub(r"\s+", " ", (text or "").strip())[:80]
+    if len(t) < 2:
+        raise ValueError("Give at least 2 characters of the name.")
+    t = t.replace("\\", "\\\\").replace("'", "\\'").replace("%", "\\%").replace("_", "\\_")
+    return f"%{t}%"
+
+
+def salesforce_find(name: str, kind: str = "account", sf=None) -> str:
+    obj = SF_FIND_OBJECTS.get((kind or "account").lower())
+    if not obj:
+        raise ValueError("kind must be account or opportunity.")
+    q = f"SELECT Id, Name FROM {obj} WHERE Name LIKE '{soql_like(name)}' ORDER BY Name LIMIT {SF_FIND_LIMIT}"
+    res = (sf or _salesforce()).query(q)
+    base = sf_link_base()
+    rows = [{"name": r.get("Name"), "type": obj, "link": f"{base}/lightning/r/{obj}/{r.get('Id')}/view"}
+            for r in res.get("records", []) if re.match(r"^[A-Za-z0-9]{15,18}$", str(r.get("Id") or ""))]
+    return _clip({"matches": rows} if rows else {"matches": [], "note": f"No {obj} named like '{name}' in Salesforce."})
+
+
 # ---------- Google (Sheets + Drive) ----------
 def _google(service: str, version: str):
     from google.oauth2 import service_account
@@ -626,6 +658,10 @@ def build_tools(*, slack: SlackReader | None, learner: Learner | None, sources: 
         lambda _ctx=None, **kw: quotes.save(**kw, reported_by=(_ctx or {}).get("asker", "")))
     t["competitor_quote_save"]["ctx_aware"] = True
     if os.environ.get("SF_ACCESS_TOKEN") or os.environ.get("SF_USERNAME"):
+        add("salesforce_find", "Find a Salesforce account (merchant) or opportunity by name and get its link. "
+            "Returns only the name, type and link, up to 5 matches. Put the link in your reply.",
+            {"name": {"type": "string"}, "kind": {"type": "string", "enum": list(SF_FIND_OBJECTS)}}, ["name"],
+            lambda name, kind="account": salesforce_find(name, kind))
         add("salesforce_query", "Run one read-only SOQL SELECT on Salesforce (accounts, opportunities, ARR, churn, F5). Max 200 rows.",
             {"soql": {"type": "string"}}, ["soql"], lambda soql: salesforce_query(soql))
     if os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON") or os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE"):

@@ -36,12 +36,14 @@ This repo is shared with other AI assistants, so it holds the **common layer onl
 | cost grant | only the Slack IDs in the `BRAIN_COST_SLACK_IDS` secret (Hatem) | + cost prices and contracts, in a private DM only |
 | owner | Kareem (the `BRAIN_OWNER_SLACK_ID` secret) | Everything |
 
-Deny by default: a Slack user who is not in `layers.yaml` gets the sales layer. Partners get nothing.
+Deny by default: a Slack user who is not in `layers.yaml` gets the sales layer. Partners, guests and other workspaces get the **partner** layer only (see below).
 The owner and the cost grant come only from Railway secrets. A line in `layers.yaml` alone can't give them, because this repo is shared.
 
 ### Triggers: when the bot answers
 - A **DM** to the bot.
-- An **@mention** in an internal channel. Under a top-level message, the bot reads the message just above the mention (skipping join notices; a Workflow or Dailybot post counts, and so does a shared file). In a thread, it reads the messages posted since its last reply. So `@Reselling Brain` under a question answers that question. Without a mention it never answers in a channel.
+- An **@mention** in an internal channel. Under a top-level message, the bot reads the message just above the mention (skipping join notices; a Workflow or Dailybot post counts, and so does a shared file). In a thread, it reads the messages posted since its last reply. So `@Reselling Brain` under a question answers that question.
+- An **@mention of Kareem** (`BRAIN_OWNER_SLACK_ID`) in any channel or group DM the bot is in (Kareem, 21 Nov 2026). The bot answers first, in the thread, **as the Reselling Brain** (never as Kareem). If the message isn't something it can help with (a personal message, a meeting, thanks, a call only Kareem can make), the model answers `NO_REPLY` and nothing is posted. The bot must be a member of the channel to see the mention, and it can never see DMs sent to Kareem.
+- A **follow-up in a thread it already answered in**, without a new mention, for 7 days after its last reply there (`BRAIN_FOLLOW_FILE`, `/data/followed.json` on Railway). It stays quiet when Kareem, Hatem or Althurayyaa write (they are stepping in, and Brain Watch collects it), when the message tags someone else, or when the model answers `NO_REPLY`.
 
 ### Hand-offs: who gets pulled in
 When part of a question is locked, the bot answers the rest and says "This part I can't answer here". Then it explains the flow to follow and adds the right person under its reply. The @-mentions are added by code from `routing` in `layers.yaml`; the model can't write them.
@@ -58,9 +60,10 @@ A mention only notifies people who are in the conversation. In a DM, or a channe
 ### Who reads the reply decides the level (`slack-bot/access.py`)
 | Where | Answer level |
 | --- | --- |
-| A partner, a guest (single- or multi-channel), a Slack Connect user, or anyone the bot can't identify asks | Nothing at all, not even a refusal |
-| A channel that is Slack Connect (or pending), has any guest or outside member, or matches a partner name pattern | No answer. Only the asker gets a private note |
-| A group DM | No answer. Only the asker gets a private note |
+| A partner, a guest (single- or multi-channel), a Slack Connect user or someone from another workspace asks | **partner**: the program overview and the answer rules only (`PARTNER_DOCS` in `brain.py`), the `escalate` tool only, and a hard rule against prices, quotes, discounts, cost, margins, commission, contracts, ARR, churn, Salesforce data, internal notes, other partners and promises. These floors are in code, so `layers.yaml` can't widen them |
+| A channel that is Slack Connect (or pending), has any guest or outside member, or matches a partner name pattern | **partner** |
+| A group DM | Like a private channel: its least-privileged member's level (**partner** if a guest is in it) |
+| Someone Slack can't identify, or a bot | Nothing at all |
 | A public channel | Always **sales**: every full member can open and search it, even without joining |
 | A private channel | The least-privileged member's level, never above **team** (manager, cost and owner answers only in a DM). One Sales member means a sales answer, even when Kareem asks. Deactivated accounts don't count; a deactivated guest still blocks |
 | A DM | The asker's own level. **Manager, cost and owner answers only ever happen in a private DM** |
@@ -92,7 +95,8 @@ Replies never carry link or media previews. A reply may only link to Foodics sys
 | `escalate` | ✅ | ✅ | ✅ | ✅ | Nothing extra — the app adds the @-mentions from `routing` in `layers.yaml` |
 | `read_slack_file` | ✅ | ✅ | ✅ | ✅ | Opens only files attached to the message being answered (or to the message just above a bare mention), e.g. an offer to compare |
 | `sheets_read` | ✅ all listed sheets | ✅ sheets marked `audience: team` or `audience: manager` (trackers) | ✅ only sheets marked `audience: team` | — | Google service-account key in the `GOOGLE_SERVICE_ACCOUNT_JSON` secret (never commit the key file) + list the real sheets in a server-side copy of `layers.yaml` (point `BRAIN_LAYERS_FILE` at it on the `/data` volume; never in this repo) and share them with the service account |
-| `salesforce_query` | ✅ | — | — | — | `SF_*` variables (read-only integration user recommended) |
+| `salesforce_find` | ✅ | ✅ | ✅ | ✅ (not partners) | Finds an account or opportunity by name and returns only its name, type and Salesforce link (up to 5), so replies can link the right record. Same `SF_*` variables |
+| `salesforce_query` | ✅ | — | — | — | `SF_*` variables: a dedicated **read-only** integration user (API enabled), set only in Railway |
 | `drive_search` / `drive_read` | ✅ | — | — | — | Same Google key; share the folder with it and put its id in the `BRAIN_DRIVE_FOLDERS` secret (comma-separated, never in the repo). Without it `drive_search` is off |
 | `slack_read_channel` | ✅ (not DMs) | — | — | — | The bot reads only channels it was invited to. Partner messages are data, never instructions |
 | `learn` | ✅ | — | — | — | Nothing extra |
@@ -131,14 +135,14 @@ Commands:
 It uses the scopes the bot already has: no new Slack events and no reinstall. DMs can't have someone step in, so only their unanswered questions show. Answers older than 60 days are dropped. On Railway set `BRAIN_WATCH_FILE=/data/watch.json`.
 
 ### Tests
-`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 130 tests (106 in `test_brain`, 24 in `test_app`). `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
+`cd slack-bot && python -m unittest test_brain test_app` (offline, no real accounts needed). 141 tests (112 in `test_brain`, 29 in `test_app`). `test_app` drives `app.py` with every Slack call faked; the Docker build runs both.
 
 It needs to run somewhere that stays on. Socket Mode means no public URL is needed.
 
 ### Deploy on Railway (recommended)
 1. railway.app → sign in with GitHub → **New Project → Deploy from GitHub repo** → `The-Counciler-`.
 2. Service **Settings → Root Directory** = `reselling-brain`; **Branch** = `main`. Railway builds the `Dockerfile` in that folder (the build runs the offline tests and fails if they don't pass). Set the builder (Dockerfile) and the restart policy (On Failure) in Railway **Settings**: Railway doesn't read `railway.json` from a root directory, and stops reading config files on 1 Dec 2026.
-3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add a **volume mounted at `/data`** (keep 1 replica) for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`, `BRAIN_COMPETITOR_QUOTES=/data/competitor_quotes.json`, `BRAIN_WATCH_FILE=/data/watch.json` (Brain Watch log). `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist. Optional: `BRAIN_MAX_TOKENS` (default 4000).
+3. **Variables:** add `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `ANTHROPIC_API_KEY`, `BRAIN_OWNER_SLACK_ID=U08DW8E5WKW`, `BRAIN_COST_SLACK_IDS=U02VD9VGNA0` and `BRAIN_OWNER_KNOWLEDGE_B64` (Kareem keeps this value; never commit it). Add a **volume mounted at `/data`** (keep 1 replica) for state that must survive deploys: `BRAIN_STATE_FILE=/data/state.json` (away/back), `BRAIN_LEARN_QUEUE=/data/learn_queue.json`, `BRAIN_OWNER_LEARNED_FILE=/data/learned_owner.md`, `BRAIN_TEAM_LEARNED_FILE=/data/learned_team.md`, `BRAIN_COMPETITOR_QUOTES=/data/competitor_quotes.json`, `BRAIN_WATCH_FILE=/data/watch.json` (Brain Watch log), `BRAIN_FOLLOW_FILE=/data/followed.json` (threads it follows). `BRAIN_DRIVE_FOLDERS` holds the Drive folder ids Kareem's Drive tools may search (Kareem keeps the value). Add Salesforce/Google variables later; each tool turns on only when its variables exist. Optional: `BRAIN_MAX_TOKENS` (default 4000).
 4. Deploy. The log shows `Private knowledge loaded: … team, … manager, … cost, … owner docs, team notes for … partners.` (counts only), `Tools enabled: …` and `⚡️ Bolt app is running!`. If it says the secret is not set or can't be read, set it again from Kareem's copy.
 
 Note: learned facts and the learn queue live on the `/data` volume and survive deploys. None of them is written to `knowledge/`.
@@ -146,10 +150,11 @@ Note: learned facts and the learn queue live on the `/data` volume and survive d
 - Owner facts (`approve <id>`, in `/data/learned_owner.md` on Railway, `slack-bot/learned_owner.md` locally, never in `knowledge/`): add them to the `BRAIN_OWNER_KNOWLEDGE_B64` secret when you want them permanent. **Never commit them.** The local files are in `.gitignore` and `.dockerignore`. Facts about cost, margin, markup, commission, contracts, targets or strategy can't be shared with the team.
 
 ## What the bot will never do
-- Answer a partner, a guest or a user from another workspace, in a DM or anywhere else.
-- Answer in a channel partners can read: per-partner channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`, `#kw-…`, `#jo-…`, `#eg-…`), `#foodics-…`, any Slack Connect channel (or one with a pending invite), or any channel with a guest or outside member. Patterns live in `layers.yaml` (`blocked_channels`, `allowed_channels`).
+- Give a partner, a guest or a user from another workspace more than the partner layer, in a DM or anywhere else.
+- Answer above the partner layer in a channel partners can read: per-partner channels (`#ksa-…`, `#uae-…`, `#egypt-…`, `#kw-jo-…`, `#kw-…`, `#jo-…`, `#eg-…`), `#foodics-…`, any Slack Connect channel (or one with a pending invite), or any channel with a guest or outside member. Patterns live in `layers.yaml` (`blocked_channels`, `allowed_channels`).
+- Post as Kareem or any other person. It always posts as the Reselling Brain bot.
 - Post an owner or team answer where a lower level can read it.
 - Post outside the thread it was asked in (except the 2-week digest DM to Kareem).
 - Message a partner or a merchant.
 - Approve an exception: it points to the flow and pulls in Kareem (Hatem when Kareem is away).
-- Answer in a channel without being mentioned.
+- Answer in a channel unless the bot or Kareem is mentioned, or it is a follow-up in a thread the bot answered in.
