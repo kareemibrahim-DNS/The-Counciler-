@@ -299,7 +299,7 @@ class RealLayersTest(unittest.TestCase):
 
     def test_sales_sees_the_common_layer_and_nothing_locked(self):
         ids = [d.id for d in brain.visible_docs("sales", self.layers, self.docs)]
-        self.assertEqual(sorted(ids), ["competitive-analysis", "cycles-at-a-glance", "how-to-answer", "line-items-and-quotes",
+        self.assertEqual(sorted(ids), ["answer-like-kareem", "competitive-analysis", "cycles-at-a-glance", "how-to-answer", "line-items-and-quotes",
                                        "program-overview", "sales-scope", "working-with-resellers"])
         p = self.prompt("sales")
         for secret in ["TEAM-POLICY-MARKER", "DISCOUNT-BANDS-MARKER", "CONTACT-NAME", "COST-TABLE-ROW", "TRACKER-NAME",

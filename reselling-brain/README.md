@@ -12,7 +12,7 @@ This folder, in The-Counciler-, is the home of the reseller bot. Everything live
 
 Reports from the build (data issues to fix in Salesforce, the security reviews) are in `reports/`.
 
-All of them read the same files in `knowledge/` (common layer only: how to answer, program overview, line items and quotes, sales scope, working with resellers, cycles at a glance, competitive analysis) and `catalog/` (partner profiles, line items and Salesforce list prices). Policy, partner notes and everything above the common layer come from the Railway secret (see below). To update the brain, edit a file there, then:
+All of them read the same files in `knowledge/` (common layer only: how to answer, program overview, line items and quotes, sales scope, working with resellers, cycles at a glance, competitive analysis, answering the way Kareem answers) and `catalog/` (partner profiles, line items and Salesforce list prices). Policy, partner notes and everything above the common layer come from the Railway secret (see below). To update the brain, edit a file there, then:
 - Slack: merge to `main` and Railway redeploys. `reload` (Kareem only, in a DM) re-reads only what the running bot already has (the files in its image, the secret and the learned facts on `/data`).
 - Claude skill: run `cd slack-bot && python build_sales_skill.py --zip /tmp` and upload the zip.
 
